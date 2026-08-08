@@ -11,11 +11,48 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('schedules', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
-    }
+            Schema::create('schedules', function (Blueprint $table) {
+    $table->id();
+
+    $table->foreignId('teacher_id')
+        ->constrained('users')
+        ->cascadeOnUpdate()
+        ->cascadeOnDelete();
+
+    $table->foreignId('class_id')
+        ->constrained('school_classes')
+        ->cascadeOnUpdate()
+        ->cascadeOnDelete();
+
+    $table->foreignId('room_id')
+        ->constrained('rooms')
+        ->cascadeOnUpdate()
+        ->cascadeOnDelete();
+
+    $table->string('subject',100);
+
+    $table->enum('day_of_week',[
+        'Senin',
+        'Selasa',
+        'Rabu',
+        'Kamis',
+        'Jumat',
+        'Sabtu'
+    ]);
+
+    $table->time('start_time');
+
+    $table->time('end_time');
+
+    $table->enum('cycle_type',[
+        'ganjil',
+        'genap'
+    ]);
+
+    $table->timestamps();
+});
+        }
+    
 
     /**
      * Reverse the migrations.

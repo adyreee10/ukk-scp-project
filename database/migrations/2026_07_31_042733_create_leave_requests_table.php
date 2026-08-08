@@ -12,9 +12,40 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('leave_requests', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
+    $table->id();
+
+    $table->foreignId('student_id')
+        ->constrained('users')
+        ->cascadeOnUpdate()
+        ->cascadeOnDelete();
+
+    $table->foreignId('applicant_id')
+        ->constrained('users')
+        ->cascadeOnUpdate()
+        ->cascadeOnDelete();
+
+    $table->foreignId('verified_by')
+        ->nullable()
+        ->constrained('users')
+        ->cascadeOnUpdate()
+        ->nullOnDelete();
+
+    $table->date('start_date');
+
+    $table->date('end_date');
+
+    $table->text('reason');
+
+    $table->string('document_path');
+
+    $table->enum('status_approval',[
+        'Pending',
+        'Disetujui',
+        'Ditolak'
+    ]);
+
+    $table->timestamps();
+});
     }
 
     /**

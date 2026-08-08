@@ -12,11 +12,31 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('attendances', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
-    }
+    $table->id();
 
+    $table->foreignId('journal_id')
+        ->constrained()
+        ->cascadeOnUpdate()
+        ->cascadeOnDelete();
+
+    $table->foreignId('student_id')
+        ->constrained('users')
+        ->cascadeOnUpdate()
+        ->cascadeOnDelete();
+
+    $table->enum('status',[
+        'Hadir',
+        'Izin',
+        'Sakit',
+        'Alpa'
+    ]);
+
+    $table->date('date');
+
+    $table->timestamps();
+});
+        }
+    
     /**
      * Reverse the migrations.
      */

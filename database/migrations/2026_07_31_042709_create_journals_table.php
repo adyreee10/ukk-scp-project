@@ -11,10 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('journals', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
+                    Schema::create('journals', function (Blueprint $table) {
+    $table->id();
+
+    $table->foreignId('schedule_id')
+        ->constrained()
+        ->cascadeOnUpdate()
+        ->cascadeOnDelete();
+
+    $table->date('date');
+
+    $table->text('topic_description');
+
+    $table->string('photo_path',255)->nullable();
+
+    $table->timestamps();
+});
     }
 
     /**
