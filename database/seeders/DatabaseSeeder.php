@@ -20,7 +20,7 @@ public function run(): void
         RoleSeeder::class,
         SchoolClassSeeder::class,
         RoomSeeder::class,
-        AdminSeeder::class,
+        WakaSeeder::class,
     ]);
 }
 }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Schedule extends Model
 {
@@ -17,17 +18,17 @@ class Schedule extends Model
         'cycle_type',
     ];
 
-    public function teacher()
+    public function teacher(): BelongsTo
     {
         return $this->belongsTo(User::class, 'teacher_id');
     }
 
-    public function schoolClass()
+    public function schoolClass(): BelongsTo
     {
         return $this->belongsTo(SchoolClass::class, 'class_id');
     }
 
-    public function room()
+    public function room(): BelongsTo
     {
         return $this->belongsTo(Room::class, 'room_id');
     }

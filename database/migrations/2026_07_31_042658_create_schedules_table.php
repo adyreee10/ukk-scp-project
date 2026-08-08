@@ -17,17 +17,17 @@ return new class extends Migration
     $table->foreignId('teacher_id')
         ->constrained('users')
         ->cascadeOnUpdate()
-        ->cascadeOnDelete();
+        ->restrictOnDelete();
 
     $table->foreignId('class_id')
         ->constrained('school_classes')
         ->cascadeOnUpdate()
-        ->cascadeOnDelete();
+        ->restrictOnDelete();
 
     $table->foreignId('room_id')
         ->constrained('rooms')
         ->cascadeOnUpdate()
-        ->cascadeOnDelete();
+        ->restrictOnDelete();
 
     $table->string('subject',100);
 
