@@ -14,6 +14,7 @@ class LeaveRequest extends Model
         'end_date',
         'reason',
         'document_path',
+        'status_approval',
     ];
 
     public function student()
