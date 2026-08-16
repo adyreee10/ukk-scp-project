@@ -8,6 +8,9 @@ use App\Http\Controllers\Api\TeacherScheduleController;
 use App\Http\Controllers\Api\TeacherJournalController;
 use App\Http\Controllers\Api\TeacherAttendanceController;
 use App\Http\Controllers\Api\StudentScheduleController;
+use App\Http\Controllers\Api\StudentAttendanceController;
+use App\Http\Controllers\Api\StudentJournalController;
+use App\Http\Controllers\Api\StudentLeaveRequestController;
 
 
 // =========================
@@ -37,7 +40,7 @@ Route::middleware('auth:sanctum')->group(function () {
 // TEACHER
 // =========================
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'role:Guru'])->group(function () {
 
     Route::get('/teacher/schedules', [
         TeacherScheduleController::class,
@@ -54,10 +57,42 @@ Route::middleware('auth:sanctum')->group(function () {
         'index'
     ]);
 
-    // STUDENT
+});
+
+// =========================
+// STUDENT
+// =========================
+
+Route::middleware(['auth:sanctum', 'role:Siswa'])->group(function () {
+
     Route::get('/student/schedules', [
         StudentScheduleController::class,
         'index'
+    ]);
+
+    Route::get('/student/attendances', [
+        StudentAttendanceController::class,
+        'index'
+    ]);
+
+    Route::get('/student/journals', [
+        StudentJournalController::class,
+        'index'
+    ]);
+
+    Route::get('/student/leave-request', [
+        StudentLeaveRequestController::class,
+        'index'
+    ]);
+
+    Route::post('/student/leave-request', [
+        StudentLeaveRequestController::class,
+        'store'
+    ]);
+
+    Route::get('/student/leave-request/{id}', [
+        StudentLeaveRequestController::class,
+        'show'
     ]);
 
 });
