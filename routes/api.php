@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\StudentScheduleController;
 use App\Http\Controllers\Api\StudentAttendanceController;
 use App\Http\Controllers\Api\StudentJournalController;
 use App\Http\Controllers\Api\StudentLeaveRequestController;
+use App\Http\Controllers\Api\StudentLeaveRequestVerificationController;
 
 
 // =========================
@@ -95,4 +96,31 @@ Route::middleware(['auth:sanctum', 'role:Siswa'])->group(function () {
         'show'
     ]);
 
+});
+
+// =========================
+// KESISWAAN
+// =========================
+
+Route::middleware(['auth:sanctum', 'role:Kesiswaan'])->group(function(){
+
+    Route::get('/student-affairs/leave-request', [
+        StudentLeaveRequestVerificationController::class,
+        'index'
+    ]);
+
+    Route::get('/student-affairs/leave-request/{id}', [
+        StudentLeaveRequestVerificationController::class,
+        'show'
+    ]);
+
+    Route::put('/student-affairs/leave-request/{id}/approve', [
+        StudentLeaveRequestVerificationController::class,
+        'approve'
+    ]);
+
+    Route::put('/student-affairs/leave-request/{id}/reject', [
+        StudentLeaveRequestVerificationController::class,
+        'reject'
+    ]);
 });
