@@ -48,9 +48,19 @@ Route::middleware(['auth:sanctum', 'role:Guru'])->group(function () {
         'index'
     ]);
 
+    Route::post('/teacher/journals', [
+        TeacherJournalController::class,
+        'store'
+    ]);
+
     Route::get('/teacher/journals', [
         TeacherJournalController::class,
         'index'
+    ]);
+
+    Route::get('/teacher/journals/{id}', [
+        TeacherJournalController::class,
+        'show'
     ]);
 
     Route::get('/teacher/attendances', [
