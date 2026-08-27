@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-                    Schema::create('journals', function (Blueprint $table) {
+    Schema::create('journals', function (Blueprint $table) {
     $table->id();
 
     $table->foreignId('schedule_id')
@@ -23,7 +23,9 @@ return new class extends Migration
 
     $table->text('topic_description');
 
-    $table->string('photo_path',255)->nullable();
+    $table->string('photo_path',255);
+
+    $table->unique(['schedule_id', 'date']);
 
     $table->timestamps();
 });

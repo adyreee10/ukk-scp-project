@@ -24,14 +24,19 @@ return new class extends Migration
         ->cascadeOnUpdate()
         ->cascadeOnDelete();
 
-    $table->enum('status',[
+    $table->string('status', 20);
+
+    rule::in([
         'Hadir',
         'Izin',
         'Sakit',
-        'Alpa'
-    ]);
+        'Alpa',
+    ])
 
     $table->date('date');
+
+    $table->unique(['journal_id', 'student_id']);
+    $table->index(['student_id', 'date']);
 
     $table->timestamps();
 });

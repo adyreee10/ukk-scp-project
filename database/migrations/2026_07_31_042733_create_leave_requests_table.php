@@ -33,16 +33,14 @@ return new class extends Migration
     $table->date('start_date');
 
     $table->date('end_date');
+    $table->string('leave_type', 10);
 
     $table->text('reason');
 
     $table->string('document_path');
 
-    $table->enum('status_approval',[
-        'Pending',
-        'Disetujui',
-        'Ditolak'
-    ]);
+    $table->string('status_approval', 20)->default('Pending');
+    $table->index(['student_id', 'status_approval', 'start_date', 'end_date']);
 
     $table->timestamps();
 });

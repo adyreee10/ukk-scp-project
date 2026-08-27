@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-            Schema::create('schedules', function (Blueprint $table) {
+    Schema::create('schedules', function (Blueprint $table) {
     $table->id();
 
     $table->foreignId('teacher_id')
@@ -20,7 +20,7 @@ return new class extends Migration
         ->restrictOnDelete();
 
     $table->foreignId('class_id')
-        ->constrained('school_classes')
+        ->constrained('classes')
         ->cascadeOnUpdate()
         ->restrictOnDelete();
 
@@ -44,15 +44,18 @@ return new class extends Migration
 
     $table->time('end_time');
 
-    $table->enum('cycle_type',[
-        'ganjil',
-        'genap'
-    ]);
+    $table->string('cycle_type', 20);
+
+    $table->index(['cycle_type', 'day_of_week']);
+    $table->index(['room_id', 'day_of_week', 'cycle_type']);
+    $table->index(['class_id', 'day_of_week', 'cycle_type']);
+    $table->index(['teacher_id', 'day_of_week', 'cycle_type']);
 
     $table->timestamps();
 });
         }
     
+
 
     /**
      * Reverse the migrations.

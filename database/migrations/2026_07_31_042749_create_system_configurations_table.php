@@ -13,11 +13,7 @@ return new class extends Migration
     {
         Schema::create('system_configurations', function (Blueprint $table) {
             $table->id();
-
-            $table->enum('active_cycle', [
-                'Ganjil',
-                'Genap'
-            ]);
+            $table->string('active_cycle', 20)->default('Putaran 1');
 
             $table->boolean('is_schedule_locked')
                 ->default(false);
@@ -25,7 +21,7 @@ return new class extends Migration
             $table->foreignId('updated_by')
                 ->constrained('users')
                 ->cascadeOnUpdate()
-                ->cascadeOnDelete();
+                ->restrictOnDelete();
 
             $table->timestamps();
         });

@@ -16,7 +16,8 @@ class RoleSeeder extends Seeder
         Role::insert([
             ['role_name' => 'Waka'],
             ['role_name' => 'Guru'],
-            ['role_name' => 'Kesiswaan'],
+            ['role_name' => 'Wali Kelas'],
+            ['role_name' => 'Guru BK'] 
             ['role_name' => 'Siswa'],
             ['role_name' => 'Orang Tua'],
         ]);
