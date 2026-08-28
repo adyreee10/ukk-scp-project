@@ -89,7 +89,7 @@ public function run(): void
         'password' => Hash::make('password123'),
     ]);
 
-    $this->user('orangtua', [
+    $parent = $this->user('orangtua', [
         'role_id' => $this->role('Orang Tua'),
         'name' => 'Orang Tua Demo',
         'email' => 'orangtua@sekolah.test',
@@ -123,6 +123,6 @@ private function role(string $name): int
 private function user(string $username, array $attributes): User
 {
     return
-    User::updateOrCreate(['Username' => $username], $attributes);
+    User::updateOrCreate(['username' => $username], $attributes);
 }
 }

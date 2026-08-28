@@ -5,6 +5,11 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\LeaveRequest;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Throwable;
+
 
 class StudentLeaveRequestController extends Controller
 {
@@ -32,22 +37,41 @@ class StudentLeaveRequestController extends Controller
     {
         $student = $request->user();
         $request->validate([
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
+            'start_date' => 'required|date_format:Y-m-d',
+            'end_date' => 'required|date_format:Y-m-d|after_or_equal:start_date',
+            'leave_type' => [
+                'required',
+                Rule::in(['Izin', 'Sakit']),
+            ],
             'reason' => 'required|string',
-            'document_path' => 'required|string',
+            'document' => 'required|file|mimes:pdf,jpg,jpeg,png|max:4096',
         ]);
 
-        $leaveRequest = LeaveRequest::create([
+        $documentPath = $request->file('document')
+            ->store('leave-documents', 'public');
+
+        try {
+            $leaveRequest = DB::transaction(function () use (
+                $student,
+                $request,
+                $documentPath
+            ){
+                return LeaveRequest::create([
             'student_id' => $student->id,
             'applicant_id' => $student->id,
             'verified_by' => null,
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
+            'leave_type' => $request->leave_type,
             'reason' => $request->reason,
-            'document_path' => $request->document_path,
+            'document_path' => $documentPath,
             'status_approval' => 'Pending',
         ]);
+    });
+}   catch (Throwable $exception){
+    Storage::disk('public')->delete($documentPath);
+    throw $exception;
+}
 
         $leaveRequest->load([
             'student',

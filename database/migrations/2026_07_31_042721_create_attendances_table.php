@@ -26,13 +26,6 @@ return new class extends Migration
 
     $table->string('status', 20);
 
-    rule::in([
-        'Hadir',
-        'Izin',
-        'Sakit',
-        'Alpa',
-    ])
-
     $table->date('date');
 
     $table->unique(['journal_id', 'student_id']);

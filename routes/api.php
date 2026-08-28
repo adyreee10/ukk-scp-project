@@ -109,10 +109,10 @@ Route::middleware(['auth:sanctum', 'role:Siswa'])->group(function () {
 });
 
 // =========================
-// KESISWAAN
+// VERIFIKASI IZIN
 // =========================
 
-Route::middleware(['auth:sanctum', 'role:Kesiswaan'])->group(function(){
+Route::middleware(['auth:sanctum', 'role:Wali Kelas,Guru BK'])->group(function(){
 
     Route::get('/student-affairs/leave-request', [
         StudentLeaveRequestVerificationController::class,

@@ -14,10 +14,10 @@ class RoleSeeder extends Seeder
     public function run(): void
     {
         Role::insert([
-            ['role_name' => 'Waka'],
+            ['role_name' => 'Waka Kurikulum'],
             ['role_name' => 'Guru'],
             ['role_name' => 'Wali Kelas'],
-            ['role_name' => 'Guru BK'] 
+            ['role_name' => 'Guru BK'],
             ['role_name' => 'Siswa'],
             ['role_name' => 'Orang Tua'],
         ]);

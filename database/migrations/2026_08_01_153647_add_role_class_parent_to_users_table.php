@@ -31,7 +31,7 @@ return new class extends Migration
                 ->after('class_id')
                 ->constrained('classes')
                 ->cascadeOnUpdate()
-                ->nullOnUpdate();
+                ->nullOnDelete();
 
             $table->foreignId('parent_id')
                 ->nullable()
@@ -54,10 +54,10 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             //
 
-            $table->dropForeign(['role_id']);
-            $table->dropForeign(['class_id']);
-            $table->dropForeign(['homeroom_class_id']);
-            $table->dropForeign(['parent_id']);
+            $table->dropConstrainedForeignId('role_id');
+            $table->dropConstrainedForeignId('class_id');
+            $table->dropConstrainedForeignId('homeroom_class_id');
+            $table->dropConstrainedForeignId('parent_id');
 
             $table->dropColumn(['username']);
         });

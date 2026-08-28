@@ -16,6 +16,7 @@ class AuthController extends Controller
         $request->validate([
             'username' => 'required|string',
             'password' => 'required|string',
+            'device_name' => 'required|string|max:100',
         ]);
 
         //Cari user berdasarkan username
@@ -30,20 +31,24 @@ class AuthController extends Controller
             }
 
             //Buat token sanctum
-            $token = $user->createToken('mobile-app')->plainTextToken;
+            $token = $user
+                ->createToken($request->device_name)
+                ->plainTextToken;
             
             return response()->json([
                 'message' => 'Login berhasil',
-                'token' => $token,
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'username' => $user->username,
-                    'email' => $user->email,
-                    'role_id' => $user->role_id,
-                    'role' => $user->role?->role_name,
-                    'class_id' => $user->class_id,
-                    'parent_id' => $user->parent_id,
+                'data' => [
+                    'token' => $token,
+                    'user' => [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'username' => $user->username,
+                        'email' => $user->email,
+                        'role_id' => $user->role_id,
+                        'role' => $user->role?->role_name,
+                        'class_id' => $user->class_id,
+                        'parent_id' => $user->parent_id,
+                    ]
                 ],
             ], 200);
     }
@@ -54,19 +59,22 @@ class AuthController extends Controller
 
             return response()->json([
                 'message' => 'Data user berhasil diambil',
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'username' => $user->username,
-                    'email' => $user->email,
-                    'role_id' => $user->role_id,
-                    'role' => $user->role?->role_name,
-                    'class_id' => $user->class_id,
-                    'class' => $user->schoolClass?->class_name,
-                    'parent_id' => $user->parent_id,
-                    'parent' => $user->parent?->name,
+                'data' => [
+                    'user' => [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'username' => $user->username,
+                        'email' => $user->email,
+                        'role_id' => $user->role_id,
+                        'role' => $user->role?->role_name,
+                        'class_id' => $user->class_id,
+                        'class' => $user->schoolClass?->class_name,
+                        'parent_id' => $user->parent_id,
+                        'parent' => $user->parent?->name,
+                    ]
                 ],
-            ]);
+
+            ], 200);
     }
 
     public function logout(Request $request)
@@ -74,39 +82,52 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
 
         return response()->json([
-            'message' => 'Logout berhasil.'
-        ]);
+            'message' => 'Logout berhasil.',
+            'data' => null,
+        ], 200);
     }
 
     public function register(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:225',
-            'username' => 'required|string|max:50|unique:users,username',
-            'email' => 'required|email|max:225|unique:users,email',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
+{
+    $request->validate([
+        'name' => 'required|string|max:225',
+        'username' => 'required|string|max:50|unique:users,username',
+        'email' => 'required|email|max:225|unique:users,email',
+        'password' => 'required|string|min:8|confirmed',
+        'device_name' => 'required|string|max:100',
+    ]);
 
-        $studentRole = \App\Models\Role::where('role_name', 'Siswa')->first();
+    $studentRole = \App\Models\Role::where(
+        'role_name',
+        'Siswa'
+    )->first();
 
-        if (!$studentRole){
-            return response()->json([
-                'message' => 'Role siswa belum tersedia.'
-            ], 500);
-        }
-
-        $user = User::create([
-            'name' => $request->name,
-            'username' => $request->username,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role_id' => $studentRole->id,
-        ]);
-
-        $token = $user->createToken('mobile-app')->plainTextToken;
-        
+    if (!$studentRole) {
         return response()->json([
-            'message' => 'Registrasi berhasil.',
+            'message' => 'Role Siswa belum tersedia.',
+            'errors' => [
+                'role' => [
+                    'Role Siswa belum tersedia pada database.',
+                ],
+            ],
+        ], 500);
+    }
+
+    $user = User::create([
+        'name' => $request->name,
+        'username' => $request->username,
+        'email' => $request->email,
+        'password' => Hash::make($request->password),
+        'role_id' => $studentRole->id,
+    ]);
+
+    $token = $user
+        ->createToken($request->device_name)
+        ->plainTextToken;
+
+    return response()->json([
+        'message' => 'Registrasi berhasil.',
+        'data' => [
             'token' => $token,
             'user' => [
                 'id' => $user->id,
@@ -118,8 +139,9 @@ class AuthController extends Controller
                 'class_id' => $user->class_id,
                 'parent_id' => $user->parent_id,
             ],
-        ], 201); 
-    }
+        ],
+    ], 201);
+}
 
     public function forgotPassword(Request $request)
     {
@@ -140,8 +162,10 @@ class AuthController extends Controller
 
     return response()->json([
         'message' => 'Reset password berhasil dibuat.',
-        'email' => $user->email,
-        'token' => $token,
+        'data' => [
+            'email' => $user->email,
+            'token' => $token,
+        ]
     ], 200);
 }
     
@@ -170,11 +194,15 @@ class AuthController extends Controller
         if ($status !== Password::PASSWORD_RESET){
             return response()->json([
                 'message' => __($status),
-            ], 400);
+                'errors' => [
+                    'token' => [__($status)],
+                ],
+            ], 422);
         }
         
         return response()->json([
             'message' => 'Password berhasil direset.',
+            'data' => null,
         ], 200);
 }
 }

@@ -6,6 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Journal;
 use App\Models\Schedule;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Throwable;
+
 
 class TeacherJournalController extends Controller
 {
@@ -38,9 +43,9 @@ class TeacherJournalController extends Controller
 
         $request->validate([
             'schedule_id' => 'required|exists:schedules,id',
-            'date' => 'required|date',
+            'date' => 'required|date_format:Y-m-d',
             'topic_description' => 'required|string',
-            'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'photo' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
         // Pastikan jadwal memang milik guru yang login
@@ -54,19 +59,70 @@ class TeacherJournalController extends Controller
             ], 403);
         }
 
-        $photoPath = null;
+        $dayNames = [
+            1 => 'Senin',
+            2 => 'Selasa',
+            3 => 'Rabu',
+            4 => 'Kamis',
+            5 => 'Jumat',
+            6 => 'Sabtu',
+            7 => 'Minggu',
+        ];
 
-        if ($request->hasFile('photo')) {
-            $photoPath = $request->file('photo')
-                ->store('journals', 'public');
+        $journalDate = Carbon::createFromFormat (
+            'Y-m-d',
+            $request->date,
+            config('app.timezone')
+        );
+
+        if ($dayNames[$journalDate->dayOfWeekIso] !== $schedule->day_of_week){
+            return response()->json([
+                'message' => 'Tanggal jurnal tidak sesuai dengan hari jadwal.',
+                'errors' => [
+                    'date' => [
+                        'Tanggal jurnal harus memiliki hari yang sama dengan jadwal.',
+                    ],
+                ],
+            ], 422);
         }
 
-        $journal = Journal::create([
-            'schedule_id' => $schedule->id,
-            'date' => $request->date,
-            'topic_description' => $request->topic_description,
-            'photo_path' => $photoPath,
-        ]);
+        $journalAlreadyExists = Journal::where(
+            'schedule_id',
+            $schedule->id
+        )
+            ->whereDate('date', $request->date)
+            ->exists();
+        if ($journalAlreadyExists){
+            return response()->json([
+                'message' => 'Jurnal untuk jadwal dan tanggal tersebut sudah tersedia.',
+                'errors' => [
+                    'journal' => [
+                        'Jurnal yang sama tidak dapat dibuat lebih dari satu kali.',
+                    ],
+                ],
+            ], 409);
+        }
+
+        $photoPath = $request->file('photo')
+            ->store('journals', 'public');
+
+        try {
+            $journal = DB::transaction(function () use (
+                $schedule,
+                $request,
+                $photoPath
+            ){
+                return Journal::create([
+                    'schedule_id' => $schedule->id,
+                    'date' => $request->date,
+                    'topic_description' => $request->topic_description,
+                    'photo_path' => $photoPath,
+                ]);
+            });
+        } catch (Throwable $exception){
+            Storage::disk('public')->delete($photoPath);
+            throw $exception;
+        }
 
         $journal->load([
             'schedule.schoolClass',

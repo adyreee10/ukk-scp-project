@@ -12,7 +12,7 @@ class WakaSeeder extends Seeder
     
     public function run(): void
     {
-        $wakaRole = Role::where('role_name', 'Waka')->first();
+        $wakaRole = Role::where('role_name', 'Waka Kurikulum')->first();
 
         User::create([
             'role_id' => $wakaRole->id,

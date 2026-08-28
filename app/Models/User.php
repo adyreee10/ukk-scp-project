@@ -16,6 +16,7 @@ class User extends Authenticatable
         'role_id',
         'class_id',
         'parent_id',
+        'homeroom_class_id',
         'name',
         'username',
         'email',

@@ -12,6 +12,7 @@ class LeaveRequest extends Model
         'verified_by',
         'start_date',
         'end_date',
+        'leave_type',
         'reason',
         'document_path',
         'status_approval',

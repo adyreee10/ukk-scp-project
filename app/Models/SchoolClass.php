@@ -20,4 +20,6 @@ class SchoolClass extends Model
     {
         return $this->hasMany(Schedule::class, 'class_id');
     }
+
+    protected $table = 'classes';
 }
