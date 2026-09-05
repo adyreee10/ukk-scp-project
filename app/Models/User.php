@@ -15,8 +15,8 @@ class User extends Authenticatable
     protected $fillable = [
         'role_id',
         'class_id',
-        'parent_id',
         'homeroom_class_id',
+        'parent_id',
         'name',
         'username',
         'email',
@@ -51,6 +51,11 @@ class User extends Authenticatable
         return $this->belongsTo(SchoolClass::class, 'class_id');
     }
 
+    public function homeroomClass()
+    {
+        return $this->belongsTo(SchoolClass::class, 'homeroom_class_id');
+    }
+
     public function parent()
     {
         return $this->belongsTo(User::class, 'parent_id');
@@ -64,11 +69,6 @@ class User extends Authenticatable
     public function schedules()
     {
         return $this->hasMany(Schedule::class, 'teacher_id');
-    }
-
-    public function journals()
-    {
-        return $this->hasMany(Journal::class, 'teacher_id');
     }
 
     public function attendances()
@@ -89,5 +89,15 @@ class User extends Authenticatable
     public function updatedConfigurations()
     {
         return $this->hasMany(SystemConfiguration::class, 'updated_by');
+    }
+
+    public function submittedLeaveRequests()
+    {
+        return $this->hasMany(LeaveRequest::class, 'applicant_id');
+    }
+
+    public function hasRole(string ...$roles): bool
+    {
+        return in_array($this->role?->role_name, $roles, true);
     }
 }

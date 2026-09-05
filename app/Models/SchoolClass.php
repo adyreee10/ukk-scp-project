@@ -22,4 +22,9 @@ class SchoolClass extends Model
     }
 
     protected $table = 'classes';
+
+    public function homeroomTeachers()
+    {
+        return $this->hasMany(User::class, 'homeroom_class_id');
+    }
 }

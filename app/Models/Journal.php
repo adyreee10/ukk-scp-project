@@ -14,6 +14,11 @@ class Journal extends Model
         'photo_path',
     ];
 
+    protected function casts():array
+    {
+        return ['date' => 'date'];
+    }
+
     public function schedule(): BelongsTo
     {
         return $this->belongsTo(Schedule::class);

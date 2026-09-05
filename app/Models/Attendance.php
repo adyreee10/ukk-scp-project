@@ -6,12 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class Attendance extends Model
 {
+    public const STATUSES = ['Hadir', 'Izin', 'Sakit', 'Alpa'];
+
     protected $fillable = [
         'journal_id',
         'student_id',
         'status',
         'date',
     ];
+
+    protected function casts():array
+    {
+        return ['date' => 'date'];
+    }
 
     public function journal()
     {

@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class LeaveRequest extends Model
 {
+    public const TYPES = ['Izin', 'Sakit'];
+    public const APPROVALS = ['Pending', 'Approved', 'Rejected'];
+
     protected $fillable = [
         'student_id',
         'applicant_id',
@@ -17,6 +20,19 @@ class LeaveRequest extends Model
         'document_path',
         'status_approval',
     ];
+
+    protected function casts():array
+    {
+        return ['start_date' => 'date', 'end_date' => 'date'];
+    }
+
+    public function scopeApprovedOn($query, string $date)
+    {
+        return $query
+            ->where('status_approval', 'Approved')
+            ->whereDate('start_date', '<=', $date)
+            ->whereDate('end_date', '>=', $date);
+    }
 
     public function student()
     {

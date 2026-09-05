@@ -59,7 +59,7 @@ return new class extends Migration
             $table->dropConstrainedForeignId('homeroom_class_id');
             $table->dropConstrainedForeignId('parent_id');
 
-            $table->dropColumn(['username']);
+            $table->dropColumn('username');
         });
     }
 };

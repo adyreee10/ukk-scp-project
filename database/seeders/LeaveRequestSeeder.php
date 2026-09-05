@@ -20,6 +20,7 @@ class LeaveRequestSeeder extends Seeder
             'verified_by' => null,
             'start_date' => '2026-08-10',
             'end_date' => '2026-08-11',
+            'leave_type' => 'Sakit',
             'reason' => 'Siswa sedang sakit dan perlu beristirahat di rumah.',
             'document_path' => 'documents/surat-sakit-siswa.pdf',
             'status_approval' => 'Pending',

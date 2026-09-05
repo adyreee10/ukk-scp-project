@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Schedule extends Model
 {
+    public const DAYS = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+
     protected $fillable = [
         'teacher_id',
         'class_id',
@@ -17,6 +19,12 @@ class Schedule extends Model
         'end_time',
         'cycle_type',
     ];
+
+    public function scopeActiveCycle($query)
+    {
+        return $query->where('cycle_type', SystemConfiguration::current()->active_cycle,
+        );
+    }
 
     public function teacher(): BelongsTo
     {
@@ -37,4 +45,5 @@ class Schedule extends Model
     {
         return $this->hasMany(Journal::class);
     }
+
 }
