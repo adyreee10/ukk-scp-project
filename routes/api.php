@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\TeacherScheduleController;
 use App\Http\Controllers\Api\TeacherJournalController;
 use App\Http\Controllers\Api\TeacherAttendanceController;
@@ -12,6 +13,10 @@ use App\Http\Controllers\Api\StudentAttendanceController;
 use App\Http\Controllers\Api\StudentJournalController;
 use App\Http\Controllers\Api\StudentLeaveRequestController;
 use App\Http\Controllers\Api\StudentLeaveRequestVerificationController;
+use App\Http\Controllers\Api\WakaClassController;
+use App\Http\Controllers\Api\WakaConfigurationController;
+use App\Http\Controllers\Api\WakaRoomController;
+use App\Http\Controllers\Api\WakaUserController;
 
 
 // =========================
@@ -19,7 +24,6 @@ use App\Http\Controllers\Api\StudentLeaveRequestVerificationController;
 // =========================
 
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/register', [AuthController::class, 'register']);
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
@@ -31,11 +35,36 @@ Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/me', [AuthController::class, 'me']);
-
     Route::post('/logout', [AuthController::class, 'logout']);
-
+    Route::put('/profile', [ProfileController::class, 'update']);
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword']);
 });
 
+// =========================
+// WAKA
+// =========================
+
+Route::middleware(['auth:sanctum', 'role:Waka Kurikulum'])->prefix('waka')->group(function () {
+        Route::get('/configuration', [
+            WakaConfigurationController::class,
+            'show',
+        ]);
+
+        Route::put('/configuration', [
+            WakaConfigurationController::class,
+            'update',
+        ]);
+
+        Route::apiResource('classes', WakaClassController::class)
+            ->except('show')
+            ->parameters(['classes' => 'schoolClass']);
+
+        Route::apiResource('rooms', WakaRoomController::class)
+            ->except('show');
+
+        Route::apiResource('users', WakaUserController::class)
+            ->except('show');
+    });
 
 // =========================
 // TEACHER

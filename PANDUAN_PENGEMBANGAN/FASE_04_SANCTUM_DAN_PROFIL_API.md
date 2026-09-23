@@ -150,12 +150,12 @@ Role, kelas, homeroom, dan parent tidak boleh diubah lewat profil. Field tersebu
 
 ## Gerbang selesai
 
-- [ ] Semua role dapat login menggunakan Bearer token.
-- [ ] Endpoint privat menolak request tanpa token.
-- [ ] Logout hanya mencabut current token.
-- [ ] Profil tidak dapat menaikkan role sendiri.
-- [ ] Forgot password tidak membocorkan keberadaan akun atau token.
-- [ ] Registrasi publik dinonaktifkan.
+- [c] Semua role dapat login menggunakan Bearer token.
+- [c] Endpoint privat menolak request tanpa token.
+- [c] Logout hanya mencabut current token.
+- [c] Profil tidak dapat menaikkan role sendiri.
+- [c] Forgot password tidak membocorkan keberadaan akun atau token.
+- [c] Registrasi publik dinonaktifkan.
 
 Commit:
 
