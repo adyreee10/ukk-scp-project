@@ -1,4 +1,4 @@
-<?php
+x<?php
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -95,6 +95,18 @@ Route::middleware(['auth:sanctum', 'role:Guru'])->group(function () {
     Route::get('/teacher/attendances', [
         TeacherAttendanceController::class,
         'index'
+    ]);
+    Route::post('/teacher/schedules', [
+        TeacherScheduleController::class,
+        'store'
+    ]);
+    Route::put('teacher/schedules/{id}', [
+        TeacherScheduleController::class,
+        'update'
+    ]);
+    Route::delete('teacher/schedules/{id}', [
+        TeacherScheduleController::class,
+        'destroy'
     ]);
 
 });
