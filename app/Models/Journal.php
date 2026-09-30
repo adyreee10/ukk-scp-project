@@ -19,6 +19,17 @@ class Journal extends Model
         return ['date' => 'date'];
     }
 
+    protected $appends = ['photo_url'];
+    
+// Ini adalah Accessor (Pembentuk 'photo_url')
+    public function getPhotoUrlAttribute()
+    {
+        if ($this->photo_path) {
+            return \Illuminate\Support\Facades\Storage::disk('public')->url($this->photo_path);
+        }
+        return null;
+    }
+
     public function schedule(): BelongsTo
     {
         return $this->belongsTo(Schedule::class);

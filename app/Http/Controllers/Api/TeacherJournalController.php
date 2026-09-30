@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\SystemConfiguration;
+use App\Support\IndonesianDay;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Journal;
@@ -10,6 +12,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Throwable;
+use Illuminate\Validation\ValidationException;
 
 
 class TeacherJournalController extends Controller
@@ -17,6 +20,11 @@ class TeacherJournalController extends Controller
     // GET semua jurnal milik guru
     public function index(Request $request)
     {
+        $request->validate([
+            'date_from' => ['nullable', 'date_format:Y-m-d'],
+            'date_to' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:date_from'],
+        ]);
+
         $teacher = $request->user();
 
         $journals = Journal::with([
@@ -26,8 +34,16 @@ class TeacherJournalController extends Controller
         ->whereHas('schedule', function ($query) use ($teacher) {
             $query->where('teacher_id', $teacher->id);
         })
+        ->when($request->date_from, function ($q, $date)
+        {
+            $q->whereDate('date', '>=', $date);
+        })
+        ->when($request->date_to, function ($q, $date)
+        {
+            $q->whereDate('date', '<=', $date);
+        })
         ->orderByDesc('date')
-        ->get();
+        ->paginate(15);
 
         return response()->json([
             'message' => 'Jurnal guru berhasil diambil.',
@@ -39,99 +55,73 @@ class TeacherJournalController extends Controller
     // POST membuat jurnal
     public function store(Request $request)
     {
-        $teacher = $request->user();
-
-        $request->validate([
-            'schedule_id' => 'required|exists:schedules,id',
-            'date' => 'required|date_format:Y-m-d',
-            'topic_description' => 'required|string',
-            'photo' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+        $validated = $request->validate([
+            'schedule_id' => ['required', 'exists:schedules,id'],
+            'date' => ['required', 'date_format:Y-m-d', 'before_or_equal:today'],
+            'topic_description' => ['required', 'string', 'max:5000'],
+            'photo' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
         // Pastikan jadwal memang milik guru yang login
-        $schedule = Schedule::where('id', $request->schedule_id)
-            ->where('teacher_id', $teacher->id)
-            ->first();
+        $schedule = Schedule::where('teacher_id', $request->user()->id)
+            ->findOrFail($validated['schedule_id']);
 
-        if (!$schedule) {
-            return response()->json([
-                'message' => 'Jadwal tidak ditemukan atau bukan milik guru.'
-            ], 403);
+        $date = Carbon::createFromFormat ('Y-m-d', $validated['date'])->startOfDay();
+        $configuration = SystemConfiguration::current();
+
+        if ($schedule->cycle_type !== $configuration->active_cycle) 
+        {
+            throw ValidationException::withMessages([
+                'schedule_id' => 'Jadwal bukan bagian dari putaran yang sedang aktif.'
+            ]);
         }
 
-        $dayNames = [
-            1 => 'Senin',
-            2 => 'Selasa',
-            3 => 'Rabu',
-            4 => 'Kamis',
-            5 => 'Jumat',
-            6 => 'Sabtu',
-            7 => 'Minggu',
-        ];
-
-        $journalDate = Carbon::createFromFormat (
-            'Y-m-d',
-            $request->date,
-            config('app.timezone')
-        );
-
-        if ($dayNames[$journalDate->dayOfWeekIso] !== $schedule->day_of_week){
-            return response()->json([
-                'message' => 'Tanggal jurnal tidak sesuai dengan hari jadwal.',
-                'errors' => [
-                    'date' => [
-                        'Tanggal jurnal harus memiliki hari yang sama dengan jadwal.',
-                    ],
-                ],
-            ], 422);
+        if (IndonesianDay::from($date) !== $schedule->day_of_week)
+        {
+            throw ValidationException::withMessages([
+                'date' => 'Hari pada tanggal jurnal tidak sesuai dengan hari jadwal.',
+            ]);
         }
 
-        $journalAlreadyExists = Journal::where(
-            'schedule_id',
-            $schedule->id
-        )
-            ->whereDate('date', $request->date)
-            ->exists();
-        if ($journalAlreadyExists){
+        if (Journal::where('schedule_id', $schedule->id)->whereDate('date', $date)->exists())
+        {
             return response()->json([
-                'message' => 'Jurnal untuk jadwal dan tanggal tersebut sudah tersedia.',
-                'errors' => [
-                    'journal' => [
-                        'Jurnal yang sama tidak dapat dibuat lebih dari satu kali.',
-                    ],
-                ],
+                'message' => 'Jurnal untuk jadwal dan tanggal ini sudah ada.'
             ], 409);
         }
 
-        $photoPath = $request->file('photo')
-            ->store('journals', 'public');
+        $photoPath = $request->file('photo')->store('journals', 'public');
 
         try {
-            $journal = DB::transaction(function () use (
-                $schedule,
-                $request,
-                $photoPath
-            ){
-                return Journal::create([
-                    'schedule_id' => $schedule->id,
-                    'date' => $request->date,
-                    'topic_description' => $request->topic_description,
-                    'photo_path' => $photoPath,
-                ]);
+            $journal = DB::transaction(function () use ($schedule, $date, $validated, $photoPath)
+            {
+                Schedule::whereKey($schedule->id)->lockForUpdate()->firstOrFail();
+
+                if (Journal::where('schedule_id', $schedule->id)
+                    ->whereDate('date', $date)
+                    ->exists()) {
+                        abort(409,
+                        'Jurnal untuk jadwal dan tanggal ini sudah ada.');
+                    }
+
+                    return Journal::create([
+                        'schedule_id' => $schedule->id,
+                        'date' => $date->toDateString(),
+                        'topic_description' => $validated['topic_description'],
+                        'photo_path' => $photoPath
+                    ]);
             });
-        } catch (Throwable $exception){
+        }
+
+        catch (Throwable $exception) 
+        {
             Storage::disk('public')->delete($photoPath);
             throw $exception;
         }
 
-        $journal->load([
-            'schedule.schoolClass',
-            'schedule.room'
-        ]);
-
         return response()->json([
             'message' => 'Jurnal berhasil dibuat.',
-            'data' => $journal,
+            'data' => $journal->load('schedule.schoolClass', 'schedule.room'),
         ], 201);
     }
 
