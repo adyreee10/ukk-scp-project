@@ -11,8 +11,8 @@ use App\Http\Controllers\Api\TeacherAttendanceController;
 use App\Http\Controllers\Api\StudentScheduleController;
 use App\Http\Controllers\Api\StudentAttendanceController;
 use App\Http\Controllers\Api\StudentJournalController;
-use App\Http\Controllers\Api\StudentLeaveRequestController;
-use App\Http\Controllers\Api\StudentLeaveRequestVerificationController;
+use App\Http\Controllers\Api\LeaveRequestController;
+use App\Http\Controllers\Api\LeaveRequestVerificationController;
 use App\Http\Controllers\Api\WakaClassController;
 use App\Http\Controllers\Api\WakaConfigurationController;
 use App\Http\Controllers\Api\WakaRoomController;
@@ -96,6 +96,12 @@ Route::middleware(['auth:sanctum', 'role:Guru'])->group(function () {
         TeacherAttendanceController::class,
         'index'
     ]);
+    
+    Route::post('/teacher/attendances', [
+        TeacherAttendanceController::class,
+        'store'
+    ]);
+    
     Route::post('/teacher/schedules', [
         TeacherScheduleController::class,
         'store'
@@ -133,20 +139,39 @@ Route::middleware(['auth:sanctum', 'role:Siswa'])->group(function () {
     ]);
 
     Route::get('/student/leave-request', [
-        StudentLeaveRequestController::class,
+        LeaveRequestController::class,
         'index'
     ]);
 
     Route::post('/student/leave-request', [
-        StudentLeaveRequestController::class,
+        LeaveRequestController::class,
         'store'
     ]);
 
     Route::get('/student/leave-request/{id}', [
-        StudentLeaveRequestController::class,
+        LeaveRequestController::class,
         'show'
     ]);
 
+});
+
+// =========================
+// PARENT  
+// =========================
+
+Route::middleware(['auth:sanctum', 'role:Orang Tua'])->group(function() {
+    Route::get('/parent/leave-request', [
+        LeaveRequestController::class, 
+        'index'
+    ]);
+    Route::post('/parent/leave-request', [
+        LeaveRequestController::class,
+        'store'
+    ]);
+    Route::get('/parent/leave-request/{id}', [
+        LeaveRequestController::class,
+        'show'
+    ]);
 });
 
 // =========================
@@ -156,22 +181,22 @@ Route::middleware(['auth:sanctum', 'role:Siswa'])->group(function () {
 Route::middleware(['auth:sanctum', 'role:Wali Kelas,Guru BK'])->group(function(){
 
     Route::get('/student-affairs/leave-request', [
-        StudentLeaveRequestVerificationController::class,
+        LeaveRequestVerificationController::class,
         'index'
     ]);
 
     Route::get('/student-affairs/leave-request/{id}', [
-        StudentLeaveRequestVerificationController::class,
+        LeaveRequestVerificationController::class,
         'show'
     ]);
 
     Route::put('/student-affairs/leave-request/{id}/approve', [
-        StudentLeaveRequestVerificationController::class,
+        LeaveRequestVerificationController::class,
         'approve'
     ]);
 
     Route::put('/student-affairs/leave-request/{id}/reject', [
-        StudentLeaveRequestVerificationController::class,
+        LeaveRequestVerificationController::class,
         'reject'
     ]);
 });

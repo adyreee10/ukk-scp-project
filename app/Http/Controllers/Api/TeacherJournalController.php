@@ -13,10 +13,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Throwable;
 use Illuminate\Validation\ValidationException;
-
+use App\Services\AttendanceService;
 
 class TeacherJournalController extends Controller
 {
+    public function __construct (private readonly AttendanceService $attendanceService) {}
+
     // GET semua jurnal milik guru
     public function index(Request $request)
     {
@@ -104,12 +106,16 @@ class TeacherJournalController extends Controller
                         'Jurnal untuk jadwal dan tanggal ini sudah ada.');
                     }
 
-                    return Journal::create([
+                    $journal = Journal::create([
                         'schedule_id' => $schedule->id,
                         'date' => $date->toDateString(),
-                        'topic_description' => $validated['topic_description'],
-                        'photo_path' => $photoPath
+                        'topic_description' => $validated ['topic_description'],
+                        'photo_path' => $photoPath,
                     ]);
+
+                    $this->attendanceService->syncApprovedLeaves($journal);
+
+                    return $journal;
             });
         }
 
