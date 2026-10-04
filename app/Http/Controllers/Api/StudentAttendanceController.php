@@ -11,18 +11,22 @@ class StudentAttendanceController extends Controller
     public function index(Request $request)
     {
         $student = $request->user();
-        $attendances = Attendance::with([
-            'journal.schedule.schoolClass',
-            'journal.schedule.teacher',
-            'journal.schedule.room',
-        ])
-        ->where('student_id', $student->id)
-        ->orderByDesc('date')
-        ->get();
+        $base = Attendance::where('student_id', $student->id);
+
+        $summary = (clone $base)
+        ->selectRaw('status, COUNT(*) as total')
+        ->groupBy('status')
+        ->pluck('total', 'status');
+
+        $data = (clone $base)
+        ->with('journal.schedule.teacher:id,name', 'journal.schedule.schoolClass:id,class_name')
+        ->latest('date')
+        ->paginate(20);
 
         return response()->json([
             'message' => 'Data absensi siswa berhasil diambil.',
-            'data' => $attendances,
+            'summary' => $summary,
+            'data' => $data,
         ], 200);
     }
 }

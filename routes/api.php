@@ -72,6 +72,10 @@ Route::middleware(['auth:sanctum', 'role:Waka Kurikulum'])->prefix('waka')->grou
 
 Route::middleware(['auth:sanctum', 'role:Guru'])->group(function () {
 
+    Route::get('/teacher/dashboard', [
+        \App\Http\Controllers\Api\DashboardController::class,
+        'teacher'
+    ]);
     Route::get('/teacher/schedules', [
         TeacherScheduleController::class,
         'index'
@@ -160,6 +164,12 @@ Route::middleware(['auth:sanctum', 'role:Siswa'])->group(function () {
 // =========================
 
 Route::middleware(['auth:sanctum', 'role:Orang Tua'])->group(function() {
+
+    Route::get('/parent/attendances/{student}', [
+        \App\Http\Controllers\Api\ParentAttendanceController::class,
+        'index'
+    ]);
+
     Route::get('/parent/leave-request', [
         LeaveRequestController::class, 
         'index'
@@ -175,10 +185,20 @@ Route::middleware(['auth:sanctum', 'role:Orang Tua'])->group(function() {
 });
 
 // =========================
-// VERIFIKASI IZIN
+// VERIFIKASI IZIN STUDENT AFFAIRS
 // =========================
 
 Route::middleware(['auth:sanctum', 'role:Wali Kelas,Guru BK'])->group(function(){
+
+    Route::get('/student-affairs/dashboard', [
+        \App\Http\Controllers\Api\DashboardController::class,
+        'waka'
+    ]);
+    
+    Route::get('/student-affairs/attendances', [
+        \App\Http\Controllers\Api\StudentAffairsAttendanceController::class,
+        'index'
+    ]);
 
     Route::get('/student-affairs/leave-request', [
         LeaveRequestVerificationController::class,

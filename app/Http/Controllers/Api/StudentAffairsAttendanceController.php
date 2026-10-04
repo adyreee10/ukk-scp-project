@@ -1,0 +1,47 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\Attendance;
+use Illuminate\Http\Request;
+
+class StudentAffairsAttendanceController extends Controller
+{
+    public function index(Request $request)
+    {
+        $validated = $request->validate([
+            'class_id' => ['nullable', 'integer', 'exists:classes,id'],
+            'date_from' => ['nullable', 'date_format:Y-m-d'],
+            'date_to' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:date_from'],
+        ]);
+
+        $user = $request->user();
+        $classId = $user->hasRole('Wali Kelas') ? $user->homeroom_class_id : ($validated['class_id'] ?? null);
+
+        abort_if ($user->hasRole('Wali Kelas') && $classId === null, 403, 'Kelas perwalian belum ditetapkan.');
+
+        $base = Attendance::query()
+        ->when($classId, fn ($query, $id) => $query->whereHas('student', fn ($student) => $student->where('class_id', $id)))
+        ->when($validated['date_from'] ?? null, fn ($query, $date) => $query->whereDate('date', '>=', $date))
+        ->when($validated['date_to'] ?? null, fn ($query, $date) => $query->whereDate('date', '<=', $date));
+
+        $summary = (clone $base)
+        ->selectRaw('status, COUNT(*) as total')
+        ->groupBy('status')
+        ->pluck('total', 'status');
+
+        $data = (clone $base)
+        ->with([
+            'student:id,name,class_id',
+            'journal.schedule.teacher:id,name'
+        ])
+        ->latest('date')
+        ->paginate(20);
+
+        return response()->json([
+            'data' => $data,
+            'summary' => $summary
+        ]);
+    }
+}
