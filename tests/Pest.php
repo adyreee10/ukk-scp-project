@@ -3,6 +3,28 @@
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
+use App\Models\Role;
+use App\Models\User;
+use Laravel\Sanctum\Sanctum;
+
+function userWithRole(string $roleName, array $attributes = []): User
+{
+    $role = Role::firstOrCreate(['role_name' => $roleName]);
+
+    return User::factory()->create([
+        'role_id' => $role->id,
+        'username' => fake()->unique()->userName(),
+        ...$attributes
+    ]);
+}
+
+function actingAsRole(string $roleName, array $attributes = []): User
+{
+    $user = userWithRole($roleName, $attributes);
+    Sanctum::actingAs($user);
+    return $user;
+}
+
 /*
 |--------------------------------------------------------------------------
 | Test Case

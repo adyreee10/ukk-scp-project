@@ -28,7 +28,7 @@ class RoleMiddleware
         $roleName = $user->role?->role_name;
 
         // Cek apakah role user diperbolehkan
-        if (!$roleName || !in_array($roleName, $roles)) {
+        if (!$roleName || !in_array($roleName, $roles, true)) {
             return response()->json([
                 'message' => 'Anda tidak memiliki akses ke endpoint ini.'
             ], 403);

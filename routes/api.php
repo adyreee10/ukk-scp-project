@@ -1,13 +1,16 @@
-x<?php
+<?php
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\ParentAttendanceController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\TeacherScheduleController;
 use App\Http\Controllers\Api\TeacherJournalController;
 use App\Http\Controllers\Api\TeacherAttendanceController;
+use App\Http\Controllers\Api\StudentAffairsAttendanceController;
 use App\Http\Controllers\Api\StudentScheduleController;
 use App\Http\Controllers\Api\StudentAttendanceController;
 use App\Http\Controllers\Api\StudentJournalController;
@@ -23,10 +26,22 @@ use App\Http\Controllers\Api\WakaUserController;
 // AUTH
 // =========================
 
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
-Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+Route::middleware('throttle:10,1')->group(function () {
+    Route::post('/login', [
+        AuthController::class,
+        'login'
+    ]);
 
+    Route::post('/forgot-password', [
+        AuthController::class,
+        'forgotPassword'
+    ]);
+
+    Route::post('/reset-password', [
+        AuthController::class,
+        'resetPassword'
+    ]);
+});
 
 // =========================
 // AUTHENTICATED USER
@@ -34,17 +49,33 @@ Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
 Route::middleware('auth:sanctum')->group(function () {
 
-    Route::get('/me', [AuthController::class, 'me']);
-    Route::post('/logout', [AuthController::class, 'logout']);
-    Route::put('/profile', [ProfileController::class, 'update']);
-    Route::put('/profile/password', [ProfileController::class, 'updatePassword']);
-});
+    Route::get('/me', [
+        AuthController::class, 
+        'me']
+    );
+
+    Route::post('/logout', [
+        AuthController::class, 
+        'logout']
+    );
+
+    Route::put('/profile', [
+        ProfileController::class, 
+        'update']
+    );
+
+    Route::put('/profile/password', [
+        ProfileController::class, 
+        'updatePassword']
+    );
+
 
 // =========================
 // WAKA
 // =========================
 
-Route::middleware(['auth:sanctum', 'role:Waka Kurikulum'])->prefix('waka')->group(function () {
+Route::middleware('role:Waka Kurikulum')->prefix('waka')->group(function () {
+
         Route::get('/configuration', [
             WakaConfigurationController::class,
             'show',
@@ -55,68 +86,46 @@ Route::middleware(['auth:sanctum', 'role:Waka Kurikulum'])->prefix('waka')->grou
             'update',
         ]);
 
-        Route::apiResource('classes', WakaClassController::class)
+        Route::apiResource('/classes', WakaClassController::class)
             ->except('show')
             ->parameters(['classes' => 'schoolClass']);
 
-        Route::apiResource('rooms', WakaRoomController::class)
+        Route::apiResource('/rooms', WakaRoomController::class)
             ->except('show');
 
-        Route::apiResource('users', WakaUserController::class)
+        Route::apiResource('/users', WakaUserController::class)
             ->except('show');
+
+        Route::get('/dashboard', [DashboardController::class, 'waka']);
     });
 
 // =========================
 // TEACHER
 // =========================
 
-Route::middleware(['auth:sanctum', 'role:Guru'])->group(function () {
+Route::middleware('role:Guru')->prefix('teacher')->group(function () {
 
-    Route::get('/teacher/dashboard', [
-        \App\Http\Controllers\Api\DashboardController::class,
+    Route::get('/dashboard', [
+        DashboardController::class,
         'teacher'
     ]);
-    Route::get('/teacher/schedules', [
-        TeacherScheduleController::class,
-        'index'
-    ]);
 
-    Route::post('/teacher/journals', [
-        TeacherJournalController::class,
-        'store'
-    ]);
+    Route::apiResource('/schedules', 
+        TeacherScheduleController::class)
+        ->only(['index', 'store', 'update', 'destroy']);
 
-    Route::get('/teacher/journals', [
-        TeacherJournalController::class,
-        'index'
-    ]);
+    Route::apiResource('/journals', 
+        TeacherJournalController::class)
+        ->only(['index', 'store', 'show']);
 
-    Route::get('/teacher/journals/{id}', [
-        TeacherJournalController::class,
-        'show'
-    ]);
-
-    Route::get('/teacher/attendances', [
+    Route::get('/attendances', [
         TeacherAttendanceController::class,
         'index'
     ]);
     
-    Route::post('/teacher/attendances', [
+    Route::post('/attendances', [
         TeacherAttendanceController::class,
         'store'
-    ]);
-    
-    Route::post('/teacher/schedules', [
-        TeacherScheduleController::class,
-        'store'
-    ]);
-    Route::put('teacher/schedules/{id}', [
-        TeacherScheduleController::class,
-        'update'
-    ]);
-    Route::delete('teacher/schedules/{id}', [
-        TeacherScheduleController::class,
-        'destroy'
     ]);
 
 });
@@ -125,98 +134,76 @@ Route::middleware(['auth:sanctum', 'role:Guru'])->group(function () {
 // STUDENT
 // =========================
 
-Route::middleware(['auth:sanctum', 'role:Siswa'])->group(function () {
+Route::middleware('role:Siswa')->prefix('student')->group(function () {
 
-    Route::get('/student/schedules', [
+    Route::get('/schedules', [
         StudentScheduleController::class,
         'index'
     ]);
 
-    Route::get('/student/attendances', [
-        StudentAttendanceController::class,
-        'index'
-    ]);
-
-    Route::get('/student/journals', [
+    Route::get('/journals', [
         StudentJournalController::class,
         'index'
     ]);
 
-    Route::get('/student/leave-request', [
-        LeaveRequestController::class,
+    Route::get('/attendances', [
+        StudentAttendanceController::class,
         'index'
     ]);
+});
 
-    Route::post('/student/leave-request', [
-        LeaveRequestController::class,
-        'store'
-    ]);
+// =========================
+// STUDENT & PARENT
+// =========================
 
-    Route::get('/student/leave-request/{id}', [
-        LeaveRequestController::class,
-        'show'
-    ]);
+Route::middleware('role:Siswa,Orang Tua')->group(function () {
 
+    Route::apiResource('/leave-requests', LeaveRequestController::class)
+        ->only(['index', 'store', 'show']);
 });
 
 // =========================
 // PARENT  
 // =========================
 
-Route::middleware(['auth:sanctum', 'role:Orang Tua'])->group(function() {
+Route::middleware('role:Orang Tua')->prefix('parent')->group(function() {
 
-    Route::get('/parent/attendances/{student}', [
-        \App\Http\Controllers\Api\ParentAttendanceController::class,
+    Route::get('/children/{student}/attendances', [
+        ParentAttendanceController::class,
         'index'
     ]);
 
-    Route::get('/parent/leave-request', [
-        LeaveRequestController::class, 
-        'index'
-    ]);
-    Route::post('/parent/leave-request', [
-        LeaveRequestController::class,
-        'store'
-    ]);
-    Route::get('/parent/leave-request/{id}', [
-        LeaveRequestController::class,
-        'show'
-    ]);
 });
 
 // =========================
-// VERIFIKASI IZIN STUDENT AFFAIRS
+// VERIFIKASI IZIN STUDENT AFFAIRS guru bk and walkes
 // =========================
 
-Route::middleware(['auth:sanctum', 'role:Wali Kelas,Guru BK'])->group(function(){
+Route::middleware('role:Wali Kelas,Guru BK')->prefix('student-affairs')->group(function(){
 
-    Route::get('/student-affairs/dashboard', [
-        \App\Http\Controllers\Api\DashboardController::class,
-        'waka'
-    ]);
-    
-    Route::get('/student-affairs/attendances', [
-        \App\Http\Controllers\Api\StudentAffairsAttendanceController::class,
-        'index'
-    ]);
-
-    Route::get('/student-affairs/leave-request', [
+    Route::get('/leave-requests', [
         LeaveRequestVerificationController::class,
         'index'
     ]);
 
-    Route::get('/student-affairs/leave-request/{id}', [
+    Route::get('/leave-requests/{id}', [
         LeaveRequestVerificationController::class,
         'show'
     ]);
 
-    Route::put('/student-affairs/leave-request/{id}/approve', [
+    Route::put('/leave-requests/{id}/approve', [
         LeaveRequestVerificationController::class,
         'approve'
     ]);
 
-    Route::put('/student-affairs/leave-request/{id}/reject', [
+    Route::put('/leave-requests/{id}/reject', [
         LeaveRequestVerificationController::class,
         'reject'
     ]);
+
+    Route::get('/attendance-recap', [
+        StudentAffairsAttendanceController::class,
+        'index'
+    ]);
+});
 });
