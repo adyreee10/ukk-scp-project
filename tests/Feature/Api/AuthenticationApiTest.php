@@ -15,8 +15,11 @@ it('issues a sanctum token for valid credentials', function () {
         'device_name' => 'pest',
     ])->assertOk()
     ->assertJsonStructure([
+    'data' => [
         'token', 'token_type', 'user'
+        ]
     ]);
+
 
     expect($user->tokens()->count())->toBe(1);
 });

@@ -14,23 +14,29 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
-            @include('layouts.navigation')
+    
+    <!-- === INI ADALAH KODE ASLI MURNI DARI PANDUAN FASE 14 === -->
+    <body class="min-h-screen bg-slate-50 text-slate-900 antialiased">
+        <div class="mx-auto min-h-screen max-w-7xl pb-20 sm:pb-0">
+            <header class="sticky top-0 z-30 border-b bg-white/95 px-4 py-3 backdrop-blur sm:px-6">
+                <div class="flex items-center justify-between">
+                    <a href="{{ route('dashboard') }}" class="font-bold text-indigo-700">SCP</a>
+                    <span class="text-sm">{{ auth()->user()->name }}</span>
+                </div>
+            </header>
 
-            <!-- Page Heading -->
-            @isset($header)
-                <header class="bg-white dark:bg-gray-800 shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
+            <main class="space-y-4 p-4 sm:p-6">
+                @if (session('success'))
+                    <div role="status" class="rounded-lg bg-emerald-50 p-3 text-emerald-800">
+                        {{ session('success') }}
                     </div>
-                </header>
-            @endisset
-
-            <!-- Page Content -->
-            <main>
+                @endif
                 {{ $slot }}
             </main>
+
+            <nav class="fixed inset-x-0 bottom-0 z-30 border-t bg-white p-2 sm:static sm:border-0">
+                {{-- Link disusun berdasarkan role; target sentuh minimal h-11 --}}
+            </nav>
         </div>
     </body>
 </html>
