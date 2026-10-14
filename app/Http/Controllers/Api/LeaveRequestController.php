@@ -37,6 +37,19 @@ class LeaveRequestController extends Controller
         ]);
 
         $student = $this->resolveStudent($user, $validated ['student_id'] ?? null);
+
+        $isOverlap = LeaveRequest::where('student_id', $student->id)
+            ->whereIn('status_approval', ['Pending', 'Approved'])
+            ->whereDate('start_date', '<=', $validated['end_date'])
+            ->whereDate('end_date', '>=', $validated['start_date'])
+            ->exists();
+
+        if ($isOverlap) {
+            return response()->json([
+                'message' => 'Siswa sudah memiliki permohonan izin aktif atau pending pada rentang tanggal tersebut.',
+            ], 409);
+        }
+
         $path = $request->file('document')->store('leave_documents', 'public');
 
         try {

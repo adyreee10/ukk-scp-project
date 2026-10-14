@@ -1,4 +1,17 @@
 <x-app-layout>
+    <!-- REMINDER MERAH (Hanya muncul jika ada jurnal yang terlambat >30 menit) -->
+    @if(isset($overdueSchedules) && $overdueSchedules->isNotEmpty())
+        <div class="mb-4 rounded-xl bg-red-50 border border-red-200 p-4 flex gap-3 items-start shadow-sm">
+            <svg class="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            <div>
+                <h3 class="text-red-800 font-bold">Peringatan Jurnal Terlambat!</h3>
+                <p class="text-red-700 text-sm mt-1">
+                    Anda memiliki {{ $overdueSchedules->count() }} kelas yang telah lewat batas waktu pengisian jurnal (>30 menit). Harap segera lengkapi.
+                </p>
+            </div>
+        </div>
+    @endif
+
     <!-- KODE ASLI DARI FASE 14: Pola card dan tabel responsif -->
     <section class="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
         <div class="mb-3 flex items-center justify-between gap-3">

@@ -21,7 +21,13 @@
             <header class="sticky top-0 z-30 border-b bg-white/95 px-4 py-3 backdrop-blur sm:px-6">
                 <div class="flex items-center justify-between">
                     <a href="{{ route('dashboard') }}" class="font-bold text-indigo-700">SCP</a>
-                    <span class="text-sm">{{ auth()->user()->name }}</span>
+                    <div class="flex items-center gap-4">
+                        <span class="text-sm font-semibold text-slate-700">{{ auth()->user()->name }}</span>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="text-xs text-red-600 font-bold hover:underline">Keluar</button>
+                        </form>
+                    </div>
                 </div>
             </header>
 
@@ -32,6 +38,23 @@
                     </div>
                 @endif
                 {{ $slot }}
+
+                @if (session('error'))
+                    <div role="status" class="rounded-lg bg-red-50 p-3 text-red-800 border border-red-200">
+                        {{ session('error') }}
+                    </div>
+                @endif
+                
+                @if ($errors->any())
+                    <div role="status" class="rounded-lg bg-red-50 p-3 text-red-800 border border-red-200">
+                        <ul class="list-disc list-inside text-sm">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
             </main>
 
             <nav class="fixed inset-x-0 bottom-0 z-30 border-t bg-white p-2 sm:static sm:border-0">
