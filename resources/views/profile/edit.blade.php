@@ -1,25 +1,27 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Profile') }}
-        </h2>
-    </x-slot>
+    <div class="space-y-6">
+        <div>
+            <h1 class="text-xl sm:text-2xl font-black text-white tracking-tight">Profil Pengguna</h1>
+            <p class="text-xs font-semibold text-slate-400 mt-0.5">Kelola informasi profil akun, kata sandi, dan preferensi akun Anda</p>
+        </div>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
+        <div class="space-y-6">
+            <!-- Informasi Akun -->
+            <div class="p-6 sm:p-8 bg-[#0f172a]/90 backdrop-blur-md border border-slate-800 shadow-xl" style="border-radius: 15px;">
                 <div class="max-w-xl">
                     @include('profile.partials.update-profile-information-form')
                 </div>
             </div>
 
-            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
+            <!-- Ubah Kata Sandi -->
+            <div class="p-6 sm:p-8 bg-[#0f172a]/90 backdrop-blur-md border border-slate-800 shadow-xl" style="border-radius: 15px;">
                 <div class="max-w-xl">
                     @include('profile.partials.update-password-form')
                 </div>
             </div>
 
-            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
+            <!-- Hapus Akun -->
+            <div class="p-6 sm:p-8 bg-[#0f172a]/90 backdrop-blur-md border border-slate-800 shadow-xl" style="border-radius: 15px;">
                 <div class="max-w-xl">
                     @include('profile.partials.delete-user-form')
                 </div>
