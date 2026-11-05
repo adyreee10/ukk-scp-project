@@ -193,7 +193,7 @@ class SchoolDocumentParserService
      */
     protected function parseTeachersSpreadsheet(UploadedFile $file, string $duplicateAction = 'replace'): array
     {
-        $rows = $this->spreadsheetService->parse($file);
+        $rows = $this->spreadsheetService->parse($file, 'teachers');
 
         if (empty($rows)) {
             return [
@@ -266,6 +266,15 @@ class SchoolDocumentParserService
         $waliRole = Role::where('role_name', 'Wali Kelas')->first() ?? $guruRole;
         $bkRole   = Role::where('role_name', 'Guru BK')->first() ?? $guruRole;
 
+        // IN-MEMORY CACHING UNTUK MEMPERCEPAT PROSES & MENGHINDARI TIMEOUT 300s
+        $allTeachers = User::whereHas('role', fn($q) => $q->whereIn('role_name', ['Guru', 'Wali Kelas', 'Guru BK', 'Waka Kurikulum', 'Admin']))
+            ->with('role')
+            ->get();
+        $existingUsernames = User::whereNotNull('username')->pluck('username')->flip()->toArray();
+        $existingEmails = User::whereNotNull('email')->pluck('email')->flip()->toArray();
+        $allClasses = SchoolClass::all()->keyBy(fn($c) => strtoupper(trim($c->class_name)));
+        $allMajors = Major::all()->keyBy(fn($m) => strtoupper(trim($m->code)));
+
         $created = 0;
         $updated = 0;
         $skipped = 0;
@@ -285,11 +294,17 @@ class SchoolDocumentParserService
 
             // Normalisasi nama kelas (contoh: 'X RPL1' -> 'X RPL 1') & Auto-provision Jurusan & Kelas
             $normClass = $this->normalizeClassName($rawClass);
-            $this->autoProvisionMajor($normClass, $createdMajors);
+            $normClassUpper = strtoupper($normClass);
 
-            $schoolClass = SchoolClass::firstOrCreate(['class_name' => $normClass]);
-            if ($schoolClass->wasRecentlyCreated) {
-                $createdClasses++;
+            if (isset($allClasses[$normClassUpper])) {
+                $schoolClass = $allClasses[$normClassUpper];
+            } else {
+                $this->autoProvisionMajor($normClass, $createdMajors, $allMajors);
+                $schoolClass = SchoolClass::firstOrCreate(['class_name' => $normClass]);
+                if ($schoolClass->wasRecentlyCreated) {
+                    $createdClasses++;
+                }
+                $allClasses[$normClassUpper] = $schoolClass;
             }
 
             // 1. PROSES WALI KELAS (1 Guru Mewakili 1 Kelas)
@@ -297,7 +312,7 @@ class SchoolDocumentParserService
             $waliClean = trim(preg_replace('/^\d+[\.\)]\s*/', '', $waliName), " \t\n\r\0\x0B\"'");
 
             if (!empty($waliClean) && !in_array(strtolower($waliClean), ['-', '--', 'none', 'null', '0', 'nama wali kelas'])) {
-                $waliTeacher = $this->findTeacherByNameFlexible($waliClean);
+                $waliTeacher = $this->findTeacherByNameFlexible($waliClean, $allTeachers);
 
                 if ($waliTeacher) {
                     if ($duplicateAction === 'keep' && $waliTeacher->homeroom_class_id && $waliTeacher->homeroom_class_id !== $schoolClass->id) {
@@ -313,13 +328,16 @@ class SchoolDocumentParserService
                         }
                     }
                 } else {
-                    // Buat akun baru Wali Kelas
+                    // Buat akun baru Wali Kelas di DB & Memori
                     $newWali = $this->createNewTeacherAccount(
                         name: $waliClean,
                         nip: null,
                         roleId: $waliRole->id,
-                        homeroomClassId: $schoolClass->id
+                        homeroomClassId: $schoolClass->id,
+                        existingUsernames: $existingUsernames,
+                        existingEmails: $existingEmails
                     );
+                    $allTeachers->push($newWali);
                     $created++;
                     $processedUserIds[] = $newWali->id;
                 }
@@ -330,7 +348,7 @@ class SchoolDocumentParserService
             $bkClean = trim(preg_replace('/^\d+[\.\)]\s*/', '', $bkName), " \t\n\r\0\x0B\"'");
 
             if (!empty($bkClean) && !in_array(strtolower($bkClean), ['-', '--', 'none', 'null', '0', 'nama guru bk'])) {
-                $bkTeacher = $this->findTeacherByNameFlexible($bkClean);
+                $bkTeacher = $this->findTeacherByNameFlexible($bkClean, $allTeachers);
 
                 if ($bkTeacher) {
                     // Update peran Guru BK dan pastikan homeroom_class_id null (karena BK adalah konselor banyak kelas)
@@ -353,14 +371,17 @@ class SchoolDocumentParserService
                         $processedUserIds[] = $bkTeacher->id;
                     }
                 } else {
-                    // Buat akun baru Guru BK
+                    // Buat akun baru Guru BK di DB & Memori
                     $newBk = $this->createNewTeacherAccount(
                         name: $bkClean,
                         nip: null,
                         roleId: $bkRole->id,
-                        homeroomClassId: null
+                        homeroomClassId: null,
+                        existingUsernames: $existingUsernames,
+                        existingEmails: $existingEmails
                     );
                     $newBk->counselorClasses()->syncWithoutDetaching([$schoolClass->id]);
+                    $allTeachers->push($newBk);
                     $created++;
                     $processedUserIds[] = $newBk->id;
                     $clearedBkTeacherIds[] = $newBk->id;
@@ -387,6 +408,15 @@ class SchoolDocumentParserService
         $guruRole = Role::firstOrCreate(['role_name' => 'Guru']);
         $waliRole = Role::where('role_name', 'Wali Kelas')->first() ?? $guruRole;
         $bkRole   = Role::where('role_name', 'Guru BK')->first() ?? $guruRole;
+
+        // IN-MEMORY CACHING UNTUK MEMPERCEPAT PROSES & MENGHINDARI TIMEOUT 300s
+        $allTeachers = User::whereHas('role', fn($q) => $q->whereIn('role_name', ['Guru', 'Wali Kelas', 'Guru BK', 'Waka Kurikulum', 'Admin']))
+            ->with('role')
+            ->get();
+        $existingUsernames = User::whereNotNull('username')->pluck('username')->flip()->toArray();
+        $existingEmails = User::whereNotNull('email')->pluck('email')->flip()->toArray();
+        $allClasses = SchoolClass::all()->keyBy(fn($c) => strtoupper(trim($c->class_name)));
+        $allMajors = Major::all()->keyBy(fn($m) => strtoupper(trim($m->code)));
 
         $created = 0;
         $updated = 0;
@@ -448,7 +478,12 @@ class SchoolDocumentParserService
                 phone: $phone,
                 address: $address,
                 skipped: $skipped,
-                duplicateAction: $duplicateAction
+                duplicateAction: $duplicateAction,
+                allTeachers: $allTeachers,
+                existingUsernames: $existingUsernames,
+                existingEmails: $existingEmails,
+                allClasses: $allClasses,
+                allMajors: $allMajors
             );
         }
 
@@ -464,46 +499,33 @@ class SchoolDocumentParserService
 
     /**
      * Memeriksa apakah data baris pegawai merupakan Tenaga Kependidikan / Non-Guru (TU, Satpam, Penjaga, dll.)
+     * Menggunakan pendekatan WHITELIST GURU yang ketat: hanya lolos jika terkonfirmasi sebagai guru
      */
     public function isNonTeachingStaff(array $row): bool
     {
-        $jabatan = strtolower($this->getField($row, ['jabatan', 'posisi', 'tugas', 'pekerjaan']));
-        $mapel = trim($this->getField($row, ['mapel', 'mata_pelajaran', 'mata_pelajaran_yang_diampu']));
+        $jabatan = strtolower($this->getField($row, ['jabatan', 'posisi', 'tugas', 'role', 'peran', 'pekerjaan']));
+        $mapel   = trim($this->getField($row, ['mapel', 'mata_pelajaran', 'mata_pelajaran_yang_diampu']));
 
-        // Jika mapel terisi dan bukan tanda strip / kosong, maka orang tersebut mengampu mata pelajaran (Guru)
-        $hasMapel = !empty($mapel) && !in_array(strtolower($mapel), ['-', '--', '0', 'null', 'none']);
+        // 1. Jika mapel terisi mata pelajaran nyata (bukan strip '-' atau kosong), orang ini terkonfirmasi Guru Mapel
+        $hasRealMapel = !empty($mapel) && !in_array(strtolower($mapel), ['-', '--', '0', 'null', 'none', 'tidak ada', 'tidak mengajar', 'kosong']);
 
-        // Kata kunci eksplisit untuk staf TU / Pegawai Administrasi / Non-Guru
-        $nonTeacherKeywords = [
-            'tata usaha', 'tu', 'administrasi', 'pengadministrasi',
-            'satpam', 'keamanan', 'security',
-            'kebersihan', 'cleaning', 'penjaga', 'caraka', 'pesuruh',
-            'pustakawan', 'perpustakaan', 'laboran', 'teknisi', 'toolman',
-            'operator', 'sopir', 'pengemudi', 'layanan khusus',
-            'tenaga kependidikan', 'ptk', 'staf tu', 'staff', 'bengkel'
-        ];
-
-        $matchesNonTeacher = false;
-        foreach ($nonTeacherKeywords as $kw) {
+        // 2. Cek apakah jabatan mengandung kata guru, pendidik, bk, konselor, kepsek, waka, wali
+        $teacherKeywords = ['guru', 'pendidik', 'pengajar', 'bk', 'bimbingan', 'konseling', 'konselor', 'kepala sekolah', 'kepsek', 'wakil kepala', 'waka', 'wali kelas'];
+        $hasTeacherJabatan = false;
+        foreach ($teacherKeywords as $kw) {
             if (str_contains($jabatan, $kw)) {
-                $matchesNonTeacher = true;
+                $hasTeacherJabatan = true;
                 break;
             }
         }
 
-        // Pengecualian: jika jabatan secara eksplisit menyebut guru / pendidik / kepsek / waka
-        $isTeacherExplicit = str_contains($jabatan, 'guru') ||
-                             str_contains($jabatan, 'pendidik') ||
-                             str_contains($jabatan, 'kepala sekolah') ||
-                             str_contains($jabatan, 'wakil kepala') ||
-                             str_contains($jabatan, 'waka') ||
-                             str_contains($jabatan, 'wali kelas');
-
-        if ($matchesNonTeacher && !$isTeacherExplicit && !$hasMapel) {
-            return true;
+        // Jika terkonfirmasi sebagai guru mapel atau jabatannya guru/pendidik/bk: BUKAN non-teaching staff (KEEEP GURU)
+        if ($hasRealMapel || $hasTeacherJabatan) {
+            return false;
         }
 
-        return false;
+        // Selain itu, semua baris tanpa mapel & tanpa jabatan guru adalah staf TU / Tendik / Non-Guru (SKIP)
+        return true;
     }
 
     /**
@@ -522,7 +544,12 @@ class SchoolDocumentParserService
         ?string $phone = null,
         ?string $address = null,
         int &$skipped = 0,
-        string $duplicateAction = 'replace'
+        string $duplicateAction = 'replace',
+        $allTeachers = null,
+        array &$existingUsernames = [],
+        array &$existingEmails = [],
+        $allClasses = null,
+        $allMajors = null
     ): void {
         $cleanName = trim(preg_replace('/^\d+\.\s*/', '', $name), " \t\n\r\0\x0B\"'");
         if (empty($cleanName)) return;
@@ -531,12 +558,21 @@ class SchoolDocumentParserService
         $homeroomClassId = null;
         if (!empty($homeroomClassName)) {
             $normClass = $this->normalizeClassName($homeroomClassName);
-            $this->autoProvisionMajor($normClass, $createdMajors);
+            $normClassUpper = strtoupper($normClass);
 
-            $schoolClass = SchoolClass::firstOrCreate(['class_name' => $normClass]);
-            if ($schoolClass->wasRecentlyCreated) {
-                $createdClasses++;
+            if ($allClasses && isset($allClasses[$normClassUpper])) {
+                $schoolClass = $allClasses[$normClassUpper];
+            } else {
+                $this->autoProvisionMajor($normClass, $createdMajors, $allMajors);
+                $schoolClass = SchoolClass::firstOrCreate(['class_name' => $normClass]);
+                if ($schoolClass->wasRecentlyCreated) {
+                    $createdClasses++;
+                }
+                if ($allClasses) {
+                    $allClasses[$normClassUpper] = $schoolClass;
+                }
             }
+
             $homeroomClassId = $schoolClass->id;
             $roleId = $waliRole->id;
         }
@@ -549,13 +585,16 @@ class SchoolDocumentParserService
             }
         }
 
-        // Cari guru yang sudah ada berdasarkan NIP atau Pencarian Nama Cerdas Fleksibel
+        // Cari guru yang sudah ada berdasarkan NIP atau Pencarian Nama Cerdas Fleksibel di Memori
         $teacher = null;
-        if ($nip) {
+        if ($nip && $allTeachers) {
+            $teacher = $allTeachers->first(fn($t) => $t->nip === $nip);
+        } elseif ($nip) {
             $teacher = User::where('nip', $nip)->first();
         }
+
         if (!$teacher) {
-            $teacher = $this->findTeacherByNameFlexible($cleanName);
+            $teacher = $this->findTeacherByNameFlexible($cleanName, $allTeachers);
         }
 
         if ($teacher) {
@@ -582,20 +621,25 @@ class SchoolDocumentParserService
             ]);
             $updated++;
         } else {
-            $this->createNewTeacherAccount(
+            $newTeacher = $this->createNewTeacherAccount(
                 name: $cleanName,
                 nip: $nip,
                 roleId: $roleId,
                 homeroomClassId: $homeroomClassId,
                 phone: $cleanPhone,
-                address: $address
+                address: $address,
+                existingUsernames: $existingUsernames,
+                existingEmails: $existingEmails
             );
+            if ($allTeachers) {
+                $allTeachers->push($newTeacher);
+            }
             $created++;
         }
     }
 
     /**
-     * Helper Membuat Akun Baru Guru dengan Username & Email Unik
+     * Helper Membuat Akun Baru Guru dengan Username & Email Unik (Mendukung In-Memory Hash Set)
      */
     protected function createNewTeacherAccount(
         string $name,
@@ -603,7 +647,9 @@ class SchoolDocumentParserService
         int $roleId,
         ?int $homeroomClassId = null,
         ?string $phone = null,
-        ?string $address = null
+        ?string $address = null,
+        array &$existingUsernames = [],
+        array &$existingEmails = []
     ): User {
         $cleanName = trim(preg_replace('/^\d+[\.\)]\s*/', '', $name), " \t\n\r\0\x0B\"'");
 
@@ -613,17 +659,19 @@ class SchoolDocumentParserService
 
         $uniqueUser = $baseUser;
         $counter = 1;
-        while (User::where('username', $uniqueUser)->exists()) {
+        while (isset($existingUsernames[$uniqueUser]) || (empty($existingUsernames) && User::where('username', $uniqueUser)->exists())) {
             $uniqueUser = "{$baseUser}{$counter}";
             $counter++;
         }
+        $existingUsernames[$uniqueUser] = true;
 
         $email = "{$uniqueUser}@guru.smk.sch.id";
         $c = 1;
-        while (User::where('email', $email)->exists()) {
+        while (isset($existingEmails[$email]) || (empty($existingEmails) && User::where('email', $email)->exists())) {
             $email = "{$uniqueUser}{$c}@guru.smk.sch.id";
             $c++;
         }
+        $existingEmails[$email] = true;
 
         return User::create([
             'name'              => $cleanName,
@@ -639,25 +687,24 @@ class SchoolDocumentParserService
     }
 
     /**
-     * Pencarian Guru Cerdas & Fleksibel (Abaikan Gelar Akademik, Tanda Baca, dan Huruf Besar/Kecil)
+     * Pencarian Guru Cerdas & Fleksibel (Mendukung In-Memory Koleksi Guru untuk Performa Cepat)
      */
-    public function findTeacherByNameFlexible(string $rawName): ?User
+    public function findTeacherByNameFlexible(string $rawName, $cachedTeachers = null): ?User
     {
         $clean = trim(preg_replace('/^\d+[\.\)]\s*/', '', $rawName), " \t\n\r\0\x0B\"'");
         if (empty($clean)) {
             return null;
         }
 
-        // 1. Coba pencocokan langsung nama persis (Exact Match)
-        $teacher = User::where('name', $clean)
-            ->whereHas('role', fn($q) => $q->whereIn('role_name', ['Guru', 'Wali Kelas', 'Guru BK', 'Waka Kurikulum', 'Admin']))
-            ->first();
+        $allTeachers = $cachedTeachers ?? User::whereHas('role', fn($q) => $q->whereIn('role_name', ['Guru', 'Wali Kelas', 'Guru BK', 'Waka Kurikulum', 'Admin']))->with('role')->get();
+
+        // 1. Coba pencocokan langsung nama persis (Exact Match) di koleksi
+        $teacher = $allTeachers->first(fn($t) => $t->name === $clean);
         if ($teacher) return $teacher;
 
-        // 2. Coba case-insensitive exact match
-        $teacher = User::whereRaw('LOWER(name) = ?', [strtolower($clean)])
-            ->whereHas('role', fn($q) => $q->whereIn('role_name', ['Guru', 'Wali Kelas', 'Guru BK', 'Waka Kurikulum', 'Admin']))
-            ->first();
+        // 2. Coba case-insensitive exact match di koleksi
+        $lowerClean = strtolower($clean);
+        $teacher = $allTeachers->first(fn($t) => strtolower($t->name) === $lowerClean);
         if ($teacher) return $teacher;
 
         // 3. Normalisasi nama dasar (hilangkan gelar depan & gelar belakang)
@@ -665,9 +712,6 @@ class SchoolDocumentParserService
         if (strlen($normSearch) < 3) {
             return null;
         }
-
-        // Ambil semua guru untuk pencocokan berbasis normalisasi gelar
-        $allTeachers = User::whereHas('role', fn($q) => $q->whereIn('role_name', ['Guru', 'Wali Kelas', 'Guru BK', 'Waka Kurikulum', 'Admin']))->get();
 
         foreach ($allTeachers as $t) {
             $tNorm = $this->stripAcademicTitles($t->name);
@@ -792,7 +836,7 @@ class SchoolDocumentParserService
             $existingStudentsByNameClass[$key] = $sr->id;
         }
 
-        $existingUsernames = User::pluck('username')->flip()->toArray();
+        $existingUsernames = User::whereNotNull('username')->pluck('username')->flip()->toArray();
         $existingClasses = SchoolClass::pluck('id', 'class_name')->toArray();
         $existingMajors = Major::pluck('id', 'code')->toArray();
         $defaultPasswordHash = Hash::make('password123');
@@ -1037,7 +1081,7 @@ class SchoolDocumentParserService
             $existingStudentsByNameClass[$key] = $sr->id;
         }
 
-        $existingUsernames = User::pluck('username')->flip()->toArray();
+        $existingUsernames = User::whereNotNull('username')->pluck('username')->flip()->toArray();
         $existingClasses = SchoolClass::pluck('id', 'class_name')->toArray();
         $existingMajors = Major::pluck('id', 'code')->toArray();
         $defaultPasswordHash = Hash::make('password123');
@@ -1537,27 +1581,33 @@ class SchoolDocumentParserService
     public function normalizeClassName(string $raw): string
     {
         $trimmed = trim($raw);
-        if (preg_match('/^([X|XI|XII]+)\s*([A-Za-z]+)(\d+)$/i', $trimmed, $m)) {
+        if (preg_match('/^(XII|XI|X)\s*([A-Za-z]+)\s*(\d+)$/i', $trimmed, $m)) {
             return strtoupper($m[1]) . ' ' . strtoupper($m[2]) . ' ' . $m[3];
         }
-        if (preg_match('/^([X|XI|XII]+)\s*([A-Za-z]+)$/i', $trimmed, $m)) {
+        if (preg_match('/^(XII|XI|X)\s*([A-Za-z]+)$/i', $trimmed, $m)) {
             return strtoupper($m[1]) . ' ' . strtoupper($m[2]);
         }
         return $trimmed;
     }
 
     /**
-     * Auto-Provisioning Jurusan (Major) dari Nama Kelas
+     * Auto-Provisioning Jurusan (Major) dari Nama Kelas (Mendukung In-Memory Hash Map)
      */
-    public function autoProvisionMajor(string $className, int &$createdCounter): ?Major
+    public function autoProvisionMajor(string $className, int &$createdCounter, $allMajors = null): ?Major
     {
-        if (preg_match('/^(?:X|XI|XII)\s+([A-Z]+)/i', $className, $matches)) {
+        if (preg_match('/^(?:XII|XI|X)\s+([A-Z]+)/i', $className, $matches)) {
             $majorCode = strtoupper($matches[1]);
+
+            if ($allMajors && isset($allMajors[$majorCode])) {
+                return $allMajors[$majorCode];
+            }
+
             $major = Major::firstOrCreate(
                 ['code' => $majorCode],
                 [
                     'name'        => "Jurusan {$majorCode}",
-                    'rombel_x_xi' => 2,
+                    'rombel_x'    => 2,
+                    'rombel_xi'   => 2,
                     'rombel_xii'  => 2,
                 ]
             );
@@ -1565,6 +1615,11 @@ class SchoolDocumentParserService
             if ($major->wasRecentlyCreated) {
                 $createdCounter++;
             }
+
+            if ($allMajors) {
+                $allMajors[$majorCode] = $major;
+            }
+
             return $major;
         }
 

@@ -116,7 +116,7 @@ def normalize_class_name(raw_name):
     name = re.sub(r'\s*[:=]\s*', '', name)
     name = re.sub(r'\s+', ' ', name)
     # Ubah format seperti 'X RPL1' atau 'XI TKJ2' menjadi 'X RPL 1'
-    m = re.match(r'^(X|XI|XII)\s*([A-Za-z]+)\s*(\d*)$', name, re.IGNORECASE)
+    m = re.match(r'^(XII|XI|X)\s*([A-Za-z]+)\s*(\d*)$', name, re.IGNORECASE)
     if m:
         grade = m.group(1).upper()
         major = m.group(2).upper()
@@ -214,7 +214,7 @@ def parse_pdf(file_path):
             })
 
             # Header fallback dari teks halaman
-            class_header_match = re.search(r'(?:SMK NEGERI 1 BANTUL\s+)?([X|XI|XII]+\s+[A-Za-z0-9\s]+)', text[:200], re.I)
+            class_header_match = re.search(r'(?:SMK NEGERI 1 BANTUL\s+)?\b((?:XII|XI|X)\s+[A-Za-z0-9\s]+)', text[:200], re.I)
             fallback_class = normalize_class_name(class_header_match.group(1)) if class_header_match else None
             if fallback_class:
                 extracted_classes.add(fallback_class)
@@ -257,7 +257,7 @@ def parse_pdf(file_path):
                 if day_row_idx > 0:
                     title_text = ' '.join([str(c) for c in table[day_row_idx - 1] if c]).strip()
                     tm = re.search(r'["“]?(\d{1,3})[\.,\s]+([^"”\n\r]+)["”]?', title_text)
-                    cm = re.search(r'\b(X|XI|XII)\s*([A-Za-z]+)\s*(\d*)\b', title_text, re.I)
+                    cm = re.search(r'\b(XII|XI|X)\s*([A-Za-z]+)\s*(\d*)\b', title_text, re.I)
 
                     if tm and not cm:
                         current_page_teacher_code = tm.group(1).strip()

@@ -206,6 +206,60 @@ class WakaController extends Controller
     }
 
     /**
+     * Hapus Jadwal Mengajar Terpilih (Bulk Delete)
+     */
+    public function schedulesDeleteSelected(Request $request)
+    {
+        $config = SystemConfiguration::current();
+        if ($config->is_schedule_locked) {
+            return redirect()->back()->with('error', 'Gagal menghapus jadwal: Siklus blok saat ini sedang TERKUNCI.');
+        }
+
+        $request->validate([
+            'schedule_ids'   => ['required', 'array', 'min:1'],
+            'schedule_ids.*' => ['exists:schedules,id'],
+        ]);
+
+        $count = Schedule::whereIn('id', $request->schedule_ids)->delete();
+
+        return redirect()->route('waka.schedules.index')
+            ->with('success', "Sukses! Berhasil menghapus {$count} jadwal pelajaran yang dipilih.");
+    }
+
+    /**
+     * Hapus Semua Jadwal Mengajar (Opsional per Putaran / Semua Putaran / Kelas)
+     */
+    public function schedulesDeleteAll(Request $request)
+    {
+        $config = SystemConfiguration::current();
+        if ($config->is_schedule_locked) {
+            return redirect()->back()->with('error', 'Gagal menghapus jadwal: Siklus blok saat ini sedang TERKUNCI.');
+        }
+
+        $query = Schedule::query();
+
+        $scope = $request->input('scope', 'active_cycle');
+        if ($scope === 'active_cycle') {
+            $cycle = $request->input('cycle_type', $config->active_cycle);
+            $query->where('cycle_type', $cycle);
+            $scopeDesc = "di {$cycle}";
+        } else {
+            $scopeDesc = "di SELURUH Putaran";
+        }
+
+        if ($request->filled('class_id') && $request->class_id !== 'all') {
+            $class = SchoolClass::find($request->class_id);
+            $query->where('class_id', $request->class_id);
+            $scopeDesc .= " untuk Kelas " . ($class ? $class->class_name : $request->class_id);
+        }
+
+        $count = $query->delete();
+
+        return redirect()->route('waka.schedules.index')
+            ->with('success', "Sukses! Berhasil menghapus {$count} jadwal pelajaran {$scopeDesc}.");
+    }
+
+    /**
      * Download Template Excel / CSV Jadwal Mengajar
      */
     public function schedulesTemplate(SpreadsheetImportService $spreadsheetService)
@@ -496,6 +550,86 @@ class WakaController extends Controller
         $teacher->delete();
 
         return redirect()->route('waka.teachers.index')->with('success', 'Data guru dan seluruh penugasan/jadwal mengajarnya berhasil dihapus.');
+    }
+
+    /**
+     * Hapus Data Guru Terpilih (Bulk Delete)
+     */
+    public function teachersDeleteSelected(Request $request)
+    {
+        $request->validate([
+            'teacher_ids'   => ['required', 'array', 'min:1'],
+            'teacher_ids.*' => ['exists:users,id'],
+        ]);
+
+        $currentUserId = auth()->id();
+        $targetIds = array_diff($request->teacher_ids, [$currentUserId]);
+
+        if (empty($targetIds)) {
+            return redirect()->back()->with('error', 'Tidak ada data guru yang dapat dihapus (akun Anda sendiri tidak dapat dihapus).');
+        }
+
+        $teachers = User::whereIn('id', $targetIds)
+            ->whereHas('role', fn($q) => $q->whereIn('role_name', ['Guru', 'Wali Kelas', 'Guru BK']))
+            ->get();
+
+        $validIds = $teachers->pluck('id')->toArray();
+        if (empty($validIds)) {
+            return redirect()->back()->with('error', 'Tidak ada data guru valid yang ditemukan.');
+        }
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($validIds) {
+            // 1. Lepaskan relasi perwalian Guru BK
+            \Illuminate\Support\Facades\DB::table('counselor_classes')->whereIn('user_id', $validIds)->delete();
+
+            // 2. Hapus jadwal mengajar yang terikat pada guru-guru ini
+            \App\Models\Schedule::whereIn('teacher_id', $validIds)->delete();
+
+            // 3. Hapus data akun guru
+            User::whereIn('id', $validIds)->delete();
+        });
+
+        $count = count($validIds);
+        return redirect()->route('waka.teachers.index')
+            ->with('success', "Sukses! Berhasil menghapus {$count} data guru dan seluruh penugasan/jadwal mengajarnya.");
+    }
+
+    /**
+     * Hapus Semua Data Guru (Opsional per Peran: Semua, Guru Pengajar, Wali Kelas, Guru BK)
+     */
+    public function teachersDeleteAll(Request $request)
+    {
+        $currentUserId = auth()->id();
+        $query = User::whereHas('role', fn($q) => $q->whereIn('role_name', ['Guru', 'Wali Kelas', 'Guru BK']))
+            ->where('id', '!=', $currentUserId);
+
+        $roleFilter = $request->input('role', 'all');
+        if ($roleFilter && $roleFilter !== 'all') {
+            $query->whereHas('role', fn($q) => $q->where('role_name', $roleFilter));
+            $roleLabel = "peran {$roleFilter}";
+        } else {
+            $roleLabel = "seluruh peran (Guru, Wali Kelas, Guru BK)";
+        }
+
+        $validIds = $query->pluck('id')->toArray();
+        if (empty($validIds)) {
+            return redirect()->back()->with('error', 'Tidak ada data guru yang dapat dihapus.');
+        }
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($validIds) {
+            // 1. Lepaskan relasi perwalian Guru BK
+            \Illuminate\Support\Facades\DB::table('counselor_classes')->whereIn('user_id', $validIds)->delete();
+
+            // 2. Hapus jadwal mengajar yang terikat pada guru-guru ini
+            \App\Models\Schedule::whereIn('teacher_id', $validIds)->delete();
+
+            // 3. Hapus data akun guru
+            User::whereIn('id', $validIds)->delete();
+        });
+
+        $count = count($validIds);
+        return redirect()->route('waka.teachers.index')
+            ->with('success', "Sukses! Berhasil menghapus {$count} data guru dengan {$roleLabel} dari sistem.");
     }
 
 

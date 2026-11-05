@@ -129,6 +129,8 @@ Route::middleware(['auth', 'role:Waka Kurikulum'])->group(function () {
     Route::post('/waka/schedules', [WakaController::class, 'schedulesStore'])->name('waka.schedules.store');
     Route::delete('/waka/schedules/{schedule}', [WakaController::class, 'schedulesDestroy'])->name('waka.schedules.destroy');
     Route::put('/waka/schedules/{schedule}', [WakaController::class, 'schedulesUpdate'])->name('waka.schedules.update');
+    Route::post('/waka/schedules/delete-selected', [WakaController::class, 'schedulesDeleteSelected'])->name('waka.schedules.delete-selected');
+    Route::post('/waka/schedules/delete-all', [WakaController::class, 'schedulesDeleteAll'])->name('waka.schedules.delete-all');
 
     // Master Data Guru & Import
     Route::get('/waka/teachers', [WakaController::class, 'teachersIndex'])->name('waka.teachers.index');
@@ -137,6 +139,8 @@ Route::middleware(['auth', 'role:Waka Kurikulum'])->group(function () {
     Route::post('/waka/teachers', [WakaController::class, 'teachersStore'])->name('waka.teachers.store');
     Route::put('/waka/teachers/{teacher}', [WakaController::class, 'teachersUpdate'])->name('waka.teachers.update');
     Route::delete('/waka/teachers/{teacher}', [WakaController::class, 'teachersDestroy'])->name('waka.teachers.destroy');
+    Route::post('/waka/teachers/delete-selected', [WakaController::class, 'teachersDeleteSelected'])->name('waka.teachers.delete-selected');
+    Route::post('/waka/teachers/delete-all', [WakaController::class, 'teachersDeleteAll'])->name('waka.teachers.delete-all');
 
     // Master Data Siswa & Import
     Route::get('/waka/students', [WakaController::class, 'studentsIndex'])->name('waka.students.index');

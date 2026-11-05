@@ -4,8 +4,22 @@
             editModalOpen: false, 
             viewModalOpen: false,
             importModalOpen: false,
+            deleteSelectedModalOpen: false,
+            deleteAllModalOpen: false,
+            selectedTeachers: [],
+            selectAll: false,
             classesList: {{ json_encode($structuredClasses) }},
             rolesList: {{ json_encode($roles) }},
+
+            toggleSelectAll(allIds) {
+                if (this.selectAll) {
+                    this.selectedTeachers = [];
+                    this.selectAll = false;
+                } else {
+                    this.selectedTeachers = allIds.map(String);
+                    this.selectAll = true;
+                }
+            },
 
             // Helper Cascading 3 Kolom (Tingkat -> Jurusan -> Rombel)
             getMajors(grade) {
@@ -146,7 +160,12 @@
                 <h1 class="text-xl sm:text-2xl font-black text-white tracking-tight">Data Guru</h1>
                 <p class="text-xs font-semibold text-slate-400 mt-0.5">Kelola data tenaga pendidik, penugasan Wali Kelas & Guru BK (multi-kelas), serta akun login guru</p>
             </div>
-            <div class="flex items-center gap-2 shrink-0">
+            <div class="flex items-center gap-2 shrink-0 flex-wrap">
+                <!-- Tombol Hapus Semua Guru -->
+                <button @click="deleteAllModalOpen = true" type="button" class="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/40 text-xs sm:text-sm font-bold shadow-md cursor-pointer transition flex items-center gap-1.5 whitespace-nowrap">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    <span>Hapus Semua Guru</span>
+                </button>
                 <button @click="importModalOpen = true" type="button" class="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs sm:text-sm font-bold text-white shadow-md shadow-emerald-950/40 cursor-pointer transition flex items-center gap-1.5">
                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                     <span>Import Excel / Dokumen</span>
@@ -224,12 +243,40 @@
             </form>
         </div>
 
+        <!-- BAR AKSI SELEKSI GURU TERPILIH (BULK ACTION BAR) -->
+        <div x-show="selectedTeachers.length > 0" 
+             x-transition
+             class="p-3.5 px-5 rounded-2xl bg-indigo-950/90 border border-indigo-500/50 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-3 text-white">
+            <div class="flex items-center gap-2.5">
+                <span class="flex h-3 w-3 rounded-full bg-rose-500 animate-pulse"></span>
+                <span class="text-xs sm:text-sm font-bold">
+                    <span x-text="selectedTeachers.length" class="text-indigo-300 font-black text-base"></span> guru dipilih dari halaman ini
+                </span>
+            </div>
+            <div class="flex items-center gap-2">
+                <button type="button" @click="selectedTeachers = []; selectAll = false" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 transition cursor-pointer">
+                    Batal Pilih
+                </button>
+                <button type="button" @click="deleteSelectedModalOpen = true" class="px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white shadow-md shadow-rose-950/60 transition flex items-center gap-1.5 cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    <span>Hapus (<span x-text="selectedTeachers.length"></span>) Guru Terpilih</span>
+                </button>
+            </div>
+        </div>
+
         <!-- Tabel Data Guru -->
         <div class="bg-[#0f172a]/90 backdrop-blur-md border border-slate-800 shadow-xl overflow-hidden" style="border-radius: 15px;">
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-slate-800 text-sm">
                     <thead class="bg-slate-900/70">
                         <tr class="text-left text-xs font-bold text-slate-400 uppercase tracking-wider">
+                            <th class="p-4 text-center w-10">
+                                <input type="checkbox" 
+                                       @change="toggleSelectAll([{{ $teachers->pluck('id')->implode(',') }}])" 
+                                       :checked="selectAll && selectedTeachers.length > 0"
+                                       class="rounded border-slate-700 bg-slate-900 text-indigo-600 focus:ring-indigo-500/30 cursor-pointer w-4 h-4"
+                                       title="Pilih Semua Guru di Halaman Ini">
+                            </th>
                             <th class="p-4 text-center w-12">No</th>
                             <th class="p-4">Guru</th>
                             <th class="p-4">NIP</th>
@@ -243,6 +290,18 @@
                     <tbody class="divide-y divide-slate-800/60">
                         @forelse ($teachers as $teacher)
                             <tr class="hover:bg-slate-800/30 transition">
+                                <!-- Checkbox Seleksi -->
+                                <td class="p-4 text-center">
+                                    @if($teacher->id !== auth()->id())
+                                        <input type="checkbox" 
+                                               value="{{ $teacher->id }}" 
+                                               x-model="selectedTeachers"
+                                               class="rounded border-slate-700 bg-slate-900 text-indigo-600 focus:ring-indigo-500/30 cursor-pointer w-4 h-4">
+                                    @else
+                                        <span class="text-[10px] text-slate-500 font-bold" title="Akun Anda Sendiri">-</span>
+                                    @endif
+                                </td>
+
                                 <!-- Nomor Urut -->
                                 <td class="p-4 text-center text-xs font-bold text-slate-400">
                                     {{ $teachers->firstItem() + $loop->index }}
@@ -962,6 +1021,87 @@
                                 class="px-5 py-2.5 rounded-xl font-bold text-white shadow-md shadow-emerald-950/40 transition flex items-center gap-1.5">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                             Mulai Import Data Guru
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- MODAL KONFIRMASI: HAPUS GURU TERPILIH -->
+        <div x-show="deleteSelectedModalOpen" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
+            <div @click="deleteSelectedModalOpen = false" class="fixed inset-0 bg-black/70 backdrop-blur-sm"></div>
+            <div class="relative w-full max-w-md bg-[#0f172a] p-6 shadow-2xl border border-rose-500/30 space-y-4 my-auto max-h-[90vh] overflow-y-auto" style="border-radius: 20px;">
+                <div class="flex items-center gap-3 border-b border-slate-800 pb-3">
+                    <div class="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-extrabold text-white">Hapus Guru Terpilih</h3>
+                        <p class="text-xs text-slate-400">Konfirmasi tindakan penghapusan massal data guru</p>
+                    </div>
+                </div>
+
+                <div class="p-3.5 rounded-xl bg-rose-950/30 border border-rose-800/40 text-xs text-rose-300 leading-relaxed">
+                    Anda yakin ingin menghapus <strong x-text="selectedTeachers.length" class="text-white underline"></strong> data guru yang dipilih? Seluruh jadwal mengajar dan perwalian kelas guru terkait juga akan dihapus. Akun Anda sendiri tidak akan terhapus.
+                </div>
+
+                <form method="POST" action="{{ route('waka.teachers.delete-selected') }}" class="space-y-4">
+                    @csrf
+                    <!-- Loop Hidden Inputs IDs -->
+                    <template x-for="id in selectedTeachers" :key="id">
+                        <input type="hidden" name="teacher_ids[]" :value="id">
+                    </template>
+
+                    <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
+                        <button @click="deleteSelectedModalOpen = false" type="button" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:bg-slate-800 hover:text-white transition cursor-pointer">
+                            Batal
+                        </button>
+                        <button type="submit" class="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-xs font-bold text-white shadow-md shadow-rose-950/60 transition cursor-pointer flex items-center gap-1.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            <span>Ya, Hapus Guru Terpilih</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- MODAL KONFIRMASI: HAPUS SEMUA DATA GURU -->
+        <div x-show="deleteAllModalOpen" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
+            <div @click="deleteAllModalOpen = false" class="fixed inset-0 bg-black/70 backdrop-blur-sm"></div>
+            <div class="relative w-full max-w-md bg-[#0f172a] p-6 shadow-2xl border border-rose-500/40 space-y-4 my-auto max-h-[90vh] overflow-y-auto" style="border-radius: 20px;">
+                <div class="flex items-center gap-3 border-b border-slate-800 pb-3">
+                    <div class="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-extrabold text-white">Hapus Semua Data Guru</h3>
+                        <p class="text-xs text-rose-400 font-semibold">Tindakan ini tidak dapat dibatalkan!</p>
+                    </div>
+                </div>
+
+                <div class="p-3.5 rounded-xl bg-rose-950/40 border border-rose-800/50 text-xs text-rose-200 leading-relaxed">
+                    PERINGATAN: Tindakan ini akan menghapus <strong>seluruh data guru</strong> dari sistem, termasuk jadwal mengajar dan perwalian kelas. Akun Waka Anda sendiri akan tetap aman.
+                </div>
+
+                <form method="POST" action="{{ route('waka.teachers.delete-all') }}" class="space-y-4 text-xs">
+                    @csrf
+                    <div>
+                        <label class="block font-bold text-slate-300 mb-1.5">Cakupan Penghapusan Peran:</label>
+                        <select name="role" class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2.5 text-xs font-semibold text-white focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500">
+                            <option value="all">⚠️ Hapus SELURUH Guru (Guru, Wali Kelas, Guru BK)</option>
+                            <option value="Guru">Hanya Guru Pengajar (Bukan Wali/BK)</option>
+                            <option value="Wali Kelas">Hanya Guru yang Memiliki Peran Wali Kelas</option>
+                            <option value="Guru BK">Hanya Guru BK (Bimbingan Konseling)</option>
+                        </select>
+                    </div>
+
+                    <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
+                        <button @click="deleteAllModalOpen = false" type="button" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:bg-slate-800 hover:text-white transition cursor-pointer">
+                            Batal
+                        </button>
+                        <button type="submit" class="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-xs font-bold text-white shadow-md shadow-rose-950/60 transition cursor-pointer flex items-center gap-1.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            <span>Ya, Hapus Semua Guru</span>
                         </button>
                     </div>
                 </form>

@@ -17,7 +17,8 @@ use Smalot\PdfParser\Parser as PdfParser;
 class FetTimetableParserService
 {
     public function __construct(
-        protected SpreadsheetImportService $spreadsheetService
+        protected SpreadsheetImportService $spreadsheetService,
+        protected SchoolDocumentParserService $schoolDocService
     ) {}
 
     /**
@@ -67,52 +68,21 @@ class FetTimetableParserService
                 }
             }
 
-            // B. Daftarkan seluruh guru dari daftar isi FET jika ada
-            if (!empty($pyResult['teachers'])) {
-                foreach ($pyResult['teachers'] as $tItem) {
-                    $this->resolveTeacher($tItem['name'], $tItem['code'] ?? null, $createdTeachers);
-                }
-            }
+            // B. (Dokumen jadwal hanya mencocokkan data guru yang ada, tidak membuat guru baru)
 
             // C. Jika Python berhasil mengekstrak jadwal langsung dari tabel FET (Jadwal Kelas / Jadwal Guru)
             if (!empty($pyResult['schedules'])) {
                 \Illuminate\Support\Facades\DB::transaction(function () use (
                     $pyResult, $cycleType, $duplicateAction, &$imported, &$skipped, &$createdTeachers, &$createdClasses, &$createdRooms
                 ) {
-                    $guruRole = Role::firstOrCreate(['role_name' => 'Guru']);
+                    // IN-MEMORY CACHING UNTUK PENCOCOKAN GURU
+                    $allTeachers = User::whereHas('role', fn($q) => $q->whereIn('role_name', ['Guru', 'Wali Kelas', 'Guru BK', 'Waka Kurikulum', 'Admin']))
+                        ->with('role')
+                        ->get();
 
-                    $teachersByName = [];
-                    $teachersByCode = [];
-                    foreach (User::whereHas('role', fn($q) => $q->whereIn('role_name', ['Guru', 'Wali Kelas', 'Guru BK']))->get() as $t) {
-                        $teachersByName[strtolower(trim($t->name))] = $t;
-                        if ($t->nip) $teachersByCode[$t->nip] = $t;
-                    }
-
-                    $classesByName = SchoolClass::pluck('id', 'class_name')->toArray();
-                    $roomsByName = Room::pluck('id', 'room_name')->toArray();
-                    $defaultPassword = Hash::make('password123');
-
-                    // Pre-create any missing teachers from pyResult
-                    foreach ($pyResult['teachers'] ?? [] as $tItem) {
-                        $tCode = $tItem['code'] ?? null;
-                        $tName = trim($tItem['name']);
-                        $tKey = strtolower($tName);
-                        if (!isset($teachersByName[$tKey]) && (!$tCode || !isset($teachersByCode[$tCode]))) {
-                            $baseUser = $tCode ? "guru_{$tCode}" : Str::slug($tName, '.');
-                            $uniqueUser = substr($baseUser ?: 'guru_' . Str::random(4), 0, 35);
-                            $newT = User::create([
-                                'name'     => $tName,
-                                'username' => $uniqueUser,
-                                'nip'      => $tCode,
-                                'email'    => "{$uniqueUser}@guru.smk1bantul.sch.id",
-                                'password' => $defaultPassword,
-                                'role_id'  => $guruRole->id,
-                            ]);
-                            $teachersByName[$tKey] = $newT;
-                            if ($tCode) $teachersByCode[$tCode] = $newT;
-                            $createdTeachers++;
-                        }
-                    }
+                    $allClasses = SchoolClass::all()->keyBy(fn($c) => strtoupper(trim($c->class_name)));
+                    $allRooms = Room::all()->keyBy(fn($r) => strtoupper(trim($r->room_name)));
+                    $allMajors = Major::all()->keyBy(fn($m) => strtoupper(trim($m->code)));
 
                     // Pre-load data jadwal yang sudah ada pada siklus ini untuk pengecekan duplikasi
                     $existingSchedules = Schedule::where('cycle_type', $cycleType)
@@ -130,43 +100,50 @@ class FetTimetableParserService
                     $now = now();
 
                     foreach ($pyResult['schedules'] as $item) {
+                        // 1. Resolve Kelas & Jurusan
                         $normClass = $this->normalizeClassName($item['class']);
                         if (empty($normClass)) continue;
+                        $normClassUpper = strtoupper($normClass);
 
-                        if (!isset($classesByName[$normClass])) {
-                            $sc = SchoolClass::create(['class_name' => $normClass]);
-                            $classesByName[$normClass] = $sc->id;
-                            $createdClasses++;
+                        if (isset($allClasses[$normClassUpper])) {
+                            $classId = $allClasses[$normClassUpper]->id;
+                        } else {
+                            $this->schoolDocService->autoProvisionMajor($normClass, $createdClasses, $allMajors);
+                            $sc = SchoolClass::firstOrCreate(['class_name' => $normClass]);
+                            if ($sc->wasRecentlyCreated) {
+                                $createdClasses++;
+                            }
+                            $allClasses[$normClassUpper] = $sc;
+                            $classId = $sc->id;
                         }
-                        $classId = $classesByName[$normClass];
 
+                        // 2. Resolve Guru: HANYA MENCOCOKKAN DENGAN DATA GURU, TIDAK MEMBUAT AKUN BARU
                         $tCode = $item['teacher_code'] ?? null;
                         $tName = trim($item['teacher_name'] ?? '');
-                        $tKey = strtolower($tName);
-                        $teacher = $teachersByName[$tKey] ?? ($tCode && isset($teachersByCode[$tCode]) ? $teachersByCode[$tCode] : null);
+                        $teacher = $this->findTeacherStrict(
+                            rawName: $tName,
+                            code: $tCode,
+                            allTeachers: $allTeachers
+                        );
+
                         if (!$teacher) {
-                            $baseUser = $tCode ? "guru_{$tCode}" : Str::slug($tName, '.');
-                            $uniqueUser = substr($baseUser ?: 'guru_' . Str::random(4), 0, 35);
-                            $teacher = User::create([
-                                'name'     => $tName ?: 'Guru Pengajar',
-                                'username' => $uniqueUser,
-                                'nip'      => $tCode,
-                                'email'    => "{$uniqueUser}@guru.smk1bantul.sch.id",
-                                'password' => $defaultPassword,
-                                'role_id'  => $guruRole->id,
-                            ]);
-                            $teachersByName[$tKey] = $teacher;
-                            if ($tCode) $teachersByCode[$tCode] = $teacher;
-                            $createdTeachers++;
+                            $skipped++;
+                            continue; // Jika guru tidak ditemukan di Data Guru, lewati baris jadwal ini
                         }
 
+                        // 3. Resolve Ruangan
                         $mappedRoom = $this->canonicalRoomName($item['room'] ?? 'Ruang Teori');
-                        if (!isset($roomsByName[$mappedRoom])) {
-                            $r = Room::create(['room_name' => $mappedRoom]);
-                            $roomsByName[$mappedRoom] = $r->id;
-                            $createdRooms++;
+                        $mappedRoomUpper = strtoupper($mappedRoom);
+                        if (isset($allRooms[$mappedRoomUpper])) {
+                            $roomId = $allRooms[$mappedRoomUpper]->id;
+                        } else {
+                            $r = Room::firstOrCreate(['room_name' => $mappedRoom]);
+                            if ($r->wasRecentlyCreated) {
+                                $createdRooms++;
+                            }
+                            $allRooms[$mappedRoomUpper] = $r;
+                            $roomId = $r->id;
                         }
-                        $roomId = $roomsByName[$mappedRoom];
 
                         $day = $item['day'];
                         $rawStart = $item['start_time'];
@@ -246,7 +223,11 @@ class FetTimetableParserService
                     if (preg_match('/"(\d+)\.\s*([^"]+)"/', $topText, $teacherHeaderMatch)) {
                         $teacherCode = $teacherHeaderMatch[1];
                         $teacherName = trim($teacherHeaderMatch[2]);
-                        $teacher = $this->resolveTeacher($teacherName, $teacherCode, $createdTeachers);
+                        $teacher = $this->findTeacherStrict($teacherName, $teacherCode);
+                        if (!$teacher) {
+                            $skipped++;
+                            continue;
+                        }
 
                         $imported += $this->parseTeacherTimetablePage(
                             $lines,
@@ -332,7 +313,11 @@ class FetTimetableParserService
             if (preg_match('/"(\d+)\.\s*([^"]+)"/', $topText, $teacherHeaderMatch)) {
                 $teacherCode = $teacherHeaderMatch[1];
                 $teacherName = trim($teacherHeaderMatch[2]);
-                $teacher = $this->resolveTeacher($teacherName, $teacherCode, $createdTeachers);
+                $teacher = $this->findTeacherStrict($teacherName, $teacherCode);
+                if (!$teacher) {
+                    $skipped++;
+                    continue;
+                }
 
                 $imported += $this->parseTeacherTimetablePage(
                     $lines,
@@ -433,7 +418,11 @@ class FetTimetableParserService
                     }
                 }
 
-                $teacher = $this->resolveTeacher($teacherName, $teacherCode, $createdTeachers);
+                $teacher = $this->findTeacherStrict($teacherName, $teacherCode);
+                if (!$teacher) {
+                    $skipped++;
+                    continue;
+                }
                 $room = $this->resolveRoom($roomName, $createdRooms);
 
                 $sessionEnd = $this->calculateNextSession($currentSession, $currentDay);
@@ -653,7 +642,11 @@ class FetTimetableParserService
                             $roomName = 'Ruang Teori';
                         }
 
-                        $teacher = $this->resolveTeacher($teacherName, $teacherCode, $createdTeachers);
+                        $teacher = $this->findTeacherStrict($teacherName, $teacherCode);
+                        if (!$teacher) {
+                            $skipped++;
+                            continue;
+                        }
                         $room = $this->resolveRoom($roomName, $createdRooms);
                         $day = $days[$cellIndex % 5] ?? 'Senin';
 
@@ -737,8 +730,12 @@ class FetTimetableParserService
             $startTime = str_contains($startRaw, ':') ? $startRaw : str_pad((int)$startRaw, 2, '0', STR_PAD_LEFT) . ':00';
             $endTime   = str_contains($endRaw, ':') ? $endRaw : str_pad((int)$endRaw, 2, '0', STR_PAD_LEFT) . ':00';
 
-            // Auto-resolve Teacher, Class, Room
-            $teacher = $this->resolveTeacher($teacherInput, null, $createdTeachers);
+            // Resolve Teacher (HANYA MENCOCOKKAN, TIDAK MEMBUAT BARU)
+            $teacher = $this->findTeacherStrict($teacherInput);
+            if (!$teacher) {
+                $skipped++;
+                continue;
+            }
             $schoolClass = $this->resolveClass($className, $createdClasses);
             $room = $this->resolveRoom($roomName, $createdRooms);
 
@@ -788,52 +785,68 @@ class FetTimetableParserService
     }
 
     /**
-     * Otomatis mencari atau membuat akun Guru
+     * Mencari dan mencocokkan akun guru yang sudah ada di sistem (HANYA MENCOCOKKAN, TIDAK MEMBUAT BARU)
      */
-    public function resolveTeacher(string $name, ?string $code, int &$createdCounter): User
-    {
-        $cleanName = preg_replace('/^\d+\.\s*/', '', trim($name, " \t\n\r\0\x0B\"'"));
+    public function findTeacherStrict(
+        string $rawName,
+        ?string $code = null,
+        $allTeachers = null
+    ): ?User {
+        $cleanName = preg_replace('/^\d+[\.\)]\s*/', '', trim($rawName, " \t\n\r\0\x0B\"'"));
 
-        $teacher = User::whereHas('role', fn($q) => $q->whereIn('role_name', ['Guru', 'Wali Kelas', 'Guru BK']))
-            ->where(function ($q) use ($cleanName, $code) {
-                $q->where('name', $cleanName)
-                  ->orWhere('name', 'like', "%{$cleanName}%");
-                if ($code) {
-                    $q->orWhere('nip', $code);
-                }
-            })->first();
+        if ($allTeachers !== null) {
+            // 1. Cari dengan flexible name matching
+            $teacher = $this->schoolDocService->findTeacherByNameFlexible($cleanName, $allTeachers);
 
-        if ($teacher) {
+            // 2. Jika tidak ditemukan lewat nama, cari lewat NIP atau username guru_{code}
+            if (!$teacher && !empty($code)) {
+                $codeStr = trim((string)$code);
+                $teacher = $allTeachers->first(fn($t) => 
+                    (string)$t->nip === $codeStr || 
+                    $t->username === "guru_{$codeStr}" ||
+                    $t->username === "guru_{$codeStr}_"
+                );
+            }
+
             return $teacher;
         }
 
-        $guruRole = Role::firstOrCreate(['role_name' => 'Guru']);
-        $baseUser = $code ? "guru_{$code}" : Str::slug($cleanName, '.');
-        $uniqueUser = $baseUser;
-        $counter = 1;
-        while (User::where('username', $uniqueUser)->exists()) {
-            $uniqueUser = "{$baseUser}{$counter}";
-            $counter++;
+        // Query database langsung jika koleksi in-memory tidak dioper
+        $teacher = $this->schoolDocService->findTeacherByNameFlexible($cleanName);
+
+        if (!$teacher && !empty($code)) {
+            $codeStr = trim((string)$code);
+            $teacher = User::whereHas('role', fn($q) => $q->whereIn('role_name', ['Guru', 'Wali Kelas', 'Guru BK', 'Waka Kurikulum', 'Admin']))
+                ->where(function ($q) use ($codeStr) {
+                    $q->where('nip', $codeStr)
+                      ->orWhere('username', "guru_{$codeStr}");
+                })->first();
         }
 
-        $email = "{$uniqueUser}@guru.smk1bantul.sch.id";
-        $c = 1;
-        while (User::where('email', $email)->exists()) {
-            $email = "{$uniqueUser}{$c}@guru.smk1bantul.sch.id";
-            $c++;
-        }
-
-        $teacher = User::create([
-            'name'     => $cleanName,
-            'username' => $uniqueUser,
-            'nip'      => $code,
-            'email'    => $email,
-            'password' => Hash::make('password123'),
-            'role_id'  => $guruRole->id,
-        ]);
-
-        $createdCounter++;
         return $teacher;
+    }
+
+    /**
+     * Helper kompatibilitas pencarian akun guru (hanya mencocokkan)
+     */
+    public function findOrCreateTeacherSafe(
+        string $rawName,
+        ?string $code,
+        &$allTeachers,
+        array &$existingUsernames,
+        array &$existingEmails,
+        Role $guruRole,
+        int &$createdCounter
+    ): ?User {
+        return $this->findTeacherStrict($rawName, $code, $allTeachers);
+    }
+
+    /**
+     * Otomatis mencari dan mencocokkan akun Guru (Fallback Helper - Tidak membuat akun baru)
+     */
+    public function resolveTeacher(string $name, ?string $code = null, int &$createdCounter = 0): ?User
+    {
+        return $this->findTeacherStrict($name, $code);
     }
 
     /**
@@ -848,21 +861,13 @@ class FetTimetableParserService
             return $schoolClass;
         }
 
-        // Otomatis buat Jurusan jika belum ada (misal: "X RPL 1" -> Major "RPL")
-        if (preg_match('/^(?:X|XI|XII)\s+([A-Z]+)/i', $normalized, $matches)) {
-            $majorCode = strtoupper($matches[1]);
-            Major::firstOrCreate(
-                ['code' => $majorCode],
-                [
-                    'name'        => "Jurusan {$majorCode}",
-                    'rombel_x_xi' => 2,
-                    'rombel_xii'  => 2,
-                ]
-            );
-        }
+        $dummy = 0;
+        $this->schoolDocService->autoProvisionMajor($normalized, $dummy);
 
-        $schoolClass = SchoolClass::create(['class_name' => $normalized]);
-        $createdCounter++;
+        $schoolClass = SchoolClass::firstOrCreate(['class_name' => $normalized]);
+        if ($schoolClass->wasRecentlyCreated) {
+            $createdCounter++;
+        }
 
         return $schoolClass;
     }
@@ -911,12 +916,12 @@ class FetTimetableParserService
     public function normalizeClassName(string $raw): string
     {
         $trimmed = trim($raw);
-        // Jika format "X RPL1" (tanpa spasi sebelum angka rombel)
-        if (preg_match('/^([X|XI|XII]+)\s*([A-Za-z]+)(\d+)$/i', $trimmed, $m)) {
+        // Jika format "XI RPL1" (tanpa spasi sebelum angka rombel)
+        if (preg_match('/^(XII|XI|X)\s*([A-Za-z]+)\s*(\d+)$/i', $trimmed, $m)) {
             return strtoupper($m[1]) . ' ' . strtoupper($m[2]) . ' ' . $m[3];
         }
-        // Jika format "X BD" (tanpa angka rombel)
-        if (preg_match('/^([X|XI|XII]+)\s*([A-Za-z]+)$/i', $trimmed, $m)) {
+        // Jika format "XI BD" (tanpa angka rombel)
+        if (preg_match('/^(XII|XI|X)\s*([A-Za-z]+)$/i', $trimmed, $m)) {
             return strtoupper($m[1]) . ' ' . strtoupper($m[2]);
         }
         return $trimmed;

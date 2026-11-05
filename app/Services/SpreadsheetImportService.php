@@ -14,12 +14,12 @@ class SpreadsheetImportService
      * @param UploadedFile $file
      * @return array
      */
-    public function parse(UploadedFile $file): array
+    public function parse(UploadedFile $file, ?string $sheetType = null): array
     {
         $extension = strtolower($file->getClientOriginalExtension());
 
         if (in_array($extension, ['xlsx', 'xlsm', 'xls', 'xltx'])) {
-            $rows = $this->parseXlsx($file, $extension);
+            $rows = $this->parseXlsx($file, $extension, $sheetType);
         } else {
             // Default: Perlakukan sebagai CSV
             $rows = $this->parseCsv($file->getRealPath());
@@ -275,14 +275,18 @@ class SpreadsheetImportService
     /**
      * Parsing file XLSX murni menggunakan ZipArchive bawaan PHP
      */
-    protected function parseXlsx(UploadedFile|string $file, ?string $extension = null): array
+    protected function parseXlsx(UploadedFile|string $file, ?string $extension = null, ?string $sheetType = null): array
     {
         $allSheets = $this->parseAllSheets($file, $extension);
         if (empty($allSheets)) {
             return [];
         }
 
-        // Gabungkan seluruh baris dari semua sheet
+        if ($sheetType === 'teachers') {
+            $allSheets = $this->filterTeacherSheets($allSheets);
+        }
+
+        // Gabungkan seluruh baris dari semua sheet terpilih
         $combined = [];
         foreach ($allSheets as $sheetRows) {
             foreach ($sheetRows as $r) {
@@ -291,6 +295,58 @@ class SpreadsheetImportService
         }
 
         return $combined;
+    }
+
+    /**
+     * Menyaring lembar kerja (worksheet) khusus data guru
+     * Otomatis mengabaikan sheet Tata Usaha, TU, Tendik, Satpam, dll.
+     */
+    public function filterTeacherSheets(array $allSheets): array
+    {
+        if (empty($allSheets)) {
+            return [];
+        }
+
+        // 1. Cek apakah ada sheet khusus bernama Guru / Dewan Guru / Data Guru / Pengajar
+        $guruSheets = [];
+        foreach ($allSheets as $sheetName => $rows) {
+            $norm = strtolower(trim((string)$sheetName));
+            if (str_contains($norm, 'guru') || str_contains($norm, 'pendidik') || str_contains($norm, 'pengajar')) {
+                if (!str_contains($norm, 'non') && !str_contains($norm, 'bukan') && !str_contains($norm, 'tu')) {
+                    $guruSheets[$sheetName] = $rows;
+                }
+            }
+        }
+
+        // Jika sheet guru teridentifikasi, gunakan HANYA sheet tersebut!
+        if (!empty($guruSheets)) {
+            return $guruSheets;
+        }
+
+        // 2. Jika tidak ada sheet bernama 'guru' (contohnya Dokumen Wali Kelas atau sheet1),
+        // buang sheet yang secara eksplisit adalah Tata Usaha / Tendik / Non-Guru
+        $filtered = [];
+        $excluded = [
+            'tata usaha', 'tu', 'staf tu', 'staff tu', 'pegawai tu',
+            'administrasi', 'tendik', 'tenaga kependidikan', 'non guru',
+            'karyawan', 'satpam', 'keamanan', 'kebersihan', 'penjaga'
+        ];
+
+        foreach ($allSheets as $sheetName => $rows) {
+            $norm = strtolower(trim((string)$sheetName));
+            $isExcluded = false;
+            foreach ($excluded as $kw) {
+                if ($norm === $kw || str_contains($norm, $kw)) {
+                    $isExcluded = true;
+                    break;
+                }
+            }
+            if (!$isExcluded) {
+                $filtered[$sheetName] = $rows;
+            }
+        }
+
+        return !empty($filtered) ? $filtered : $allSheets;
     }
 
     /**

@@ -3,7 +3,21 @@
             addModalOpen: false, 
             editModalOpen: false, 
             importModalOpen: false,
-            editSchedule: { id: '', subject: '', teacher_id: '', class_id: '', room_id: '', day_of_week: '', start_time: '', end_time: '', cycle_type: '' } 
+            deleteSelectedModalOpen: false,
+            deleteAllModalOpen: false,
+            selectedSchedules: [],
+            selectAll: false,
+            editSchedule: { id: '', subject: '', teacher_id: '', class_id: '', room_id: '', day_of_week: '', start_time: '', end_time: '', cycle_type: '' },
+
+            toggleSelectAll(allIds) {
+                if (this.selectAll) {
+                    this.selectedSchedules = [];
+                    this.selectAll = false;
+                } else {
+                    this.selectedSchedules = allIds.map(String);
+                    this.selectAll = true;
+                }
+            }
          }" 
          class="space-y-6">
 
@@ -14,10 +28,10 @@
                 <h1 class="text-xl sm:text-2xl font-black text-white tracking-tight">Jadwal Mengajar</h1>
                 <p class="text-xs font-semibold text-slate-400 mt-0.5">Input dan kelola jadwal pelajaran mandiri untuk seluruh guru dan kelas</p>
             </div>
-            <div class="flex items-center gap-2 shrink-0">
+            <div class="flex items-center gap-2 shrink-0 flex-wrap">
                 @if($config->is_schedule_locked)
                     <button type="button" 
-                            onclick="alert('Jadwal saat ini sedang TERKUNCI. Buka kunci siklus blok terlebih dahulu untuk menambah atau mengimpor jadwal!')" 
+                            onclick="alert('Jadwal saat ini sedang TERKUNCI. Buka kunci siklus blok terlebih dahulu untuk menambah, mengimpor, atau menghapus jadwal!')" 
                             class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl btn-schedule-locked text-xs sm:text-sm font-black whitespace-nowrap cursor-pointer transition inline-flex items-center gap-2 tracking-wide uppercase">
                         <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
@@ -25,6 +39,11 @@
                         <span>Jadwal Terkunci</span>
                     </button>
                 @else
+                    <!-- Tombol Hapus Semua Jadwal -->
+                    <button @click="deleteAllModalOpen = true" type="button" class="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/40 text-xs sm:text-sm font-bold shadow-md cursor-pointer transition flex items-center gap-1.5 whitespace-nowrap">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        <span>Hapus Semua Jadwal</span>
+                    </button>
                     <button @click="importModalOpen = true" type="button" class="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs sm:text-sm font-bold text-white shadow-md shadow-emerald-950/40 cursor-pointer transition flex items-center gap-1.5">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                         <span>Import Excel / Dokumen</span>
@@ -78,12 +97,46 @@
             </form>
         </div>
 
+        <!-- BAR AKSI SELEKSI JADWAL TERPILIH (BULK ACTION BAR) -->
+        <div x-show="selectedSchedules.length > 0" 
+             x-transition
+             class="p-3.5 px-5 rounded-2xl bg-indigo-950/90 border border-indigo-500/50 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-3 text-white">
+            <div class="flex items-center gap-2.5">
+                <span class="flex h-3 w-3 rounded-full bg-rose-500 animate-pulse"></span>
+                <span class="text-xs sm:text-sm font-bold">
+                    <span x-text="selectedSchedules.length" class="text-indigo-300 font-black text-base"></span> jadwal dipilih dari halaman ini
+                </span>
+            </div>
+            <div class="flex items-center gap-2">
+                <button type="button" @click="selectedSchedules = []; selectAll = false" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 transition cursor-pointer">
+                    Batal Pilih
+                </button>
+                <button type="button" 
+                        @if($config->is_schedule_locked)
+                            onclick="alert('Jadwal saat ini sedang TERKUNCI.')"
+                        @else
+                            @click="deleteSelectedModalOpen = true" 
+                        @endif
+                        class="px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white shadow-md shadow-rose-950/60 transition flex items-center gap-1.5 cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    <span>Hapus (<span x-text="selectedSchedules.length"></span>) Jadwal Terpilih</span>
+                </button>
+            </div>
+        </div>
+
         <!-- Tabel Jadwal (Gelap Keabuan) -->
         <div class="bg-[#0f172a]/90 backdrop-blur-md border border-slate-800 shadow-xl overflow-hidden" style="border-radius: 15px;">
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-slate-800/80 text-sm">
                     <thead class="bg-slate-900/70">
                         <tr class="text-left text-xs font-bold text-slate-400 uppercase tracking-wider">
+                            <th class="p-4 text-center w-10">
+                                <input type="checkbox" 
+                                       @change="toggleSelectAll([{{ $schedules->pluck('id')->implode(',') }}])" 
+                                       :checked="selectAll && selectedSchedules.length > 0"
+                                       class="rounded border-slate-700 bg-slate-900 text-indigo-600 focus:ring-indigo-500/30 cursor-pointer w-4 h-4"
+                                       title="Pilih Semua Jadwal di Halaman Ini">
+                            </th>
                             <th class="p-4">Hari & Jam</th>
                             <th class="p-4">Mata Pelajaran</th>
                             <th class="p-4">Guru Pengampu</th>
@@ -95,6 +148,13 @@
                     <tbody class="divide-y divide-slate-800/60">
                         @forelse ($schedules as $item)
                             <tr class="hover:bg-slate-800/30 transition">
+                                <!-- Checkbox Seleksi -->
+                                <td class="p-4 text-center">
+                                    <input type="checkbox" 
+                                           value="{{ $item->id }}" 
+                                           x-model="selectedSchedules"
+                                           class="rounded border-slate-700 bg-slate-900 text-indigo-600 focus:ring-indigo-500/30 cursor-pointer w-4 h-4">
+                                </td>
                                 <td class="p-4">
                                     <p class="font-bold text-white">{{ $item->day_of_week }}</p>
                                     <p class="text-xs text-indigo-400 font-semibold">{{ $item->period_label }}</p>
@@ -446,6 +506,15 @@
                       }" 
                       class="space-y-4 text-xs">
                     @csrf
+
+                    <!-- Info Ketentuan Import Jadwal Sesuai Aturan Waka -->
+                    <div class="p-3 rounded-xl bg-indigo-950/30 border border-indigo-800/40 text-[11px] text-indigo-300 flex items-start gap-2">
+                        <svg class="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span>
+                            <strong>Ketentuan Import:</strong> Jadwal yang diimpor mencakup hari, mata pelajaran, jam, guru pengajar, kelas, ruangan, dan putaran. Dokumen yang diimpor <strong>hanya mencocokkan dengan data guru yang sudah ada</strong> di sistem dan <strong>tidak akan menginput/menambah data guru baru</strong>.
+                        </span>
+                    </div>
+
                     <div>
                         <label class="block font-bold text-slate-300 mb-1">Target Siklus Putaran</label>
                         <select name="cycle_type" class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-xs font-bold text-white focus:border-indigo-500">
@@ -529,6 +598,96 @@
                                 class="px-5 py-2.5 rounded-xl font-bold text-white shadow-md shadow-emerald-950/40 transition flex items-center gap-1.5">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                             Mulai Import Terpadu
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- MODAL KONFIRMASI: HAPUS JADWAL TERPILIH -->
+        <div x-show="deleteSelectedModalOpen" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
+            <div @click="deleteSelectedModalOpen = false" class="fixed inset-0 bg-black/70 backdrop-blur-sm"></div>
+            <div class="relative w-full max-w-md bg-[#0f172a] p-6 shadow-2xl border border-rose-500/30 space-y-4 my-auto max-h-[90vh] overflow-y-auto" style="border-radius: 20px;">
+                <div class="flex items-center gap-3 border-b border-slate-800 pb-3">
+                    <div class="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-extrabold text-white">Hapus Jadwal Terpilih</h3>
+                        <p class="text-xs text-slate-400">Konfirmasi tindakan penghapusan massal jadwal</p>
+                    </div>
+                </div>
+
+                <div class="p-3.5 rounded-xl bg-rose-950/30 border border-rose-800/40 text-xs text-rose-300 leading-relaxed">
+                    Anda yakin ingin menghapus <strong x-text="selectedSchedules.length" class="text-white underline"></strong> jadwal pelajaran yang dipilih? Tindakan ini akan menghapus jadwal tersebut secara permanen.
+                </div>
+
+                <form method="POST" action="{{ route('waka.schedules.delete-selected') }}" class="space-y-4">
+                    @csrf
+                    <!-- Loop Hidden Inputs IDs -->
+                    <template x-for="id in selectedSchedules" :key="id">
+                        <input type="hidden" name="schedule_ids[]" :value="id">
+                    </template>
+
+                    <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
+                        <button @click="deleteSelectedModalOpen = false" type="button" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:bg-slate-800 hover:text-white transition cursor-pointer">
+                            Batal
+                        </button>
+                        <button type="submit" class="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-xs font-bold text-white shadow-md shadow-rose-950/60 transition cursor-pointer flex items-center gap-1.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            <span>Ya, Hapus Jadwal Terpilih</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- MODAL KONFIRMASI: HAPUS SEMUA JADWAL -->
+        <div x-show="deleteAllModalOpen" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
+            <div @click="deleteAllModalOpen = false" class="fixed inset-0 bg-black/70 backdrop-blur-sm"></div>
+            <div class="relative w-full max-w-md bg-[#0f172a] p-6 shadow-2xl border border-rose-500/40 space-y-4 my-auto max-h-[90vh] overflow-y-auto" style="border-radius: 20px;">
+                <div class="flex items-center gap-3 border-b border-slate-800 pb-3">
+                    <div class="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-extrabold text-white">Hapus Semua Jadwal</h3>
+                        <p class="text-xs text-rose-400 font-semibold">Tindakan ini tidak dapat dibatalkan!</p>
+                    </div>
+                </div>
+
+                <div class="p-3.5 rounded-xl bg-rose-950/40 border border-rose-800/50 text-xs text-rose-200 leading-relaxed">
+                    PERINGATAN: Tindakan ini akan menghapus jadwal pelajaran dari sistem sesuai cakupan yang Anda tentukan di bawah.
+                </div>
+
+                <form method="POST" action="{{ route('waka.schedules.delete-all') }}" class="space-y-4 text-xs">
+                    @csrf
+                    <div>
+                        <label class="block font-bold text-slate-300 mb-1.5">Cakupan Putaran / Siklus:</label>
+                        <select name="scope" class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2.5 text-xs font-semibold text-white focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500">
+                            <option value="active_cycle">Hanya Jadwal di {{ $config->active_cycle }} (Putaran Aktif)</option>
+                            <option value="all_cycles">⚠️ Hapus SELURUH Jadwal di SEMUA Putaran (Putaran 1 & Putaran 2)</option>
+                        </select>
+                        <input type="hidden" name="cycle_type" value="{{ $config->active_cycle }}">
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-slate-300 mb-1.5">Cakupan Kelas (Opsional):</label>
+                        <select name="class_id" class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2.5 text-xs font-semibold text-white focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500">
+                            <option value="all">Semua Kelas</option>
+                            @foreach($classes as $c)
+                                <option value="{{ $c->id }}">Hanya Kelas: {{ $c->class_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
+                        <button @click="deleteAllModalOpen = false" type="button" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:bg-slate-800 hover:text-white transition cursor-pointer">
+                            Batal
+                        </button>
+                        <button type="submit" class="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-xs font-bold text-white shadow-md shadow-rose-950/60 transition cursor-pointer flex items-center gap-1.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            <span>Ya, Hapus Jadwal</span>
                         </button>
                     </div>
                 </form>
