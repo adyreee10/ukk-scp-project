@@ -14,7 +14,11 @@
             this.counts = { Hadir: h, Sakit: s, Izin: i, Alpa: a };
         },
         setAll(status) {
-            document.querySelectorAll('input[type=radio][value=' + status + ']').forEach(el => el.checked = true);
+            document.querySelectorAll('input[type=radio][value=' + status + ']').forEach(el => {
+                if (!el.dataset.hasApprovedLeave || status !== 'Hadir') {
+                    el.checked = true;
+                }
+            });
             this.updateCounts();
         },
         init() {
@@ -37,7 +41,7 @@
             @if($selectedSchedule)
                 <div class="mt-2.5 flex items-center justify-center" style="display: flex; justify-content: center;">
                     <span class="px-3.5 py-1.5 rounded-xl text-xs font-black bg-[#0f172a]/90 text-indigo-300 border border-slate-800 shadow-sm">
-                        {{ $selectedSchedule->day_of_week }} • {{ substr($selectedSchedule->start_time, 0, 5) }} - {{ substr($selectedSchedule->end_time, 0, 5) }} WIB
+                        {{ $selectedSchedule->day_of_week }} • {{ $selectedSchedule->period_label }}
                     </span>
                 </div>
             @endif
@@ -52,6 +56,101 @@
                     <a href="{{ route('teacher.dashboard') }}" class="px-5 py-2.5 rounded-xl scp-btn-gradient text-xs font-bold text-white shadow-sm inline-block" style="color: #ffffff !important;">
                         Kembali ke Jadwal Saya
                     </a>
+                </div>
+            </div>
+        @elseif($existingJournalToday)
+            <!-- TAMPILAN JIKA JURNAL UNTUK JADWAL INI SUDAH DIISI HARI INI (CUKUP 1 KALI PENGISIAN) -->
+            <div class="space-y-6">
+                <!-- BANNER NOTIFIKASI SUDAH DIISI -->
+                <div class="p-6 bg-[#0f172a]/95 backdrop-blur-md rounded-2xl border border-emerald-500/40 shadow-xl space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-black text-white">Jurnal KBM Hari Ini Sudah Berhasil Diisi!</h2>
+                            <p class="text-xs text-slate-300 mt-0.5">
+                                Jurnal untuk mata pelajaran <strong>{{ $selectedSchedule->subject }}</strong> di kelas <strong>{{ $selectedSchedule->schoolClass?->class_name }}</strong> pada hari ini telah tersimpan (cukup 1 kali pengisian per hari).
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Dropdown Pilih Jadwal Lain -->
+                    <div class="pt-3 border-t border-slate-800">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                            Pilih Jadwal Mengajar Lainnya:
+                        </label>
+                        <select onchange="window.location.href = '{{ route('teacher.journals.create') }}?schedule_id=' + this.value" 
+                                class="w-full sm:w-96 rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2.5 text-xs sm:text-sm font-semibold text-white focus:border-indigo-500 focus:outline-none">
+                            @foreach ($schedules as $item)
+                                <option value="{{ $item->id }}" {{ $item->id == $selectedSchedule->id ? 'selected' : '' }} class="bg-slate-900 text-white">
+                                    {{ $item->schoolClass->class_name }} — {{ $item->subject }} ({{ $item->day_of_week }}) {{ in_array($item->id, $filledScheduleIdsToday ?? []) ? '— [✓ Sudah Diisi Hari Ini]' : '' }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+                <!-- KARTU RINGKASAN JURNAL YANG SUDAH TERCATAT -->
+                <div class="bg-[#0f172a]/90 backdrop-blur-md p-6 border border-slate-800 shadow-xl space-y-5" style="border-radius: 15px;">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <h3 class="text-sm font-extrabold text-white">Ringkasan Jurnal KBM yang Tercatat</h3>
+                        <span class="text-xs font-mono text-emerald-400 font-bold bg-emerald-950/70 border border-emerald-800 px-2.5 py-1 rounded-lg">
+                            Tanggal: {{ \Carbon\Carbon::parse($existingJournalToday->date)->translatedFormat('d F Y') }}
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <span class="block text-xs font-bold text-slate-400 mb-1">Materi / Topik Pembelajaran:</span>
+                            <div class="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 text-xs sm:text-sm text-slate-200 leading-relaxed whitespace-pre-line">
+                                {{ $existingJournalToday->topic_description }}
+                            </div>
+                        </div>
+
+                        <div>
+                            <span class="block text-xs font-bold text-slate-400 mb-1">Dokumentasi Bukti KBM:</span>
+                            @if($existingJournalToday->photo_url)
+                                <img src="{{ $existingJournalToday->photo_url }}" alt="Bukti KBM" class="w-full max-h-48 object-cover rounded-xl border border-slate-800 shadow-md">
+                            @else
+                                <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-400 text-center">
+                                    Tidak ada foto dokumentasi
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Rekap Presensi Siswa -->
+                    <div class="pt-4 border-t border-slate-800">
+                        <span class="block text-xs font-bold text-slate-400 mb-2">Rekapitulasi Kehadiran Siswa:</span>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+                            <div class="px-3 py-2 rounded-xl bg-emerald-950/40 border border-emerald-800/50 flex items-center justify-between">
+                                <span class="text-xs font-bold text-emerald-300">Hadir</span>
+                                <span class="text-sm font-black text-white">{{ $existingJournalToday->attendances->where('status', 'Hadir')->count() }}</span>
+                            </div>
+                            <div class="px-3 py-2 rounded-xl bg-amber-950/40 border border-amber-800/50 flex items-center justify-between">
+                                <span class="text-xs font-bold text-amber-300">Sakit</span>
+                                <span class="text-sm font-black text-white">{{ $existingJournalToday->attendances->where('status', 'Sakit')->count() }}</span>
+                            </div>
+                            <div class="px-3 py-2 rounded-xl bg-blue-950/40 border border-blue-800/50 flex items-center justify-between">
+                                <span class="text-xs font-bold text-blue-300">Izin</span>
+                                <span class="text-sm font-black text-white">{{ $existingJournalToday->attendances->where('status', 'Izin')->count() }}</span>
+                            </div>
+                            <div class="px-3 py-2 rounded-xl bg-red-950/40 border border-red-800/50 flex items-center justify-between">
+                                <span class="text-xs font-bold text-red-300">Alpa</span>
+                                <span class="text-sm font-black text-white">{{ $existingJournalToday->attendances->where('status', 'Alpa')->count() }}</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <a href="{{ route('teacher.dashboard') }}" class="px-4 py-2 rounded-xl scp-btn-gradient text-xs font-bold text-white shadow-md transition" style="color: #ffffff !important;">
+                                ← Kembali ke Dashboard Guru
+                            </a>
+                            <a href="{{ route('teacher.journals.history') }}" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 transition">
+                                Lihat Semua Riwayat Jurnal
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         @else
@@ -72,7 +171,7 @@
                                     class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2.5 text-xs sm:text-sm font-semibold text-white focus:border-indigo-500 focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
                                 @foreach ($schedules as $item)
                                     <option value="{{ $item->id }}" {{ $item->id == $selectedSchedule->id ? 'selected' : '' }} class="bg-slate-900 text-white">
-                                        {{ $item->schoolClass->class_name }} — {{ $item->subject }} ({{ $item->day_of_week }})
+                                        {{ $item->schoolClass->class_name }} — {{ $item->subject }} ({{ $item->day_of_week }}) {{ in_array($item->id, $filledScheduleIdsToday ?? []) ? '— [✓ Sudah Diisi Hari Ini]' : '' }}
                                     </option>
                                 @endforeach
                             </select>
@@ -229,13 +328,26 @@
 
                                 <div class="space-y-2.5 max-h-[500px] overflow-y-auto pr-1">
                                     @foreach ($students as $index => $student)
+                                        @php
+                                            $approvedLeave = isset($approvedLeavesToday) ? $approvedLeavesToday->get($student->id) : null;
+                                            $defaultLeaveStatus = $approvedLeave ? ($approvedLeave->leave_type === 'Sakit' ? 'Sakit' : 'Izin') : 'Hadir';
+                                            $currentStatus = old('attendances.'.$student->id, $defaultLeaveStatus);
+                                        @endphp
                                         <div x-show="!searchStudent || '{{ strtolower(addslashes($student->name)) }}'.includes(searchStudent.toLowerCase())"
-                                             class="p-3 rounded-xl border border-slate-800/80 bg-slate-900/40 hover:bg-slate-800/40 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 transition">
-                                            <!-- Info Siswa -->
+                                             class="p-3 rounded-xl border {{ $approvedLeave ? 'border-indigo-500/40 bg-indigo-950/20' : 'border-slate-800/80 bg-slate-900/40' }} hover:bg-slate-800/40 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 transition">
+                                            <!-- Info Siswa & Badge Izin ACC -->
                                             <div class="flex items-center gap-2.5 min-w-0">
                                                 <span class="text-xs font-bold text-slate-500 w-5 text-right">{{ $index + 1 }}.</span>
                                                 <div class="min-w-0">
-                                                    <p class="text-xs font-bold text-white truncate">{{ $student->name }}</p>
+                                                    <div class="flex items-center gap-2 flex-wrap">
+                                                        <p class="text-xs font-bold text-white truncate">{{ $student->name }}</p>
+                                                        @if($approvedLeave)
+                                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-black {{ $approvedLeave->leave_type === 'Sakit' ? 'bg-amber-950/80 text-amber-300 border border-amber-600/70' : 'bg-blue-950/80 text-blue-300 border border-blue-600/70' }}" 
+                                                                  title="Surat izin/sakit telah disetujui (ACC) oleh Wali Kelas / Guru BK">
+                                                                ✓ ACC: {{ $approvedLeave->leave_type }}
+                                                            </span>
+                                                        @endif
+                                                    </div>
                                                     <p class="text-[10px] text-slate-400">@<span>{{ $student->username }}</span></p>
                                                 </div>
                                             </div>
@@ -245,8 +357,9 @@
                                                 <!-- Hadir -->
                                                 <label class="cursor-pointer">
                                                     <input type="radio" name="attendances[{{ $student->id }}]" value="Hadir" 
+                                                           data-has-approved-leave="{{ $approvedLeave ? '1' : '' }}"
                                                            class="sr-only peer" 
-                                                           {{ old('attendances.'.$student->id, 'Hadir') === 'Hadir' ? 'checked' : '' }}>
+                                                           {{ $currentStatus === 'Hadir' ? 'checked' : '' }}>
                                                     <span class="px-2.5 py-1 rounded-md text-[11px] font-bold border border-slate-700 text-slate-400 bg-slate-900 peer-checked:bg-emerald-600 peer-checked:text-white peer-checked:border-emerald-600 transition inline-block">
                                                         H
                                                     </span>
@@ -255,8 +368,9 @@
                                                 <!-- Sakit -->
                                                 <label class="cursor-pointer">
                                                     <input type="radio" name="attendances[{{ $student->id }}]" value="Sakit" 
+                                                           data-has-approved-leave="{{ $approvedLeave ? '1' : '' }}"
                                                            class="sr-only peer" 
-                                                           {{ old('attendances.'.$student->id) === 'Sakit' ? 'checked' : '' }}>
+                                                           {{ $currentStatus === 'Sakit' ? 'checked' : '' }}>
                                                     <span class="px-2.5 py-1 rounded-md text-[11px] font-bold border border-slate-700 text-slate-400 bg-slate-900 peer-checked:bg-amber-500 peer-checked:text-white peer-checked:border-amber-500 transition inline-block">
                                                         S
                                                     </span>
@@ -265,8 +379,9 @@
                                                 <!-- Izin -->
                                                 <label class="cursor-pointer">
                                                     <input type="radio" name="attendances[{{ $student->id }}]" value="Izin" 
+                                                           data-has-approved-leave="{{ $approvedLeave ? '1' : '' }}"
                                                            class="sr-only peer" 
-                                                           {{ old('attendances.'.$student->id) === 'Izin' ? 'checked' : '' }}>
+                                                           {{ $currentStatus === 'Izin' ? 'checked' : '' }}>
                                                     <span class="px-2.5 py-1 rounded-md text-[11px] font-bold border border-slate-700 text-slate-400 bg-slate-900 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-600 transition inline-block">
                                                         I
                                                     </span>
@@ -275,13 +390,20 @@
                                                 <!-- Alpa -->
                                                 <label class="cursor-pointer">
                                                     <input type="radio" name="attendances[{{ $student->id }}]" value="Alpa" 
+                                                           data-has-approved-leave="{{ $approvedLeave ? '1' : '' }}"
                                                            class="sr-only peer" 
-                                                           {{ old('attendances.'.$student->id) === 'Alpa' ? 'checked' : '' }}>
+                                                           {{ $currentStatus === 'Alpa' ? 'checked' : '' }}>
                                                     <span class="px-2.5 py-1 rounded-md text-[11px] font-bold border border-slate-700 text-slate-400 bg-slate-900 peer-checked:bg-red-600 peer-checked:text-white peer-checked:border-red-600 transition inline-block">
                                                         A
                                                     </span>
                                                 </label>
                                             </div>
+
+                                            <!-- Input Catatan Khusus Siswa (Opsional / Otomatis Alasan Izin) -->
+                                            <input type="text" name="attendance_notes[{{ $student->id }}]" 
+                                                   value="{{ old('attendance_notes.'.$student->id, $approvedLeave ? $approvedLeave->reason : '') }}"
+                                                   placeholder="{{ $approvedLeave ? 'Alasan ACC: ' . $approvedLeave->reason : 'Catatan khusus (opsional)...' }}" 
+                                                   class="w-full sm:w-44 text-[11px] rounded-lg bg-slate-950/80 border border-slate-700/80 text-slate-200 placeholder-slate-500 px-2.5 py-1 focus:border-indigo-500 focus:outline-none">
                                         </div>
                                     @endforeach
                                 </div>

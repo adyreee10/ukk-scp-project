@@ -14,7 +14,8 @@
                 <div>
                     <div class="flex items-center justify-between mb-4">
                         <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Siklus Pembelajaran</span>
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold badge-running shadow-sm">
+                            <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
                             Sedang Berjalan
                         </span>
                     </div>
@@ -31,19 +32,29 @@
                     </p>
 
                     <div class="rounded-xl bg-slate-900/80 p-3.5 border border-slate-800 text-xs text-slate-300 mb-6">
-                        <p class="font-bold text-white">Periode Pelaksanaan:</p>
-                        <p class="text-slate-400 mt-0.5">01 Juli 2026 s.d. 31 Desember 2026</p>
+                        <p class="font-bold text-white">Durasi Pelaksanaan:</p>
+                        <p class="text-slate-300 mt-0.5">1 Putaran Berlangsung Selama <strong class="text-indigo-400 font-black">2 Minggu (10 Hari Efektif KBM)</strong></p>
+                        <p class="text-[11px] text-slate-500 mt-1">Rotasi bergantian antara Putaran 1 dan Putaran 2 sepanjang semester berjalan.</p>
                     </div>
                 </div>
 
                 <!-- Aksi Ubah Putaran -->
                 <form method="POST" action="{{ route('waka.toggle-cycle') }}">
                     @csrf
-                    <button type="submit" 
-                            class="w-full scp-btn-gradient py-3 px-4 text-xs font-bold rounded-xl text-center cursor-pointer uppercase tracking-wider"
-                            style="border-radius: 12px;">
-                        Ganti Menjadi {{ $configuration->active_cycle === 'Putaran 1' ? 'Putaran 2' : 'Putaran 1' }}
-                    </button>
+                    @if($configuration->is_schedule_locked)
+                        <button type="button" 
+                                onclick="alert('Jadwal saat ini sedang TERKUNCI. Anda harus membuka kunci jadwal terlebih dahulu di kartu sebelah kanan jika ingin mengubah putaran!')"
+                                class="w-full bg-slate-800 text-slate-500 py-3 px-4 text-xs font-bold rounded-xl text-center cursor-not-allowed uppercase tracking-wider"
+                                style="border-radius: 12px;">
+                            Putaran Terkunci (Buka Kunci Dahulu)
+                        </button>
+                    @else
+                        <button type="submit" 
+                                class="w-full scp-btn-gradient py-3 px-4 text-xs font-bold rounded-xl text-center cursor-pointer uppercase tracking-wider"
+                                style="border-radius: 12px;">
+                            Ganti Menjadi {{ $configuration->active_cycle === 'Putaran 1' ? 'Putaran 2' : 'Putaran 1' }}
+                        </button>
+                    @endif
                 </form>
             </div>
 
@@ -51,21 +62,24 @@
             <div class="bg-[#0f172a]/90 backdrop-blur-md p-6 border border-slate-800 shadow-xl flex flex-col justify-between" style="border-radius: 15px;">
                 <div>
                     <div class="flex items-center justify-between mb-4">
-                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Keamanan Jadwal</span>
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Kuncian Jadwal</span>
                         @if($configuration->is_schedule_locked)
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-red-500/10 text-red-400 border border-red-500/20">
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold badge-locked shadow-sm">
+                                <span class="h-2 w-2 rounded-full bg-red-400"></span>
                                 Terkunci
                             </span>
                         @else
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold badge-open shadow-sm">
+                                <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
                                 Terbuka
                             </span>
                         @endif
                     </div>
 
+
                     <h2 class="text-base font-bold text-slate-300">Status Modifikasi Jadwal</h2>
                     <div class="my-3">
-                        <span class="text-3xl font-black {{ $configuration->is_schedule_locked ? 'text-red-400' : 'text-emerald-400' }} tracking-tight">
+                        <span class="text-3xl font-black {{ $configuration->is_schedule_locked ? 'text-red-500 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400' }} tracking-tight">
                             {{ $configuration->is_schedule_locked ? 'Jadwal Terkunci' : 'Jadwal Terbuka' }}
                         </span>
                     </div>
@@ -78,10 +92,10 @@
                         @endif
                     </p>
 
-                    <div class="rounded-xl {{ $configuration->is_schedule_locked ? 'bg-red-950/20 border-red-900/40 text-red-300' : 'bg-emerald-950/20 border-emerald-900/40 text-emerald-300' }} p-3.5 border text-xs mb-6">
-                        <p class="font-bold text-white">Keterangan:</p>
-                        <p class="mt-0.5">
-                            {{ $configuration->is_schedule_locked ? 'Perubahan jadwal dinonaktifkan sementara.' : 'Perubahan jadwal diizinkan sepenuhnya.' }}
+                    <div class="rounded-xl p-4 border text-xs mb-6 shadow-sm {{ $configuration->is_schedule_locked ? 'box-desc-locked' : 'box-desc-open' }}">
+                        <p class="font-extrabold uppercase tracking-wider text-[11px] mb-1">Keterangan:</p>
+                        <p class="font-semibold text-xs leading-relaxed">
+                            {{ $configuration->is_schedule_locked ? 'Perubahan jadwal dinonaktifkan sementara. Buka kunci jadwal terlebih dahulu jika ingin menambah atau mengedit jadwal mengajar.' : 'Perubahan jadwal diizinkan sepenuhnya. Waka Kurikulum dapat menambah, mengedit, atau menghapus jadwal mengajar.' }}
                         </p>
                     </div>
                 </div>
@@ -114,4 +128,66 @@
             </div>
         </div>
     </div>
+        <style>
+        /* Mode Gelap (Default) */
+        .badge-running, .badge-open {
+            background-color: rgba(6, 78, 59, 0.7) !important;
+            border: 1px solid #10b981 !important;
+            color: #6ee7b7 !important;
+        }
+        .badge-locked {
+            background-color: rgba(127, 29, 29, 0.7) !important;
+            border: 1px solid #ef4444 !important;
+            color: #fca5a5 !important;
+        }
+        .box-desc-locked {
+            background-color: rgba(127, 29, 29, 0.35) !important;
+            border: 1px solid rgba(239, 68, 68, 0.6) !important;
+            border-left: 5px solid #ef4444 !important;
+            color: #fecaca !important;
+        }
+        .box-desc-locked p.font-extrabold {
+            color: #f87171 !important;
+        }
+        .box-desc-open {
+            background-color: rgba(6, 78, 59, 0.35) !important;
+            border: 1px solid rgba(16, 185, 129, 0.6) !important;
+            border-left: 5px solid #10b981 !important;
+            color: #d1fae5 !important;
+        }
+        .box-desc-open p.font-extrabold {
+            color: #34d399 !important;
+        }
+
+        /* Mode Terang (Light Mode) */
+        html.theme-light .badge-running, 
+        html.theme-light .badge-open {
+            background-color: #d1fae5 !important;
+            border: 1px solid #059669 !important;
+            color: #064e3b !important;
+        }
+        html.theme-light .badge-locked {
+            background-color: #fee2e2 !important;
+            border: 1px solid #dc2626 !important;
+            color: #7f1d1d !important;
+        }
+        html.theme-light .box-desc-locked {
+            background-color: #fef2f2 !important;
+            border: 1px solid #f87171 !important;
+            border-left: 5px solid #dc2626 !important;
+            color: #7f1d1d !important;
+        }
+        html.theme-light .box-desc-locked p.font-extrabold {
+            color: #991b1b !important;
+        }
+        html.theme-light .box-desc-open {
+            background-color: #ecfdf5 !important;
+            border: 1px solid #34d399 !important;
+            border-left: 5px solid #059669 !important;
+            color: #064e3b !important;
+        }
+        html.theme-light .box-desc-open p.font-extrabold {
+            color: #065f46 !important;
+        }
+    </style>
 </x-app-layout>

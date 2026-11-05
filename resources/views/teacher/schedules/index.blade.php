@@ -51,7 +51,7 @@
             
             @php
                 $currentDay = request('day', 'Semua');
-                $days = ['Semua', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+                $days = ['Semua', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
             @endphp
 
             @foreach ($days as $day)
@@ -91,7 +91,7 @@
                                     <p class="text-xs text-slate-400">{{ $schedule->schoolClass->class_name }} • {{ $schedule->room->room_name }}</p>
                                 </div>
                                 <span class="text-xs font-mono font-bold text-slate-300 shrink-0">
-                                    {{ substr($schedule->start_time, 0, 5) }} - {{ substr($schedule->end_time, 0, 5) }}
+                                    {{ $schedule->period_label }}
                                 </span>
                             </div>
                             <div class="mt-3 pt-3 border-t border-slate-800/80 flex justify-end">
@@ -123,7 +123,7 @@
                                     <td class="p-4">
                                         <div class="font-bold text-white">{{ $schedule->day_of_week }}</div>
                                         <div class="text-xs font-mono text-slate-400">
-                                            {{ substr($schedule->start_time, 0, 5) }} - {{ substr($schedule->end_time, 0, 5) }}
+                                            {{ $schedule->period_label }}
                                         </div>
                                     </td>
                                     <td class="p-4 font-semibold text-white">{{ $schedule->subject }}</td>

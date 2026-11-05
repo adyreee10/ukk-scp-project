@@ -47,22 +47,32 @@ class LeaveRequestVerificationController extends Controller
 
     public function reject(Request $request, int $id)
     {
-        return $this->transition($request, $id, 'Rejected');
+        $request->validate([
+            'rejection_note' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        return $this->transition($request, $id, 'Rejected', $request->input('rejection_note'));
     }
 
-    private function transition(Request $request, int $id, string $target)
+    private function transition(Request $request, int $id, string $target, ?string $rejectionNote = null)
     {
-        $leave = DB::transaction(function () use ($request, $id, $target) {
+        $leave = DB::transaction(function () use ($request, $id, $target, $rejectionNote) {
             $leave = $this->visibleTo($request->user())->lockForUpdate()->findOrFail($id);
 
             if ($leave->status_approval !== 'Pending') {
                 abort(409, 'Pengajuan sudah pernah diverifikasi.');
             }
 
-            $leave->update([
+            $updateData = [
                 'status_approval' => $target,
                 'verified_by' => $request->user()->id,
-            ]);
+            ];
+
+            if ($target === 'Rejected' && $rejectionNote) {
+                $updateData['rejection_note'] = $rejectionNote;
+            }
+
+            $leave->update($updateData);
 
             return $leave->fresh();
         });

@@ -1,5 +1,20 @@
 <x-app-layout>
-    <div x-data="{ activeTab: 'leaves' }" class="space-y-6">
+<div x-data="{ 
+        activeTab: 'leaves',
+        previewDocOpen: false,
+        previewDocUrl: '',
+        previewDocTitle: '',
+        openPreviewDoc(url, title) {
+            this.previewDocUrl = url;
+            this.previewDocTitle = title;
+            this.previewDocOpen = true;
+        },
+        closePreviewDoc() {
+            this.previewDocOpen = false;
+            this.previewDocUrl = '';
+            this.previewDocTitle = '';
+        }
+     }" class="space-y-6">
 
         <!-- HEADER HALAMAN -->
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -89,13 +104,22 @@
                                     </span>
                                 </div>
 
+                                @if($req->status_approval === 'Rejected' && $req->rejection_note)
+                                    <div class="mt-2 text-xs bg-red-950/40 border border-red-800/50 rounded-lg p-2.5 text-red-200">
+                                        <span class="text-[10px] uppercase font-bold text-red-400 block mb-0.5">Alasan Penolakan:</span>
+                                        {{ $req->rejection_note }}
+                                    </div>
+                                @endif
+
                                 @if($req->document_path)
                                     <div class="mt-3 pt-2.5 border-t border-slate-800 flex justify-between items-center text-xs">
                                         <span class="text-slate-400">Lampiran Bukti:</span>
-                                        <a href="{{ asset('storage/' . $req->document_path) }}" target="_blank" 
-                                           class="font-bold text-indigo-400 hover:text-indigo-300 transition hover:underline">
-                                            Lihat Berkas →
-                                        </a>
+                                        <button type="button" 
+                                                @click="openPreviewDoc('{{ asset('storage/' . $req->document_path) }}', 'Surat Izin: {{ addslashes($req->leave_type) }} - {{ addslashes($student->name ?? auth()->user()->name) }}')"
+                                                class="font-bold text-indigo-400 hover:text-indigo-300 transition hover:underline cursor-pointer flex items-center gap-1">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                            <span>Lihat Berkas</span>
+                                        </button>
                                     </div>
                                 @endif
                             </div>
@@ -137,11 +161,12 @@
                                         <!-- Dokumen Lampiran -->
                                         <td class="p-4 text-center whitespace-nowrap">
                                             @if($req->document_path)
-                                                <a href="{{ asset('storage/' . $req->document_path) }}" target="_blank" 
-                                                   class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-950/60 border border-indigo-800/60 text-indigo-300 hover:text-indigo-200 text-xs font-bold transition hover:border-indigo-700">
+                                                <button type="button" 
+                                                        @click="openPreviewDoc('{{ asset('storage/' . $req->document_path) }}', 'Surat Izin: {{ addslashes($req->leave_type) }} - {{ addslashes($student->name ?? auth()->user()->name) }}')"
+                                                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-950/60 border border-indigo-800/60 text-indigo-300 hover:text-indigo-200 text-xs font-bold transition hover:border-indigo-700 cursor-pointer">
                                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                                                    Lihat Surat
-                                                </a>
+                                                    <span>Lihat Surat</span>
+                                                </button>
                                             @else
                                                 <span class="text-xs text-slate-500 font-medium">-</span>
                                             @endif
@@ -160,10 +185,18 @@
                                                     Disetujui
                                                 </span>
                                             @else
-                                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-red-950/70 border border-red-700/60 text-red-300 text-xs font-bold shadow-sm">
-                                                    <svg class="w-3.5 h-3.5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
-                                                    Ditolak
-                                                </span>
+                                                <div class="inline-flex flex-col items-center max-w-xs">
+                                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-red-950/70 border border-red-700/60 text-red-300 text-xs font-bold shadow-sm whitespace-nowrap">
+                                                        <svg class="w-3.5 h-3.5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                        Ditolak
+                                                    </span>
+                                                    @if($req->rejection_note)
+                                                        <div class="mt-1.5 text-left bg-red-950/40 border border-red-800/50 rounded-lg p-2 text-red-200 w-full whitespace-normal">
+                                                            <span class="text-[10px] uppercase font-bold text-red-400 block mb-0.5">Alasan:</span>
+                                                            <span class="text-xs break-words">{{ $req->rejection_note }}</span>
+                                                        </div>
+                                                    @endif
+                                                </div>
                                             @endif
                                         </td>
                                     </tr>
@@ -238,6 +271,43 @@
                 @endif
             </div>
         </div>
+                <!-- MODAL PRATINJAU DOKUMEN / SURAT BUKTI (IN-PAGE PREVIEW) -->
+        <div x-show="previewDocOpen" 
+             x-cloak 
+             class="fixed inset-0 z-50 overflow-y-auto" 
+             style="display: none;"
+             @keydown.escape.window="closePreviewDoc()">
+            <div class="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity" 
+                 @click="closePreviewDoc()"></div>
 
+            <div class="flex min-h-full items-center justify-center p-4 text-center">
+                <div class="relative transform overflow-hidden rounded-2xl bg-[#0f172a] border border-slate-700 text-left shadow-2xl transition-all w-full max-w-2xl p-5"
+                     @click.stop>
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                        <h3 class="text-sm font-bold text-white" x-text="previewDocTitle"></h3>
+                        <div class="flex items-center gap-2">
+                            <!-- Tombol Khusus untuk Buka Tab Baru Jika Ingin Lebih Jelas -->
+                            <a :href="previewDocUrl" target="_blank" 
+                               class="text-xs text-indigo-400 hover:text-indigo-300 font-bold hover:underline flex items-center gap-1">
+                                <span>Buka Tab Baru</span>
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                            </a>
+                            <button type="button" @click="closePreviewDoc()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition cursor-pointer">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 flex items-center justify-center bg-slate-950/70 rounded-xl p-2 min-h-[300px] border border-slate-800/80 overflow-hidden">
+                        <template x-if="previewDocUrl && (previewDocUrl.endsWith('.pdf') || previewDocUrl.includes('.pdf'))">
+                            <iframe :src="previewDocUrl" class="w-full h-[500px] rounded-lg border-0"></iframe>
+                        </template>
+                        <template x-if="previewDocUrl && !(previewDocUrl.endsWith('.pdf') || previewDocUrl.includes('.pdf'))">
+                            <img :src="previewDocUrl" alt="Surat Keterangan" class="max-h-[500px] w-auto max-w-full rounded-lg object-contain shadow-md" />
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </x-app-layout>

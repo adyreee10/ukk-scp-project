@@ -18,51 +18,56 @@
 | Tahun Ajaran | 2026/2027 |
 | Bentuk Penilaian | Penugasan Perorangan |
 | Alokasi Waktu | 16-24 jam |
-| Target Utama | Aplikasi pengelolaan presensi, jurnal mengajar guru, perizinan siswa, jadwal blok, dan monitoring keterlambatan jurnal |
-| Pendekatan Antarmuka | Mobile-First Design |
+| Target Utama | Platform terintegrasi Web Dashboard (Laravel Blade) & Mobile Client (Flutter) untuk pengelolaan presensi, jurnal mengajar guru dengan foto real-time, perizinan siswa (harian & potong jam), jadwal blok, serta monitoring keterlambatan jurnal |
+| Pendekatan Antarmuka | Multi-Platform: Web Application (Waka Kurikulum, Guru, Tim Kesiswaan, Siswa) & Mobile Native Flutter App (Guru, Wali Kelas, Guru BK, Siswa) |
 
 ---
 
 # 2. Tujuan Dokumen
 
-Dokumen SRS ini bertujuan menerjemahkan soal UKK SCP menjadi spesifikasi perangkat lunak yang lebih terstruktur, rinci, mudah dipahami, dan dapat dijadikan acuan selama analisis, perancangan, implementasi, pengujian, serta presentasi UKK.
+Dokumen SRS ini bertujuan menerjemahkan soal UKK SCP menjadi spesifikasi perangkat lunak yang lebih terstruktur, rinci, mudah dipahami, dan dapat dijadikan acuan selama analisis, perancangan, implementasi, pengujian, serta presentasi UKK di hadapan guru penguji maupun pihak industri mitra.
 
 Dokumen ini berfungsi sebagai:
 
-1. Acuan fitur yang wajib tersedia.
-2. Acuan hak akses setiap pengguna.
+1. Acuan fitur yang wajib tersedia pada Web dan Mobile Client (Flutter).
+2. Acuan hak akses setiap pengguna pada masing-masing platform.
 3. Acuan aturan bisnis inti yang menentukan valid/tidaknya aplikasi.
-4. Acuan struktur data dan relasi database.
-5. Acuan alur kerja sistem.
-6. Acuan validasi dan skenario pengujian.
+4. Acuan struktur data, relasi database, dan kontrak REST API Sanctum.
+5. Acuan alur kerja sistem (workflow presensi, izin, dan jadwal).
+6. Acuan validasi dan skenario pengujian automated & manual.
 7. Acuan pengecekan kesesuaian aplikasi dengan rubrik penilaian UKK.
 
 ---
 
 # 3. Ruang Lingkup Sistem
 
-School Class Progress (SCP) adalah platform sekolah untuk mendukung pembelajaran berbasis **Teaching Factory** dengan **siklus jadwal blok dua mingguan**.
+School Class Progress (SCP) adalah platform sekolah terpadu untuk mendukung pembelajaran berbasis **Teaching Factory** dengan **siklus jadwal blok dua mingguan (Putaran 1 & Putaran 2)** yang terintegrasi antara **Web Admin & Portal (Laravel Blade)** dan **Aplikasi Mobile (Flutter)**.
 
 Sistem wajib mencakup kebutuhan berikut:
 
-- autentikasi pengguna;
-- pengelolaan profil;
-- pengelolaan master data oleh Waka Kurikulum;
-- pengaturan Putaran 1 dan Putaran 2;
-- input jadwal mengajar oleh guru;
-- pencegahan jadwal bentrok berdasarkan waktu, ruang, dan kelas;
-- mekanisme penguncian jadwal;
-- pengisian jurnal mengajar;
-- pengisian presensi siswa;
-- unggah bukti foto jurnal secara real-time;
-- pengajuan izin/sakit oleh siswa atau orang tua;
-- unggah dokumen pendukung izin;
-- verifikasi pengajuan izin oleh Tim Kesiswaan;
-- sinkronisasi izin yang disetujui ke presensi saat guru membuka jurnal kelas;
-- rekap kehadiran siswa;
+- autentikasi pengguna multi-platform berbasis Web Session dan REST API Sanctum;
+- pengelolaan profil pengguna dan pembaruan kata sandi;
+- pengelolaan master data oleh Waka Kurikulum (Tahun Ajaran & Semester aktif, Jurusan, Jam Pelajaran harian 1-10 sesi, Kelas, Ruang, dan Pengguna);
+- penugasan Wali Kelas terintegrasi pada manajemen kelas;
+- pengaturan siklus operasional Putaran 1 dan Putaran 2 secara global;
+- input jadwal mengajar secara mandiri oleh guru sesuai SK;
+- pencegahan bentrok jadwal otomatis (*Conflict Prevention*) berdasarkan waktu, ruang, dan kelas;
+- mekanisme penguncian jadwal (*Lock Schedule*) yang membatasi aksi pada UI dan backend;
+- pengisian jurnal mengajar KBM guru;
+- pengisian presensi siswa sekelas dengan opsi Hadir, Sakit, Izin, Alpa;
+- unggah bukti foto kegiatan KBM (melalui berkas pada Web atau tangkapan kamera langsung (*real-time capture*) pada Mobile Flutter);
+- pengajuan izin/sakit oleh siswa atau orang tua (mendukung Izin Harian dan Izin Potong Jam Pelajaran);
+- unggah dokumen bukti izin (berkas PDF/gambar atau foto kamera langsung secara real-time pada Mobile Flutter);
+- validasi pencegahan pengajuan izin tumpang tindih (*Conflict Overlap* HTTP 409);
+- verifikasi pengajuan izin oleh Wali Kelas, dengan kewajiban mengisi alasan (*Rejection Note*) jika menolak izin;
+- pemantauan rekapan izin dan presensi oleh Guru BK untuk pendampingan dan pembinaan siswa;
+- sinkronisasi otomatis izin yang disetujui (*Approved*) ke presensi saat guru membuat jurnal KBM;
+- rekapitulasi kehadiran siswa dan pencarian arsip jurnal KBM dengan filter tanggal dan rekapan 1 bulan;
 - dashboard reminder apabila guru terlambat mengisi jurnal lebih dari 30 menit setelah jadwal selesai.
 
-Sistem dirancang **Mobile-First** agar nyaman digunakan guru saat berada di kelas dan orang tua saat mengakses dari rumah.
+Sistem dirancang dengan arsitektur **Hybrid Client-Server**:
+1. **Web Dashboard (Laravel 11 + Tailwind CSS + Alpine.js):** Digunakan secara menyeluruh oleh Waka Kurikulum, Guru, Wali Kelas, Guru BK, dan Siswa.
+2. **Mobile Client (Flutter):** Digunakan secara khusus dan praktis oleh Guru, Wali Kelas, Guru BK, dan Siswa untuk kebutuhan mobilitas tinggi di kelas maupun di rumah, terutama untuk pemanfaatan kamera perangkat secara real-time.
 
 ---
 
@@ -96,16 +101,20 @@ Spesifikasi ini diturunkan dari lima kelompok informasi pada PDF UKK:
 | Teaching Factory | Pola pembelajaran yang menjadi konteks penggunaan jadwal blok pada sistem |
 | Putaran 1 | Salah satu siklus jadwal blok aktif |
 | Putaran 2 | Siklus jadwal blok alternatif terhadap Putaran 1 |
-| Active Cycle | Putaran yang sedang berlaku secara global pada sistem |
+| Active Cycle | Putaran yang sedang berlaku secara global pada sistem (Putaran 1 atau Putaran 2) |
 | Lock Schedule | Kondisi saat Waka Kurikulum mengunci jadwal sehingga guru tidak dapat menambah, mengubah, atau menghapus jadwal |
-| Conflict Prevention | Mekanisme otomatis untuk menolak jadwal yang waktunya beririsan pada ruang atau kelas yang sama |
-| Jurnal | Catatan pelaksanaan kegiatan mengajar guru berdasarkan suatu jadwal |
-| Presensi | Catatan status kehadiran siswa pada jurnal/kelas tertentu |
+| Conflict Prevention | Mekanisme otomatis backend untuk menolak jadwal yang waktunya beririsan pada ruang atau kelas yang sama |
+| Jurnal | Catatan pelaksanaan kegiatan mengajar guru berdasarkan suatu jadwal KBM |
+| Presensi | Catatan status kehadiran siswa (Hadir, Sakit, Izin, Alpa) pada jurnal/kelas tertentu |
 | Leave Request | Pengajuan izin atau sakit dari siswa/orang tua |
+| Izin Potong Jam | Pengajuan izin khusus untuk jam pelajaran tertentu pada hari KBM berjalan |
+| Rejection Note | Catatan/alasan tertulis wajib dari Wali Kelas saat menolak pengajuan izin siswa |
 | Applicant | Pengguna yang melakukan pengajuan izin; dapat berupa siswa atau orang tua |
-| Verified By | Pengguna dari Tim Kesiswaan yang memverifikasi pengajuan izin |
+| Verified By | Pengguna dari Tim Kesiswaan (Wali Kelas) yang memverifikasi pengajuan izin |
 | Reminder Jurnal | Peringatan visual bila jadwal guru telah berakhir lebih dari 30 menit tetapi jurnal belum dibuat |
 | Mobile-First | Pendekatan desain yang memprioritaskan pengalaman pada layar ponsel, lalu disesuaikan untuk layar lebih besar |
+| Flutter Mobile Client | Aplikasi mobile multi-platform untuk Guru, Guru BK, dan Siswa yang berkomunikasi via REST API Sanctum |
+| Real-Time Camera Capture | Pengambilan foto bukti KBM dan perizinan langsung dari sensor kamera ponsel untuk menjamin otentisitas data |
 
 ---
 
@@ -139,76 +148,81 @@ PDF menyebut terdapat **6 role**, tetapi antarmuka disederhanakan menjadi **4 ke
 5. Siswa.
 6. Orang Tua.
 
-## 7.2 Kelompok antarmuka
+## 7.2 Kelompok antarmuka dan Platform
 
-### A. Waka Kurikulum
+Sistem membagi antarmuka berdasarkan platform operasional:
 
-Tanggung jawab:
+### A. Waka Kurikulum (Platform: Web Application Only)
 
-- mengelola master data;
-- menentukan siklus blok aktif;
-- melakukan Lock Schedule;
-- menerima notifikasi/rekap guru yang belum mengisi jurnal.
-
-### B. Guru
+Waka Kurikulum difokuskan pada manajemen tingkat tinggi melalui komputer desktop/laptop sekolah.
 
 Tanggung jawab:
 
-- menginput rencana jadwal mengajar secara mandiri sesuai SK;
-- mengisi jurnal mengajar;
-- mengisi presensi siswa;
-- mengunggah bukti foto kegiatan secara real-time;
-- menerima peringatan keterlambatan jurnal pada dashboard.
+- mengelola master data (Tahun Ajaran & Semester, Jurusan, Jam Pelajaran harian 1-10 sesi, Kelas, Ruang, dan Pengguna);
+- menentukan siklus blok aktif (Putaran 1 / Putaran 2);
+- melakukan Lock Schedule secara global;
+- monitoring dan audit riwayat jurnal KBM guru dengan filter tanggal dan arsip bulanan;
+- menerima notifikasi/rekap guru yang terlambat mengisi jurnal.
 
-### C. Tim Kesiswaan
-
-Terdiri dari:
-
-- Wali Kelas;
-- Guru BK.
-
-Keduanya menggunakan antarmuka yang serupa.
+### B. Guru Pengajar (Platform: Web & Mobile Flutter)
 
 Tanggung jawab:
 
-- memantau rekap absensi;
-- memeriksa pengajuan izin/sakit;
-- melakukan verifikasi/persetujuan sesuai kelas perwalian.
+- menginput rencana jadwal mengajar secara mandiri sesuai SK (pada Web);
+- mengisi jurnal mengajar KBM dan topik materi;
+- mengisi presensi siswa sekelas (Hadir, Sakit, Izin, Alpa);
+- mengunggah bukti foto KBM secara real-time via kamera ponsel (pada Mobile Flutter) atau upload berkas (pada Web);
+- menerima pengingat (*reminder*) keterlambatan jurnal pada dashboard.
 
-### D. Siswa dan Orang Tua
+### C. Tim Kesiswaan (Wali Kelas & Guru BK) (Platform: Web & Mobile Flutter)
 
-Menggunakan portal login yang sama.
+Tim Kesiswaan memiliki antarmuka terintegrasi dengan pemisahan wewenang yang tegas:
+
+1. **Wali Kelas:**
+   - memeriksa permohonan izin/sakit siswa khusus kelas perwaliannya;
+   - melakukan verifikasi persetujuan (*Approve*) atau penolakan (*Reject*);
+   - wajib mengisi catatan penolakan (*Rejection Note*) saat menolak izin;
+   - memantau rekap absensi dan perizinan kelasnya.
+2. **Guru BK:**
+   - memantau rekapan kehadiran dan perizinan seluruh siswa lintas kelas;
+   - mendeteksi dini siswa dengan ketidakhadiran tinggi (Alpa/Izin berulang) untuk tindak lanjut bimbingan dan konseling (*read-only monitoring*).
+
+### D. Siswa dan Orang Tua (Platform: Web & Mobile Flutter)
+
+Menggunakan portal login yang sama dengan akses terpersonalisasi.
 
 Tanggung jawab:
 
-- melihat rekap kehadiran;
-- mengajukan izin/sakit;
-- mengunggah bukti surat dokter atau dokumen resmi.
+- melihat jadwal KBM kelas aktif sesuai putaran berjalan;
+- melihat riwayat presensi dan rekapitulasi kehadiran pribadi;
+- mengajukan izin/sakit (Izin Harian penuh maupun Izin Potong Jam Pelajaran);
+- mengunggah bukti surat izin/surat dokter melalui tangkapan kamera langsung (*real-time capture*) pada Mobile Flutter atau berkas PDF/gambar pada Web;
+- memantau status persetujuan dan membaca catatan penolakan jika izin ditolak.
 
 ---
 
-# 8. Matriks Hak Akses Fitur
+# 8. Matriks Hak Akses Fitur dan Platform
 
-| Fitur | Siswa / Orang Tua | Guru | Wali Kelas / Guru BK | Waka Kurikulum |
-|---|:---:|:---:|:---:|:---:|
-| Login | Ya | Ya | Ya | Ya |
-| Logout | Ya | Ya | Ya | Ya |
-| Update Profil | Ya | Ya | Ya | Ya |
-| Input Jadwal | Tidak | Ya | Tidak | Tidak |
-| Cek Tabrakan Waktu/Ruang/Kelas | Tidak | Otomatis saat input jadwal | Tidak | Tidak |
-| Input Jurnal | Tidak | Ya | Tidak | Tidak |
-| Input Presensi | Tidak | Ya | Tidak | Tidak |
-| Upload Foto Jurnal | Tidak | Ya | Tidak | Tidak |
-| Pengajuan Izin/Sakit | Ya | Tidak | Tidak | Tidak |
-| Upload Dokumen Izin | Ya | Tidak | Tidak | Tidak |
-| Verifikasi/Approve Izin | Tidak | Tidak | Ya | Tidak |
-| Lihat Rekap Absensi | Ya | Sesuai kebutuhan operasional | Ya | Tidak disebut eksplisit pada matriks |
-| Dashboard Reminder Jurnal >30 menit | Tidak | Ya | Tidak | Menerima rekap/notifikasi guru belum jurnal |
-| Lock Schedule | Tidak | Tidak | Tidak | Ya |
-| Toggle Putaran 1/2 | Tidak | Tidak | Tidak | Ya |
-| Kelola Master Data | Tidak | Tidak | Tidak | Ya |
+| Fitur / Modul | Siswa / Orang Tua | Guru Pengajar | Wali Kelas | Guru BK | Waka Kurikulum | Platform Tersedia |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|
+| Login & Logout | Ya | Ya | Ya | Ya | Ya | Web & Mobile Flutter |
+| Update Profil & Kata Sandi | Ya | Ya | Ya | Ya | Ya | Web & Mobile Flutter |
+| Kelola Master Tahun Ajaran | Tidak | Tidak | Tidak | Tidak | Ya | Web Only |
+| Kelola Master Jurusan & Jam Pelajaran | Tidak | Tidak | Tidak | Tidak | Ya | Web Only |
+| Kelola Master Kelas & Ruang | Tidak | Tidak | Tidak | Tidak | Ya | Web Only |
+| Kelola Master Pengguna | Tidak | Tidak | Tidak | Tidak | Ya | Web Only |
+| Toggle Putaran 1/2 & Lock Schedule | Tidak | Tidak | Tidak | Tidak | Ya | Web Only |
+| Input & Modifikasi Jadwal | Tidak | Ya | Ya (Jadwal Mengajar) | Ya (Jadwal Mengajar) | Tidak | Web Only |
+| Isi Jurnal & Presensi Kelas | Tidak | Ya | Ya | Ya | Tidak | Web & Mobile Flutter |
+| Ambil Foto KBM Real-Time Kamera | Tidak | Ya | Ya | Ya | Tidak | Mobile Flutter |
+| Pengajuan Izin Harian & Potong Jam | Ya | Tidak | Tidak | Tidak | Tidak | Web & Mobile Flutter |
+| Foto Bukti Izin Kamera Real-Time | Ya | Tidak | Tidak | Tidak | Tidak | Mobile Flutter |
+| Approve / Reject Izin (+ Rejection Note) | Tidak | Tidak | Ya (Kelas Perwalian) | Tidak | Tidak | Web & Mobile Flutter |
+| Rekapitulasi Izin & Presensi Siswa | Ya (Pribadi) | Ya (Kelas Terkait) | Ya (Kelas Perwalian) | Ya (Seluruh Siswa) | Ya (Monitoring) | Web & Mobile Flutter |
+| Dashboard Reminder Jurnal >30 menit | Tidak | Ya | Ya | Ya | Ya (Rekap Keterlambatan) | Web & Mobile Flutter |
+| Filter Monitoring & Arsip Jurnal KBM | Tidak | Tidak | Tidak | Tidak | Ya (Arsip 1 Bulan / Tanggal) | Web Only |
 
-> Catatan: Dokumen sumber menyebut Waka mengelola master data, tetapi tidak merinci daftar seluruh operasi CRUD maupun halaman master data. Implementasi harus tetap mengacu pada entitas blueprint database yang relevan.
+> Catatan Teknis: Seluruh fitur Mobile Flutter terhubung secara aman dengan Backend Laravel melalui protokol REST API dengan autentikasi Bearer Token Laravel Sanctum.
 
 ---
 
@@ -247,15 +261,16 @@ Sistem harus menyediakan fasilitas update profil bagi seluruh role.
 
 Waka Kurikulum harus dapat mengelola data dasar yang diperlukan sistem.
 
-Blueprint database menunjukkan master data berikut:
+Master data sistem mencakup:
 
 - roles;
-- classes;
-- rooms;
-- users;
-- konfigurasi sistem.
-
-PDF tidak merinci operasi per tabel. Minimal implementasi harus memastikan data yang diperlukan jadwal, pengguna, kelas, ruang, dan konfigurasi dapat tersedia dengan benar.
+- classes (terhubung dengan jurusan dan wali kelas);
+- rooms (ruang kelas dan laboratorium);
+- users (guru, siswa, orang tua, staf);
+- academic_years (tahun ajaran dan semester aktif);
+- majors (jurusan/konsentrasi keahlian SMK);
+- lesson_hours (sesi jam pelajaran harian 1-10 sesi);
+- system_configurations (siklus putaran aktif dan kuncian jadwal).
 
 ## FR-WAKA-002 - Menentukan Active Cycle
 
@@ -291,11 +306,42 @@ Saat jadwal dikunci, guru harus kehilangan hak untuk:
 Pembatasan wajib diterapkan pada:
 
 1. antarmuka: tombol aksi tidak tersedia/disembunyikan;
-2. backend/API: request manipulasi jadwal ditolak.
+2. backend/API: request manipulasi jadwal ditolak dengan kode status HTTP 403 Forbidden.
 
 ## FR-WAKA-006 - Rekap Guru Belum Mengisi Jurnal
 
-Waka Kurikulum harus dapat menerima notifikasi atau rekap guru yang belum mengisi jurnal sesuai kondisi keterlambatan yang ditentukan sistem.
+Waka Kurikulum harus dapat menerima notifikasi atau rekap guru yang belum mengisi jurnal sesuai kondisi keterlambatan yang ditentukan sistem (jadwal telah lewat >30 menit dari jam selesai KBM).
+
+## FR-WAKA-007 - Mengelola Master Tahun Ajaran & Semester
+
+Waka Kurikulum harus dapat:
+- menambah dan mengedit data tahun ajaran (contoh: 2026/2027);
+- menetapkan semester aktif (Ganjil / Genap);
+- mengaktifkan satu tahun ajaran sebagai acuan operasional sistem berjalan (*Active Academic Year*).
+
+## FR-WAKA-008 - Mengelola Master Jurusan (Majors)
+
+Waka Kurikulum harus dapat mengelola data jurusan (kode jurusan dan nama konsentrasi keahlian, contoh: RPL, TKJ, DKV) yang menjadi induk dari setiap kelas/rombongan belajar.
+
+## FR-WAKA-009 - Mengelola Master Jam Pelajaran (Lesson Hours)
+
+Waka Kurikulum harus dapat mengonfigurasi jam pelajaran sekolah:
+- 10 sesi jam harian (Jam Ke-1 s/d Jam Ke-10);
+- penentuan jam mulai dan jam selesai untuk setiap sesi KBM;
+- penandaan sesi istirahat (Istirahat 1 pagi dan Istirahat 2 siang).
+
+## FR-WAKA-010 - Penugasan Wali Kelas pada Rombongan Belajar
+
+Waka Kurikulum dapat menetapkan guru tertentu sebagai Wali Kelas langsung pada form pengelolaan kelas. Sistem harus secara otomatis menyinkronkan status peran guru terkait menjadi Wali Kelas dan memperbarui kelas perwalian yang diampu.
+
+## FR-WAKA-011 - Monitoring & Filter Arsip Jurnal KBM
+
+Waka Kurikulum harus memiliki antarmuka monitoring jurnal dengan fitur filter:
+- filter berdasarkan tanggal spesifik KBM;
+- filter berdasarkan rekapan 1 bulan kalender penuh;
+- filter berdasarkan guru pengajar tertentu;
+- filter berdasarkan kelas tertentu;
+- tombol reset untuk mengembalikan filter ke kondisi default hari ini.
 
 ---
 
@@ -430,18 +476,20 @@ Sesuai blueprint, jurnal menyimpan:
 
 ## FR-JRN-003 - Upload Foto Real-Time
 
-Saat mengisi jurnal/presensi, guru harus menyediakan bukti foto kegiatan secara real-time.
+Saat mengisi jurnal/presensi, guru harus menyediakan bukti foto kegiatan mengajar secara real-time.
 
-File disimpan melalui referensi `photo_path` pada tabel `journals`.
+Mekanisme pengambilan bukti foto:
+1. **Pada Mobile Flutter:** Foto diambil secara langsung menggunakan sensor kamera ponsel (*Real-Time Device Camera Capture*) saat guru berada di dalam kelas untuk menjamin integritas kehadiran fisik KBM.
+2. **Pada Web Application:** Foto dapat diunggah melalui berkas digital yang tersimpan.
+
+File disimpan di storage dan referensi tautan disimpan melalui field `photo_path` pada tabel `journals`.
 
 ## FR-JRN-004 - Validasi Upload Foto
 
 Sistem harus memvalidasi:
 
-- ekstensi/jenis file;
-- batas ukuran file.
-
-**Penting:** PDF mewajibkan validasi ekstensi dan ukuran, tetapi tidak menetapkan ekstensi apa saja dan berapa batas maksimal ukuran. Nilainya harus ditentukan oleh implementasi/proyek dan didokumentasikan, tetapi tidak boleh diklaim sebagai nilai yang berasal dari PDF.
+- ekstensi/jenis file (khusus format gambar: jpg, jpeg, png);
+- batas ukuran file (maksimal 5 MB / 5120 KB).
 
 ## FR-ATT-001 - Membuat Presensi
 
@@ -460,14 +508,14 @@ Presensi harus menyimpan tanggal pada field `date`.
 
 ## FR-ATT-004 - Status Presensi
 
-Presensi harus menyimpan nilai pada field `status` bertipe enum.
+Presensi harus menyimpan nilai pada field `status` bertipe enum:
 
-Nilai yang secara eksplisit disebut PDF untuk sinkronisasi izin adalah:
-
+- Hadir;
+- Sakit;
 - Izin;
-- Sakit.
+- Alpa.
 
-PDF tidak mendefinisikan seluruh daftar status presensi lainnya.
+Siswa yang memiliki izin berstatus `Approved` pada hari terkait akan terkunci secara otomatis sebagai Sakit atau Izin saat guru membuka sesi presensi jurnal.
 
 ---
 
@@ -475,52 +523,62 @@ PDF tidak mendefinisikan seluruh daftar status presensi lainnya.
 
 ## FR-STD-001 - Portal Login Bersama
 
-Siswa dan Orang Tua menggunakan portal login yang sama.
+Siswa dan Orang Tua dapat menggunakan portal Web maupun aplikasi Mobile Flutter.
 
-Hak akses tetap dibedakan sesuai role setelah autentikasi.
+Hak akses dibedakan secara otomatis berdasarkan role setelah autentikasi.
 
 ## FR-STD-002 - Melihat Rekap Kehadiran
 
-Siswa/Orang Tua harus dapat melihat rekap kehadiran siswa yang terkait.
+Siswa/Orang Tua harus dapat melihat rekap kehadiran siswa yang terkait secara transparan (total Hadir, Sakit, Izin, Alpa).
 
 ## FR-STD-003 - Pengajuan Izin/Sakit
 
-Siswa atau Orang Tua harus dapat membuat pengajuan izin/sakit.
+Siswa atau Orang Tua harus dapat membuat pengajuan izin/sakit melalui Web maupun Mobile Flutter.
+
+Sistem mendukung dua jenis durasi izin:
+1. **Izin Harian Penuh:** Izin sakit atau keperluan keluarga untuk 1 hari atau rentang beberapa hari (`start_date` sampai `end_date`).
+2. **Izin Potong Jam Pelajaran:** Izin dispensasi atau keperluan khusus pada hari berjalan yang hanya mencakup beberapa jam pelajaran tertentu (dilengkapi `start_time` dan `end_time`).
 
 ## FR-STD-004 - Data Pengajuan
 
-Sesuai blueprint, pengajuan izin menyimpan:
+Sesuai model data terintegrasi, pengajuan izin menyimpan:
 
-- student_id;
-- applicant_id;
-- verified_by;
-- start_date;
-- end_date;
-- reason;
-- document_path;
-- status_approval.
+- `student_id`;
+- `applicant_id`;
+- `verified_by`;
+- `leave_type` (Sakit, Izin, atau Potong Jam Pelajaran);
+- `start_date`;
+- `end_date`;
+- `start_time` (khusus izin potong jam);
+- `end_time` (khusus izin potong jam);
+- `reason`;
+- `document_path`;
+- `status_approval`;
+- `rejection_note` (alasan jika permohonan ditolak).
 
 ## FR-STD-005 - Applicant
 
 `applicant_id` digunakan untuk menyimpan pengguna yang benar-benar mengajukan permohonan.
 
-Dengan demikian sistem dapat membedakan apakah pengajuan dilakukan oleh siswa atau orang tua.
+Dengan demikian sistem dapat membedakan apakah pengajuan dilakukan langsung oleh siswa atau oleh orang tua siswa.
 
-## FR-STD-006 - Upload Dokumen
+## FR-STD-006 - Upload Dokumen & Foto Real-Time Bukti Izin
 
-Pengajuan izin harus dilengkapi fitur upload dokumen, misalnya surat dokter atau surat resmi sesuai kasus.
+Pengajuan izin harus dilengkapi bukti fisik/surat resmi:
+1. **Pada Mobile Flutter:** Siswa/Orang Tua dapat memotret surat dokter atau surat izin orang tua langsung menggunakan kamera ponsel secara real-time (*real-time camera capture*) atau memilih berkas dari galeri.
+2. **Pada Web Application:** Pengguna dapat mengunggah berkas dokumen (format PDF, JPG, JPEG, PNG maksimal 2-4 MB).
 
 ## FR-STD-007 - Status Awal
 
-Setiap pengajuan baru harus berstatus:
+Setiap pengajuan baru yang berhasil dikirim harus berstatus:
 
 ```text
 Pending
 ```
 
-## FR-STD-008 - Validasi Dokumen
+## FR-STD-008 - Validasi Pencegahan Overlap Izin
 
-Rubrik mengharuskan validasi upload file. PDF tidak menentukan nilai ekstensi maupun ukuran maksimum, sehingga parameter tersebut harus ditetapkan pada implementasi dan dicatat sebagai konfigurasi/keputusan teknis.
+Sistem harus menolak pembuatan permohonan izin baru apabila siswa yang bersangkutan telah memiliki permohonan aktif atau pending pada rentang tanggal yang sama (*Conflict Overlap Prevention*), dengan mengembalikan kode status HTTP 409 Conflict.
 
 ---
 
@@ -528,27 +586,35 @@ Rubrik mengharuskan validasi upload file. PDF tidak menentukan nilai ekstensi ma
 
 ## FR-KES-001 - Melihat Rekap Absensi
 
-Wali Kelas dan Guru BK harus dapat memantau rekap absensi.
+Wali Kelas dan Guru BK harus dapat memantau rekap absensi siswa:
+- Wali Kelas memantau kelas perwaliannya secara mendalam.
+- Guru BK memantau seluruh siswa lintas kelas untuk bimbingan konseling.
 
 ## FR-KES-002 - Melihat Pengajuan Izin
 
-Tim Kesiswaan harus dapat melihat pengajuan izin/sakit yang perlu diverifikasi sesuai konteks kelas perwaliannya.
+Tim Kesiswaan harus dapat melihat daftar pengajuan izin/sakit siswa:
+- Wali Kelas melihat permohonan `Pending` dari siswa kelasnya untuk diproses.
+- Guru BK melihat arsip dan rekapan perizinan yang telah diverifikasi (*Read-Only Monitoring*).
 
-## FR-KES-003 - Approve Izin
+## FR-KES-003 - Verifikasi Izin (Approve & Reject)
 
-Tim Kesiswaan harus dapat mengubah pengajuan dari status `Pending` menjadi `Approved`.
+Wali Kelas memiliki wewenang memverifikasi pengajuan izin siswa:
+1. **Approve:** Mengubah status dari `Pending` menjadi `Approved`.
+2. **Reject:** Mengubah status dari `Pending` menjadi `Rejected`.
 
-## FR-KES-004 - Mencatat Verifikator
+## FR-KES-004 - Kewajiban Mengisi Catatan Penolakan (Rejection Note)
 
-Saat pengajuan diverifikasi, sistem harus dapat mencatat pengguna yang melakukan verifikasi pada `verified_by`.
+Apabila Wali Kelas menolak (*Reject*) permohonan izin siswa, sistem **wajib mewajibkan** pengisian alasan penolakan pada kolom `rejection_note` (minimal 3 karakter). Catatan ini akan tampil pada portal Siswa/Orang Tua agar alasan penolakan transparan.
 
-## FR-KES-005 - Approval Tidak Langsung Membuat Presensi
+## FR-KES-005 - Mencatat Verifikator
 
-Ketika izin disetujui, sistem **tidak boleh langsung** membuat presensi pada tabel `attendances`.
+Saat pengajuan diverifikasi (baik Approved maupun Rejected), sistem harus mencatat ID pengguna Wali Kelas yang memproses pada field `verified_by`.
 
-Presensi baru disinkronkan pada saat guru mata pelajaran membuat jurnal dan membuka kelas pada hari yang sesuai.
+## FR-KES-006 - Approval Tidak Langsung Membuat Presensi
 
-Ini merupakan aturan bisnis inti.
+Ketika izin disetujui (*Approved*), sistem **tidak boleh langsung** membuat data presensi pada tabel `attendances`.
+
+Presensi baru disinkronkan pada saat guru mata pelajaran membuat jurnal dan membuka kelas pada hari yang sesuai. Ini merupakan salah satu dari 5 Aturan Bisnis Inti UKK.
 
 ---
 
@@ -735,19 +801,22 @@ Blueprint menyediakan `updated_by` pada `system_configurations` yang berelasi ke
 
 # 20. Rancangan Database Wajib
 
-Struktur database harus mengacu pada blueprint PDF karena digunakan untuk mendukung Conflict Prevention dan Sinkronisasi Izin.
+Struktur database mengacu pada blueprint PDF UKK serta pengembangan entitas pendukung akademik yang terintegrasi.
 
-Terdapat 9 tabel utama:
+Terdapat 12 tabel utama:
 
-1. roles;
-2. classes;
-3. rooms;
-4. users;
-5. system_configurations;
-6. schedules;
-7. journals;
-8. attendances;
-9. leave_requests.
+1. `roles` (peran pengguna: Waka Kurikulum, Guru, Wali Kelas, Guru BK, Siswa, Orang Tua);
+2. `classes` (rombongan belajar/kelas, berelasi ke jurusan dan wali kelas);
+3. `rooms` (ruang kelas dan laboratorium);
+4. `users` (akun pengguna terpadu);
+5. `system_configurations` (konfigurasi siklus aktif dan kuncian jadwal);
+6. `schedules` (jadwal mengajar blok mingguan);
+7. `journals` (catatan KBM dan tautan bukti foto);
+8. `attendances` (presensi kehadiran siswa per sesi jurnal);
+9. `leave_requests` (pengajuan izin/sakit harian & potong jam);
+10. `academic_years` (master data tahun ajaran dan status periode aktif);
+11. `majors` (master data jurusan/konsentrasi keahlian SMK);
+12. `lesson_hours` (master konfigurasi 10 sesi jam pelajaran harian).
 
 ---
 
@@ -935,17 +1004,22 @@ Daftar enum lengkap tidak diberikan PDF.
 
 ## 21.9 Tabel `leave_requests`
 
-| Field | Tipe pada Blueprint | Null | Keterangan |
+| Field | Tipe Data | Null | Keterangan |
 |---|---|---|---|
-| id | int | PK | Primary key |
-| student_id | int | NN | Siswa yang mengajukan/mendapat izin |
-| applicant_id | int | NN | Pengguna yang membuat pengajuan |
-| verified_by | int | Tidak ditandai NN | Tim Kesiswaan yang memverifikasi |
-| start_date | date | NN | Awal masa izin |
-| end_date | date | NN | Akhir masa izin |
-| reason | text | NN | Alasan izin/sakit |
-| document_path | varchar(255) | NN | Lokasi dokumen bukti |
-| status_approval | enum | NN | Status persetujuan |
+| id | bigint unsigned | PK | Primary key |
+| student_id | bigint unsigned | NN | Siswa yang bersangkutan (FK ke users) |
+| applicant_id | bigint unsigned | NN | Pengguna yang membuat pengajuan (FK ke users) |
+| verified_by | bigint unsigned | Nullable | Wali Kelas yang memverifikasi (FK ke users) |
+| leave_type | enum | NN | Jenis izin ('Sakit', 'Izin', 'Potong Jam Pelajaran') |
+| start_date | date | NN | Tanggal awal izin |
+| end_date | date | NN | Tanggal akhir izin |
+| start_time | string(10) | Nullable | Jam mulai (khusus izin potong jam pelajaran) |
+| end_time | string(10) | Nullable | Jam selesai (khusus izin potong jam pelajaran) |
+| reason | text | NN | Keterangan/alasan pengajuan izin |
+| document_path | varchar(255) | NN | Lokasi berkas bukti izin / foto kamera real-time |
+| status_approval | enum | NN | Status ('Pending', 'Approved', 'Rejected') |
+| rejection_note | text | Nullable | Catatan/alasan penolakan dari Wali Kelas |
+| created_at / updated_at | timestamp | Nullable | Jejak audit waktu pembuatan & perubahan data |
 
 Relasi:
 
@@ -955,14 +1029,54 @@ leave_requests.applicant_id -> users.id
 leave_requests.verified_by  -> users.id
 ```
 
-Nilai status yang secara eksplisit disebut:
+---
 
+## 21.10 Tabel `academic_years`
+
+| Field | Tipe Data | Null | Keterangan |
+|---|---|---|---|
+| id | bigint unsigned | PK | Primary key |
+| name | varchar(20) | NN | Nama tahun ajaran (contoh: '2026/2027') |
+| semester | enum | NN | Semester ('Ganjil', 'Genap') |
+| is_active | boolean | NN | Penanda tahun ajaran yang sedang aktif (default: false) |
+| created_at / updated_at | timestamp | Nullable | Waktu pembuatan & update |
+
+Fungsi: Mengelola data periode tahun pelajaran dan semester yang aktif secara global pada sistem.
+
+---
+
+## 21.11 Tabel `majors`
+
+| Field | Tipe Data | Null | Keterangan |
+|---|---|---|---|
+| id | bigint unsigned | PK | Primary key |
+| code | varchar(20) | NN | Kode unik jurusan (contoh: 'RPL', 'TKJ', 'DKV') |
+| name | varchar(100) | NN | Nama lengkap program keahlian |
+| created_at / updated_at | timestamp | Nullable | Waktu pembuatan & update |
+
+Relasi:
 ```text
-Pending
-Approved
+majors.id -> classes.major_id
 ```
 
-PDF tidak menyebut nilai status lain seperti Rejected, sehingga nilai tersebut tidak dinyatakan wajib dalam SRS ini.
+Fungsi: Mengelompokkan rombongan belajar/kelas berdasarkan program keahlian SMK.
+
+---
+
+## 21.12 Tabel `lesson_hours`
+
+| Field | Tipe Data | Null | Keterangan |
+|---|---|---|---|
+| id | bigint unsigned | PK | Primary key |
+| day_of_week | varchar(20) | NN | Hari operasional ('Senin' s/d 'Jumat') |
+| session_number | int | NN | Nomor sesi jam pelajaran (1 s/d 10) |
+| name | varchar(50) | NN | Label jam (contoh: 'Jam Ke-1') |
+| start_time | string(10) | NN | Waktu mulai sesi KBM (contoh: '07:00') |
+| end_time | string(10) | NN | Waktu selesai sesi KBM (contoh: '07:40') |
+| duration_minutes | int | NN | Durasi sesi dalam menit (default: 40) |
+| notes | string(100) | Nullable | Catatan sesi (contoh: 'Sesi Belajar Pagi', 'Istirahat') |
+
+Fungsi: Standar waktu jam pelajaran harian yang digunakan acuan jadwal mengajar dan penghitungan toleransi keterlambatan pengisian jurnal KBM.
 
 ---
 
@@ -1914,7 +2028,42 @@ Aplikasi dinilai kuat apabila kelima aturan bisnis inti benar-benar dijalankan d
 
 ---
 
-# 42. Referensi Halaman PDF
+# 42. Arsitektur Klien Mobile Flutter & Integrasi REST API Laravel Sanctum
+
+Untuk memenuhi kebutuhan mobilitas tinggi di lingkungan sekolah dan pemanfaatan perangkat keras ponsel (kamera real-time), sistem menyediakan klien mobile berbasis **Flutter** yang mengonsumsi layanan REST API backend Laravel yang diamankan dengan **Laravel Sanctum**.
+
+## 42.1 Sasaran Pengguna Aplikasi Mobile
+Aplikasi Flutter secara khusus difokuskan untuk tiga peran operasional lapangan:
+1. **Guru Pengajar (dan Wali Kelas):** Melihat jadwal harian, mengisi jurnal KBM dengan foto bukti kamera real-time, dan memproses absensi siswa.
+2. **Guru BK:** Memantau rekapan absensi siswa bermasalah secara cepat dari ponsel untuk pembinaan.
+3. **Siswa:** Melihat jadwal KBM kelas, melihat histori kehadiran, dan mengajukan izin/sakit dengan melampirkan foto surat dokter dari kamera langsung.
+*(Peran Waka Kurikulum tetap menggunakan Web Dashboard untuk kemudahan administrasi master data dan monitoring).*
+
+## 42.2 Mekanisme Foto Real-Time pada Flutter
+Pada aplikasi Flutter:
+- Menggunakan pustaka resmi `image_picker` dengan konfigurasi sumber: `ImageSource.camera`.
+- Gambar yang ditangkap langsung dari kamera ponsel dikompresi secara otomatis pada sisi klien sebelum dikirimkan ke server melalui request `multipart/form-data`.
+- Hal ini mencegah manipulasi dokumen atau penggunaan foto lama, sehingga menjamin validitas kehadiran fisik KBM dan keabsahan perizinan siswa.
+
+## 42.3 Daftar Endpoint REST API Sanctum
+Berikut adalah endpoint backend yang digunakan oleh aplikasi Flutter:
+
+| Method | Endpoint | Fungsi | Hak Akses (Role) |
+|---|---|---|---|
+| POST | `/api/login` | Autentikasi kredensial & penerbitan Bearer Token Sanctum | Publik / Seluruh Pengguna |
+| POST | `/api/logout` | Revoke/pencabutan token aktif | Terautentikasi |
+| GET | `/api/me` | Mengambil data profil pengguna & hak akses aktif | Terautentikasi |
+| GET | `/api/teacher/dashboard` | Mengambil jadwal KBM hari ini & status reminder keterlambatan jurnal | Guru, Wali Kelas, Guru BK |
+| GET | `/api/teacher/schedules` | Mengambil daftar jadwal mengajar guru pada putaran aktif | Guru, Wali Kelas |
+| POST | `/api/teacher/journals` | Mengirim jurnal KBM beserta foto bukti (multipart/form-data) | Guru, Wali Kelas |
+| GET | `/api/student/dashboard` | Mengambil jadwal kelas hari ini & statistik presensi siswa | Siswa |
+| GET | `/api/student/schedules` | Mengambil jadwal mingguan kelas siswa | Siswa |
+| POST | `/api/leaves` | Mengirim permohonan izin (harian/potong jam) beserta foto/surat dokter | Siswa, Orang Tua |
+| GET | `/api/leaves` | Mengambil riwayat & status permohonan izin (Pending/Approved/Rejected + Rejection Note) | Siswa, Orang Tua |
+
+---
+
+# 43. Referensi Halaman PDF
 
 - **Halaman 1:** identitas tugas, petunjuk umum, peralatan dan lingkungan kerja.
 - **Halaman 2:** deskripsi proyek, role, kelompok antarmuka, dan matriks fitur.

@@ -13,9 +13,9 @@
         <div class="bg-[#0f172a]/90 backdrop-blur-md p-6 border border-slate-800 shadow-xl transition hover:border-slate-700" style="border-radius: 15px;">
             <div class="flex items-center justify-between mb-3">
                 <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Tenaga Pendidik</span>
-                <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+                <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full badge-academic shadow-sm">
                     Akademik
-                </span>
+                </span> 
             </div>
             <div class="text-4xl font-black text-white tracking-tight my-1">
                 {{ $teacherCount ?? 0 }}
@@ -29,9 +29,9 @@
         <div class="bg-[#0f172a]/90 backdrop-blur-md p-6 border border-slate-800 shadow-xl transition hover:border-slate-700" style="border-radius: 15px;">
             <div class="flex items-center justify-between mb-3">
                 <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Peserta Didik</span>
-                <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-950/60 text-indigo-300 border border-indigo-800/60">
+                <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full badge-active shadow-sm">
                     Aktif
-                </span>
+                </span> 
             </div>
             <div class="text-4xl font-black text-white tracking-tight my-1">
                 {{ $studentCount ?? 0 }}
@@ -46,7 +46,8 @@
     <div class="bg-[#0f172a]/90 backdrop-blur-md p-6 border border-slate-800 shadow-xl mb-6" style="border-radius: 15px;">
         <div class="flex items-center justify-between mb-2">
             <h2 class="text-base font-extrabold text-white">Siklus Blok Aktif</h2>
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold badge-running shadow-sm">
+                <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
                 Sedang Berjalan
             </span>
         </div>
@@ -57,19 +58,24 @@
         </div>
 
         <p class="text-xs text-slate-400 mt-2">
-            Periode Pelaksanaan: <span class="font-bold text-slate-200">01-07-2026 s.d. 31-12-2026</span>
+            Durasi Pelaksanaan: <span class="font-bold text-slate-200">2 Minggu per Putaran (10 Hari Efektif KBM)</span>
         </p>
 
-        <!-- Tombol Aksi Menuju Halaman Siklus Blok -->
+        <!-- Tombol Aksi Menuju Halaman Siklus Blok & Status Jadwal -->
         <div class="mt-4 pt-4 border-t border-slate-800 flex items-center justify-between">
             <a href="{{ route('waka.cycle.index') }}" 
-               class="text-xs font-bold text-indigo-400 hover:text-indigo-300 transition flex items-center gap-1.5 hover:underline">
+               class="px-4 py-2.5 text-xs font-bold rounded-xl text-center cursor-pointer transition uppercase tracking-wider bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm inline-flex items-center gap-1.5"
+               style="color: #ffffff !important;">
                 Atur Siklus Blok →
             </a>
-            <span class="text-xs font-medium {{ $configuration->is_schedule_locked ? 'text-red-400' : 'text-emerald-400' }}">
-                Status Jadwal: {{ $configuration->is_schedule_locked ? 'Terkunci' : 'Terbuka' }}
-            </span>
+            <div class="flex items-center gap-2">
+                <span class="text-xs font-semibold text-slate-400">Status Jadwal:</span>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold {{ $configuration->is_schedule_locked ? 'badge-locked' : 'badge-open' }} shadow-sm">
+                    {{ $configuration->is_schedule_locked ? 'Terkunci' : 'Terbuka' }}
+                </span>
+            </div>
         </div>
+
     </div>
 
     <!-- MONITORING KETERLAMBATAN PENGISIAN JURNAL -->
@@ -81,9 +87,10 @@
 
         @if($lateTeachers->isEmpty())
             <!-- Kotak Hijau Bersih Tanpa Emoji Checklist -->
-            <div class="p-4 bg-emerald-950/30 border border-emerald-800/50 text-emerald-300" style="border-radius: 12px;">
-                <div class="text-xs sm:text-sm font-medium">
-                    <strong class="font-bold text-emerald-200">[Kondisi Ideal]</strong> Tidak ada keterlambatan pengisian jurnal hari ini. Seluruh guru telah mengisi jurnal pembelajaran tepat waktu.
+            <div class="p-4 rounded-xl box-ideal shadow-sm">
+                <div class="text-xs sm:text-sm font-semibold flex items-center gap-2">
+                    <strong class="font-extrabold uppercase tracking-wide text-emerald-400">[Kondisi Ideal]</strong>
+                    <span>Tidak ada keterlambatan pengisian jurnal hari ini. Seluruh guru telah mengisi jurnal pembelajaran tepat waktu.</span>
                 </div>
             </div>
         @else
@@ -102,7 +109,7 @@
                             <tr class="bg-red-950/20">
                                 <td class="p-3 font-medium text-slate-200">{{ $schedule->teacher->name }}</td>
                                 <td class="p-3 text-slate-400">{{ $schedule->subject }}</td>
-                                <td class="p-3 font-bold text-red-400">{{ substr($schedule->start_time, 0, 5) }} - {{ substr($schedule->end_time, 0, 5) }}</td>
+                                <td class="p-3 font-bold text-red-400">{{ $schedule->period_label }}</td>
                             </tr>
                         @endforeach
                     </tbody>

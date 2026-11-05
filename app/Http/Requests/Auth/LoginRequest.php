@@ -2,10 +2,12 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -21,20 +23,43 @@ class LoginRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Persiapkan data sebelum validasi.
+     * Menjaga kompatibilitas jika ada input lama bernama 'email'.
+     */
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('email') && ! $this->has('login')) {
+            $this->merge(['login' => $this->email]);
+        }
+    }
+
+    /**
+     * Aturan validasi login.
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
+            'login' => ['required', 'string'],
             'password' => ['required', 'string'],
         ];
     }
 
     /**
-     * Attempt to authenticate the request's credentials.
+     * Pesan validasi kustom.
+     */
+    public function messages(): array
+    {
+        return [
+            'login.required' => 'Email, Username, NIS, atau NIP wajib diisi.',
+            'password.required' => 'Kata sandi wajib diisi.',
+        ];
+    }
+
+    /**
+     * Autentikasi multi-identifier:
+     * Mencocokkan input dengan Email, Username, NIS (Siswa), atau NIP (Guru/Staff).
      *
      * @throws ValidationException
      */
@@ -42,19 +67,33 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        $login = trim($this->input('login'));
+
+        // Cari user yang cocok dengan salah satu kolom: email, username, nis, atau nip
+        $user = User::where(function ($query) use ($login) {
+            $query->where('email', $login)
+                  ->orWhere('username', $login)
+                  ->orWhere('nis', $login)
+                  ->orWhere('nip', $login);
+        })->first();
+
+        // Cek apakah user ditemukan dan password cocok
+        if (! $user || ! Hash::check($this->input('password'), $user->password)) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'login' => 'Email, Username, NIS, NIP, atau kata sandi yang Anda masukkan salah.',
             ]);
         }
+
+        // Login ke sesi web Laravel
+        Auth::login($user, $this->boolean('remember'));
 
         RateLimiter::clear($this->throttleKey());
     }
 
     /**
-     * Ensure the login request is not rate limited.
+     * Pastikan request tidak melebihi batas percobaan (Rate Limiting).
      *
      * @throws ValidationException
      */
@@ -69,7 +108,7 @@ class LoginRequest extends FormRequest
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
-            'email' => trans('auth.throttle', [
+            'login' => trans('auth.throttle', [
                 'seconds' => $seconds,
                 'minutes' => ceil($seconds / 60),
             ]),
@@ -77,10 +116,10 @@ class LoginRequest extends FormRequest
     }
 
     /**
-     * Get the rate limiting throttle key for the request.
+     * Kunci throttle rate-limiting berbasis input login dan IP user.
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+        return Str::transliterate(Str::lower($this->string('login')).'|'.$this->ip());
     }
 }

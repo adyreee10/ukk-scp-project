@@ -10,6 +10,8 @@ class SystemConfiguration extends Model
 
     protected $fillable = [
         'active_cycle',
+        'academic_year',
+        'semester',
         'is_schedule_locked',
         'updated_by',
     ];
@@ -24,8 +26,23 @@ class SystemConfiguration extends Model
         return $this->belongsTo(User::class, 'updated_by');
     }
 
-    public static function current():self
+        public function getAcademicYearAttribute($value)
     {
-        return static::query()->findOrFail(1);
+        return $value ?? '2026/2027';
+    }
+
+    public function getSemesterAttribute($value)
+    {
+        return $value ?? 'Semester 1 (Ganjil)';
+    }
+
+    public static function current(): self
+    {
+        return static::query()->first() ?? static::create([
+            'active_cycle'       => 'Putaran 1',
+            'academic_year'      => '2026/2027',
+            'semester'           => 'Semester 1 (Ganjil)',
+            'is_schedule_locked' => false,
+        ]);
     }
 }

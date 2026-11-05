@@ -98,7 +98,7 @@
                                     </span>
                                 </td>
                                 <td class="p-4 text-xs font-mono text-slate-300">
-                                    {{ substr($schedule->start_time, 0, 5) }} - {{ substr($schedule->end_time, 0, 5) }} WIB
+                                    {{ $schedule->period_label }}
                                 </td>
                                 <td class="p-4 text-xs text-slate-300">
                                     {{ $schedule->room?->room_name ?? '-' }}

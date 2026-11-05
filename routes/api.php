@@ -103,7 +103,7 @@ Route::middleware('role:Waka Kurikulum')->prefix('waka')->group(function () {
 // TEACHER
 // =========================
 
-Route::middleware('role:Guru')->prefix('teacher')->group(function () {
+Route::middleware('role:Guru,Wali Kelas')->prefix('teacher')->group(function () {
 
     Route::get('/dashboard', [
         DashboardController::class,

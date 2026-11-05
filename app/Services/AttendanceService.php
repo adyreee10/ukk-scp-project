@@ -20,6 +20,7 @@ class AttendanceService
         $studentIds = User::query()
         ->where('class_id', $journal->schedule->class_id)
         ->whereHas('role', fn ($query) => $query->where('role_name', 'Siswa'))
+        ->where('student_status', 'Aktif')
         ->pluck('id');
 
         $leaves = LeaveRequest::query()
@@ -47,6 +48,7 @@ class AttendanceService
             ->whereIn('id', $studentIds)
             ->where('class_id', $journal->schedule->class_id)
             ->whereHas('role', fn ($query) => $query->where('role_name', 'Siswa'))
+            ->where('student_status', 'Aktif')
             ->count();
 
             if ($validCount !== $studentIds->unique()->count()) {
@@ -65,13 +67,18 @@ class AttendanceService
             ->keyBy('student_id');
 
             foreach($rows as $row) {
-            $forcedStatus = $approved->get($row['student_id'])?->leave_type;
+                $forcedStatus = $approved->get($row['student_id'])?->leave_type;
 
-            Attendance::updateOrCreate(
-            ['journal_id' => $journal->id, 'student_id' => $row['student_id']],
-            ['status' => $forcedStatus ?? $row['status'], 'date' => $date], 
-            );
+                Attendance::updateOrCreate(
+                    ['journal_id' => $journal->id, 'student_id' => $row['student_id']],
+                    [
+                        'status' => $forcedStatus ?? $row['status'],
+                        'note'   => $row['note'] ?? null,
+                        'date'   => $date,
+                    ], 
+                );
             }
+
         
             return $journal->attendances()->with('student:id,name')->get();
         });

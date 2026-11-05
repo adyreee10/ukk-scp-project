@@ -11,15 +11,24 @@ use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
-    /**
-     * Display the user's profile form.
+        /**
+     * Tampilkan halaman profil pengguna dengan detail lengkap.
      */
     public function edit(Request $request): View
     {
+        $user = $request->user()->load([
+            'role', 
+            'schoolClass', 
+            'homeroomClass', 
+            'parent', 
+            'children.schoolClass'
+        ]);
+
         return view('profile.edit', [
-            'user' => $request->user(),
+            'user' => $user,
         ]);
     }
+
 
     /**
      * Update the user's profile information.

@@ -44,101 +44,162 @@
                     <form method="POST" action="{{ route('family.leaves.store') }}" enctype="multipart/form-data" class="space-y-5">
                         @csrf
 
-                        <!-- Jenis Izin (Interaktif & Kontras Tinggi di Light/Dark Mode) -->
-                        <div x-data="{ leaveType: '{{ old('leave_type', 'Sakit') }}' }">
-                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
-                                Jenis Izin <span class="text-red-400">*</span>
-                            </label>
-                            
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                                                <!-- Jenis Izin (3 Opsi: Sakit, Izin, Potong Jam Pelajaran) -->
+                        <div x-data="{ leaveType: '{{ old('leave_type', 'Sakit') }}' }" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+                                    Jenis Izin <span class="text-red-400">*</span>
+                                </label>
                                 
-                                <!-- Opsi 1: Sakit -->
-                                <label @click="leaveType = 'Sakit'"
-                                       :class="leaveType === 'Sakit' 
-                                            ? 'leave-active-sakit ring-2 ring-amber-500/50' 
-                                            : 'leave-inactive hover:border-slate-400'"
-                                       class="relative flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-all duration-150">
-                                    <input type="radio" name="leave_type" value="Sakit" x-model="leaveType" class="sr-only">
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                                     
-                                    <div class="flex items-center gap-3.5">
-                                        <!-- Indikator Bulat Radio -->
-                                        <div :class="leaveType === 'Sakit' ? 'border-amber-500 bg-amber-500' : 'border-slate-400 bg-transparent'"
-                                             class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition">
-                                            <div x-show="leaveType === 'Sakit'" class="w-2 h-2 rounded-full bg-white"></div>
+                                    <!-- Opsi 1: Sakit (Seharian) -->
+                                    <label @click="leaveType = 'Sakit'"
+                                           :class="leaveType === 'Sakit' 
+                                                ? 'leave-active-sakit ring-2 ring-amber-500/50' 
+                                                : 'leave-inactive hover:border-slate-400'"
+                                           class="relative flex items-center justify-between p-3.5 rounded-xl border cursor-pointer transition-all duration-150">
+                                        <input type="radio" name="leave_type" value="Sakit" x-model="leaveType" class="sr-only">
+                                        
+                                        <div class="flex items-center gap-3">
+                                            <div :class="leaveType === 'Sakit' ? 'border-amber-500 bg-amber-500' : 'border-slate-400 bg-transparent'"
+                                                 class="w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition">
+                                                <div x-show="leaveType === 'Sakit'" class="w-1.5 h-1.5 rounded-full bg-white"></div>
+                                            </div>
+
+                                            <div>
+                                                <span :class="leaveType === 'Sakit' ? '!text-amber-600 dark:!text-amber-400 font-black' : 'font-bold'"
+                                                      class="block text-xs">
+                                                    Sakit
+                                                </span>
+                                                <span class="block text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+                                                    Surat dokter / sakit seharian
+                                                </span>
+                                            </div>
                                         </div>
+                                    </label>
 
-                                        <div>
-                                            <span :class="leaveType === 'Sakit' ? '!text-amber-600 dark:!text-amber-400 font-black' : 'font-bold'"
-                                                  class="block text-xs">
-                                                Sakit
-                                            </span>
-                                            <span class="block text-[11px] text-slate-500 dark:text-slate-400 font-medium">
-                                                Surat dokter / keterangan sakit
-                                            </span>
+                                    <!-- Opsi 2: Izin (Seharian) -->
+                                    <label @click="leaveType = 'Izin'"
+                                           :class="leaveType === 'Izin' 
+                                                ? 'leave-active-izin ring-2 ring-blue-500/50' 
+                                                : 'leave-inactive hover:border-slate-400'"
+                                           class="relative flex items-center justify-between p-3.5 rounded-xl border cursor-pointer transition-all duration-150">
+                                        <input type="radio" name="leave_type" value="Izin" x-model="leaveType" class="sr-only">
+                                        
+                                        <div class="flex items-center gap-3">
+                                            <div :class="leaveType === 'Izin' ? 'border-blue-500 bg-blue-500' : 'border-slate-400 bg-transparent'"
+                                                 class="w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition">
+                                                <div x-show="leaveType === 'Izin'" class="w-1.5 h-1.5 rounded-full bg-white"></div>
+                                            </div>
+
+                                            <div>
+                                                <span :class="leaveType === 'Izin' ? '!text-blue-600 dark:!text-blue-400 font-black' : 'font-bold'"
+                                                      class="block text-xs">
+                                                    Izin
+                                                </span>
+                                                <span class="block text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+                                                    Acara keluarga, lomba / urusan penting
+                                                </span>
+                                            </div>
                                         </div>
-                                    </div>
+                                    </label>
 
-                                    <!-- Ikon Centang Aktif -->
-                                    <div x-show="leaveType === 'Sakit'" class="text-amber-600 dark:text-amber-400 shrink-0">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                    </div>
-                                </label>
+                                    <!-- Opsi 3: Potong Jam Pelajaran -->
+                                    <label @click="leaveType = 'Potong Jam Pelajaran'"
+                                           :class="leaveType === 'Potong Jam Pelajaran' 
+                                                ? 'border-purple-500 bg-purple-950/30 ring-2 ring-purple-500/50' 
+                                                : 'leave-inactive hover:border-slate-400'"
+                                           class="relative flex items-center justify-between p-3.5 rounded-xl border cursor-pointer transition-all duration-150">
+                                        <input type="radio" name="leave_type" value="Potong Jam Pelajaran" x-model="leaveType" class="sr-only">
+                                        
+                                        <div class="flex items-center gap-3">
+                                            <div :class="leaveType === 'Potong Jam Pelajaran' ? 'border-purple-500 bg-purple-500' : 'border-slate-400 bg-transparent'"
+                                                 class="w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition">
+                                                <div x-show="leaveType === 'Potong Jam Pelajaran'" class="w-1.5 h-1.5 rounded-full bg-white"></div>
+                                            </div>
 
-                                <!-- Opsi 2: Izin Keperluan -->
-                                <label @click="leaveType = 'Izin'"
-                                       :class="leaveType === 'Izin' 
-                                            ? 'leave-active-izin ring-2 ring-blue-500/50' 
-                                            : 'leave-inactive hover:border-slate-400'"
-                                       class="relative flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-all duration-150">
-                                    <input type="radio" name="leave_type" value="Izin" x-model="leaveType" class="sr-only">
-                                    
-                                    <div class="flex items-center gap-3.5">
-                                        <!-- Indikator Bulat Radio -->
-                                        <div :class="leaveType === 'Izin' ? 'border-blue-500 bg-blue-500' : 'border-slate-400 bg-transparent'"
-                                             class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition">
-                                            <div x-show="leaveType === 'Izin'" class="w-2 h-2 rounded-full bg-white"></div>
+                                            <div>
+                                                <span :class="leaveType === 'Potong Jam Pelajaran' ? '!text-purple-400 font-black' : 'font-bold'"
+                                                      class="block text-xs">
+                                                    Potong Jam Pelajaran
+                                                </span>
+                                                <span class="block text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+                                                    Izin pada jam KBM tertentu
+                                                </span>
+                                            </div>
                                         </div>
-
-                                        <div>
-                                            <span :class="leaveType === 'Izin' ? '!text-blue-600 dark:!text-blue-400 font-black' : 'font-bold'"
-                                                  class="block text-xs">
-                                                Izin Keperluan
-                                            </span>
-                                            <span class="block text-[11px] text-slate-500 dark:text-slate-400 font-medium">
-                                                Kepentingan keluarga / dinas
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <!-- Ikon Centang Aktif -->
-                                    <div x-show="leaveType === 'Izin'" class="text-blue-600 dark:text-blue-400 shrink-0">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                    </div>
-                                </label>
-
+                                    </label>
+                                </div>
                             </div>
-                        </div>
 
-
-                        <!-- Rentang Tanggal -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
-                                    Tanggal Mulai <span class="text-red-400">*</span>
-                                </label>
-                                <input type="date" name="start_date" value="{{ old('start_date', date('Y-m-d')) }}" required 
-                                       class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500 transition">
+                            <!-- FORM RENTANG TANGGAL (JIKA SAKIT ATAU IZIN SEHARIAN) -->
+                            <div x-show="leaveType === 'Sakit' || leaveType === 'Izin'" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                                        Tanggal Mulai <span class="text-red-400">*</span>
+                                    </label>
+                                    <input type="date" name="start_date" value="{{ old('start_date', date('Y-m-d')) }}"
+                                           :required="leaveType === 'Sakit' || leaveType === 'Izin'"
+                                           class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500 transition">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                                        Tanggal Selesai <span class="text-red-400">*</span>
+                                    </label>
+                                    <input type="date" name="end_date" value="{{ old('end_date', date('Y-m-d')) }}"
+                                           :required="leaveType === 'Sakit' || leaveType === 'Izin'"
+                                           class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500 transition">
+                                </div>
                             </div>
-                            <div>
-                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
-                                    Tanggal Selesai <span class="text-red-400">*</span>
-                                </label>
-                                <input type="date" name="end_date" value="{{ old('end_date', date('Y-m-d')) }}" required 
-                                       class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500 transition">
+
+                                                        <!-- FORM JAM KHUSUS (JIKA POTONG JAM PELAJARAN) -->
+                            <div x-show="leaveType === 'Potong Jam Pelajaran'" style="display: none;" class="p-4 rounded-xl bg-purple-950/20 border border-purple-500/30 space-y-3">
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-purple-300 mb-1.5">
+                                        Tanggal Izin <span class="text-red-400">*</span>
+                                    </label>
+                                    <input type="date" name="single_date" value="{{ old('single_date', date('Y-m-d')) }}"
+                                           :required="leaveType === 'Potong Jam Pelajaran'"
+                                           class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-purple-500 transition">
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-bold uppercase tracking-wider text-purple-300 mb-1.5">
+                                            Dari Jam Pelajaran <span class="text-red-400">*</span>
+                                        </label>
+                                        <select name="start_time" 
+                                                :required="leaveType === 'Potong Jam Pelajaran'"
+                                                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-purple-500 transition cursor-pointer">
+                                            @for($i = 1; $i <= 10; $i++)
+                                                @php $val = sprintf('%02d:00', $i); @endphp
+                                                <option value="{{ $val }}" {{ old('start_time', '01:00') === $val ? 'selected' : '' }}>
+                                                    Jam ke - {{ $i }}
+                                                </option>
+                                            @endfor
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold uppercase tracking-wider text-purple-300 mb-1.5">
+                                            Sampai Jam Pelajaran <span class="text-red-400">*</span>
+                                        </label>
+                                        <select name="end_time" 
+                                                :required="leaveType === 'Potong Jam Pelajaran'"
+                                                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-purple-500 transition cursor-pointer">
+                                            @for($i = 1; $i <= 10; $i++)
+                                                @php $val = sprintf('%02d:00', $i); @endphp
+                                                <option value="{{ $val }}" {{ old('end_time', '02:00') === $val ? 'selected' : '' }}>
+                                                    Jam ke - {{ $i }}
+                                                </option>
+                                            @endfor
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <p class="text-[11px] text-purple-300/80">
+                                    Siswa hanya izin pada rentang jam tersebut dan tetap mengikuti pembelajaran sebelum atau sesudahnya.
+                                </p>
                             </div>
                         </div>
 
@@ -147,7 +208,7 @@
                             <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
                                 Alasan / Keterangan Lengkap <span class="text-red-400">*</span>
                             </label>
-                            <textarea name="reason" rows="4" required placeholder="Contoh: Mengalami demam dan disarankan istirahat oleh dokter / menghadiri acara keluarga penting..." 
+                            <textarea name="reason" rows="4" required placeholder="Contoh: Mengikuti kejuaraan lomba / menghadiri acara keluarga / keperluan penting lainnya..."
                                       class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition">{{ old('reason') }}</textarea>
                         </div>
 
@@ -187,7 +248,7 @@
                         </li>
                         <li class="flex items-start gap-2">
                             <span class="text-indigo-400 font-bold">•</span>
-                            <span>Izin <strong>Keperluan</strong> wajib menyertakan surat pemberitahuan yang ditandatangani orang tua / wali.</span>
+                            <span>Izin <strong>Keperluan</strong> menyertakan surat orang tua/wali atau surat tugas dispensasi (misal: lomba/event resmi).</span>
                         </li>
                         <li class="flex items-start gap-2">
                             <span class="text-indigo-400 font-bold">•</span>

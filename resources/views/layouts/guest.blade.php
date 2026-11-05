@@ -67,13 +67,13 @@
             }
         </style>
     </head>
-    <body class="font-sans antialiased scp-bg-gradient flex items-center justify-center p-4 relative overflow-hidden">
+    <body class="font-sans antialiased scp-bg-gradient min-h-screen flex items-center justify-center p-4 sm:p-6 py-8 sm:py-12 relative overflow-x-hidden overflow-y-auto">
         <!-- Ambient Glowing Orbs -->
         <div class="absolute -top-32 -right-32 h-96 w-96 rounded-full scp-glow-1 pointer-events-none"></div>
         <div class="absolute -bottom-32 -left-32 h-96 w-96 rounded-full scp-glow-2 pointer-events-none"></div>
 
         <!-- Login Card with 15px Corner Radius -->
-        <div class="relative w-full sm:max-w-md bg-white p-8 sm:p-10 shadow-2xl border border-slate-200" style="border-radius: 15px;">
+        <div class="relative w-full sm:max-w-md bg-white p-8 sm:p-10 shadow-2xl border border-slate-200 my-auto" style="border-radius: 15px;">
             {{ $slot }}
         </div>
     </body>

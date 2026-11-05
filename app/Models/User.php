@@ -12,16 +12,23 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    protected $fillable = [
+        protected $fillable = [
         'role_id',
         'class_id',
+        'student_status',
         'homeroom_class_id',
         'parent_id',
         'name',
         'username',
+        'nip',
+        'nis',
         'email',
+        'phone',
+        'address',
+        'birth_date',
         'password',
     ];
+
 
     protected $hidden = [
         'password',
@@ -54,6 +61,23 @@ class User extends Authenticatable
     public function homeroomClass()
     {
         return $this->belongsTo(SchoolClass::class, 'homeroom_class_id');
+    }
+
+    public function counselorClasses()
+    {
+        return $this->belongsToMany(SchoolClass::class, 'counselor_classes', 'user_id', 'class_id')->withTimestamps();
+    }
+
+    public function getHandledClassIds(): array
+    {
+        $roleName = $this->role?->role_name;
+        if ($roleName === 'Wali Kelas') {
+            return $this->homeroom_class_id ? [$this->homeroom_class_id] : [];
+        }
+        if ($roleName === 'Guru BK') {
+            return $this->counselorClasses()->pluck('classes.id')->toArray();
+        }
+        return [];
     }
 
     public function parent()
@@ -100,4 +124,10 @@ class User extends Authenticatable
     {
         return in_array($this->role?->role_name, $roles, true);
     }
+
+        public function getStudentStatusAttribute($value)
+    {
+        return $value ?? 'Aktif';
+    }
+
 }

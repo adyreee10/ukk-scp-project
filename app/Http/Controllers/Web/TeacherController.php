@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Models\Journal;
+use App\Models\LeaveRequest;
 use App\Models\Schedule;
 use App\Models\SystemConfiguration;
 use App\Models\User;
@@ -29,11 +30,11 @@ class TeacherController extends Controller
         $allSchedules = Schedule::with(['schoolClass', 'room'])
             ->where('teacher_id', $user->id)
             ->where('cycle_type', $configuration->active_cycle)
-            ->orderByRaw("CASE day_of_week WHEN 'Senin' THEN 1 WHEN 'Selasa' THEN 2 WHEN 'Rabu' THEN 3 WHEN 'Kamis' THEN 4 WHEN 'Jumat' THEN 5 WHEN 'Sabtu' THEN 6 END")
+            ->orderByRaw("CASE day_of_week WHEN 'Senin' THEN 1 WHEN 'Selasa' THEN 2 WHEN 'Rabu' THEN 3 WHEN 'Kamis' THEN 4 WHEN 'Jumat' THEN 5 END")
             ->orderBy('start_time')
             ->get();
 
-                // Filter jadwal HANYA untuk hari ini
+        // Filter jadwal HANYA untuk hari ini
         $todaySchedules = $allSchedules->filter(fn($s) => $s->day_of_week === $todayName);
 
         // Cek ID jadwal yang sudah diisi jurnalnya pada hari ini
@@ -65,8 +66,6 @@ class TeacherController extends Controller
             'recentJournals',
             'filledScheduleIdsToday'
         ));
-
-
     }
 
     /**
@@ -80,7 +79,7 @@ class TeacherController extends Controller
         $query = Schedule::with(['schoolClass', 'room'])
             ->where('teacher_id', $user->id)
             ->where('cycle_type', $configuration->active_cycle)
-            ->orderByRaw("CASE day_of_week WHEN 'Senin' THEN 1 WHEN 'Selasa' THEN 2 WHEN 'Rabu' THEN 3 WHEN 'Kamis' THEN 4 WHEN 'Jumat' THEN 5 WHEN 'Sabtu' THEN 6 END")
+            ->orderByRaw("CASE day_of_week WHEN 'Senin' THEN 1 WHEN 'Selasa' THEN 2 WHEN 'Rabu' THEN 3 WHEN 'Kamis' THEN 4 WHEN 'Jumat' THEN 5 END")
             ->orderBy('start_time');
 
         // Filter hari jika dipilih oleh guru
@@ -100,26 +99,60 @@ class TeacherController extends Controller
     {
         $configuration = SystemConfiguration::current();
         $user = auth()->user();
+        $today = now()->toDateString();
 
         $schedules = Schedule::with(['schoolClass', 'room'])
             ->where('teacher_id', $user->id)
             ->where('cycle_type', $configuration->active_cycle)
-            ->orderByRaw("CASE day_of_week WHEN 'Senin' THEN 1 WHEN 'Selasa' THEN 2 WHEN 'Rabu' THEN 3 WHEN 'Kamis' THEN 4 WHEN 'Jumat' THEN 5 WHEN 'Sabtu' THEN 6 END")
+            ->orderByRaw("CASE day_of_week WHEN 'Senin' THEN 1 WHEN 'Selasa' THEN 2 WHEN 'Rabu' THEN 3 WHEN 'Kamis' THEN 4 WHEN 'Jumat' THEN 5 END")
             ->orderBy('start_time')
             ->get();
+
+        $filledScheduleIdsToday = Journal::whereDate('date', $today)
+            ->whereIn('schedule_id', $schedules->pluck('id'))
+            ->pluck('schedule_id')
+            ->toArray();
 
         $selectedScheduleId = $request->query('schedule_id', $schedules->first()?->id);
         $selectedSchedule = $schedules->firstWhere('id', $selectedScheduleId) ?? $schedules->first();
 
+        // Cek apakah jadwal ini sudah memiliki rekaman jurnal pada hari ini
+        $existingJournalToday = null;
+        if ($selectedSchedule) {
+            $existingJournalToday = Journal::with(['attendances.student'])
+                ->where('schedule_id', $selectedSchedule->id)
+                ->whereDate('date', $today)
+                ->first();
+        }
+
         $students = collect();
+        $approvedLeavesToday = collect();
+
         if ($selectedSchedule && $selectedSchedule->class_id) {
             $students = User::where('class_id', $selectedSchedule->class_id)
                 ->whereHas('role', fn($q) => $q->where('role_name', 'Siswa'))
+                ->where('student_status', 'Aktif')
                 ->orderBy('name')
                 ->get();
+
+            // Ambil data izin siswa yang telah disetujui (Approved) untuk kelas dan hari ini
+            $approvedLeavesToday = LeaveRequest::approvedOn($today)
+                ->whereIn('student_id', $students->pluck('id'))
+                ->latest('updated_at')
+                ->get()
+                ->unique('student_id')
+                ->keyBy('student_id');
         }
 
-        return view('teacher.journals.create', compact('schedules', 'selectedSchedule', 'students', 'configuration'));
+        return view('teacher.journals.create', compact(
+            'schedules', 
+            'selectedSchedule', 
+            'students', 
+            'configuration',
+            'filledScheduleIdsToday',
+            'existingJournalToday',
+            'approvedLeavesToday'
+        ));
     }
 
     /**
@@ -133,7 +166,9 @@ class TeacherController extends Controller
             'topic_description' => ['required', 'string', 'max:5000'],
             'photo'             => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:3072'],
             'attendances'       => ['nullable', 'array'],
+            'attendance_notes'  => ['nullable', 'array'],
         ]);
+
 
         $schedule = Schedule::where('teacher_id', auth()->id())->findOrFail($validated['schedule_id']);
         $date = Carbon::parse($validated['date'])->startOfDay();
@@ -158,17 +193,56 @@ class TeacherController extends Controller
 
             if (!empty($validated['attendances'])) {
                 $rows = [];
+                $notes = $request->input('attendance_notes', []);
                 foreach ($validated['attendances'] as $studentId => $status) {
                     $rows[] = [
                         'student_id' => (int) $studentId,
                         'status'     => $status,
+                        'note'       => !empty($notes[$studentId]) ? trim($notes[$studentId]) : null,
                     ];
                 }
                 $attendanceService->saveBatch($journal, $rows);
             }
+
         });
 
         return redirect()->route('teacher.dashboard')
             ->with('success', 'Jurnal pembelajaran dan presensi siswa berhasil disimpan ke sistem!');
     }
+        /**
+     * Halaman Riwayat Lengkap Jurnal KBM Guru & Deteksi Jurnal yang Belum Diisi
+     */
+    public function journalsHistory(Request $request, JournalReminderService $reminderService)
+    {
+        $user = auth()->user();
+        $configuration = SystemConfiguration::current();
+
+        $query = Journal::with(['schedule.schoolClass', 'schedule.room', 'attendances'])
+            ->whereHas('schedule', fn($q) => $q->where('teacher_id', $user->id));
+
+        // Filter berdasarkan Bulan (jika dipilih)
+        if ($request->filled('month')) {
+            $month = Carbon::parse($request->month);
+            $query->whereYear('date', $month->year)->whereMonth('date', $month->month);
+        }
+
+        // Filter berdasarkan Kelas yang diampu
+        if ($request->filled('class_id')) {
+            $classId = $request->class_id;
+            $query->whereHas('schedule', fn($q) => $q->where('class_id', $classId));
+        }
+
+        $journals = $query->orderByDesc('date')->orderByDesc('id')->paginate(15)->withQueryString();
+
+        // Ambil daftar kelas yang diajar guru ini untuk opsi dropdown filter
+        $myClasses = \App\Models\SchoolClass::whereHas('schedules', fn($q) => $q->where('teacher_id', $user->id))
+            ->orderBy('class_name')
+            ->get();
+
+        // Deteksi jadwal yang hari ini terlambat / belum diisi
+        $overdueSchedules = $reminderService->overdueFor($user);
+
+        return view('teacher.journals.history', compact('journals', 'myClasses', 'overdueSchedules', 'configuration'));
+    }
+
 }

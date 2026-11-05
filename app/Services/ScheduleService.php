@@ -60,8 +60,8 @@ class ScheduleService
             ->when($exceptId !== null, fn ($query) => $query->where('id', '<>', $exceptId))
             ->where('cycle_type', $data['cycle_type'])
             ->where('day_of_week', $data['day_of_week'])
-            ->where('start_time', '<', $data['end_time'])
-            ->where('end_time', '>', $data['start_time'])
+            ->where('start_time', '<=', $data['end_time'])
+            ->where('end_time', '>=', $data['start_time'])
             ->where(function ($query) use ($teacherId, $data) {
                 $query->where('teacher_id', $teacherId)
                     ->orWhere('class_id', $data['class_id'])

@@ -14,22 +14,22 @@
     <form method="POST" action="{{ route('login') }}" class="space-y-4">
         @csrf
 
-        <!-- Email Address -->
+                <!-- Login: Email / Username / NIS / NIP -->
         <div>
-            <label for="email" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
-                Alamat Email
+            <label for="login" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                Email / Username / NIS / NIP
             </label>
-            <input id="email" 
+            <input id="login" 
                    style="border-radius: 15px;"
                    class="block w-full border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 transition focus:border-indigo-600 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-500/15" 
-                   type="email" 
-                   name="email" 
-                   value="{{ old('email') }}" 
+                   type="text" 
+                   name="login" 
+                   value="{{ old('login') }}" 
                    required 
                    autofocus 
                    autocomplete="username" 
-                   placeholder="nama@sekolah.test" />
-            <x-input-error :messages="$errors->get('email')" class="mt-1 text-xs" />
+                   placeholder="Masukkan Email, Username, NIS, atau NIP" />
+            <x-input-error :messages="$errors->get('login') ?? $errors->get('email')" class="mt-1 text-xs" />
         </div>
 
         <!-- Password with Visibility Toggle -->

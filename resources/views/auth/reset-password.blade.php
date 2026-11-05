@@ -4,17 +4,22 @@
         <div class="inline-flex h-14 w-14 items-center justify-center scp-badge-gradient font-black text-2xl mb-3.5 ring-4 ring-indigo-100/80 text-white" style="border-radius: 15px;">
             SCP
         </div>
-        <h2 class="text-2xl font-black text-slate-800 tracking-tight">Atur Kata Sandi Baru</h2>
+        <h2 class="text-2xl font-black text-slate-800 tracking-tight">Verifikasi OTP & Sandi Baru</h2>
         <p class="text-xs font-semibold text-slate-500 mt-1.5 leading-relaxed">
-            Silakan masukkan kata sandi baru untuk akun Anda.
+            Masukkan 6 digit kode OTP yang telah dikirimkan ke email Anda beserta kata sandi baru.
         </p>
     </div>
 
+    <!-- Notifikasi Status Pengiriman OTP -->
+    @if (session('status'))
+        <div role="status" class="mb-4 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-bold text-emerald-800 flex items-center justify-between">
+            <span>{{ session('status') }}</span>
+            <span class="text-[10px] uppercase tracking-wider text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md font-extrabold">Terkirim</span>
+        </div>
+    @endif
+
     <form method="POST" action="{{ route('password.store') }}" class="space-y-4">
         @csrf
-
-        <!-- Password Reset Token -->
-        <input type="hidden" name="token" value="{{ $request->route('token') }}">
 
         <!-- Email Address -->
         <div>
@@ -23,24 +28,43 @@
             </label>
             <input id="email" 
                    style="border-radius: 15px;"
-                   class="block w-full border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 transition focus:border-indigo-600 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-500/15" 
+                   class="block w-full border border-slate-200 bg-slate-100 px-4 py-3 text-sm text-slate-700 font-semibold focus:border-indigo-600 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-500/15" 
                    type="email" 
                    name="email" 
-                   value="{{ old('email', $request->email) }}" 
+                   value="{{ old('email', $email) }}" 
                    required 
-                   autofocus 
-                   autocomplete="username" />
+                   placeholder="Alamat email akun" />
             <x-input-error :messages="$errors->get('email')" class="mt-1 text-xs" />
         </div>
 
-        <!-- Password -->
+        <!-- Kode OTP 6 Digit -->
+        <div>
+            <div class="flex items-center justify-between mb-1.5">
+                <label for="otp" class="block text-xs font-bold uppercase tracking-wider text-slate-600">
+                    Kode OTP (6 Digit)
+                </label>
+            </div>
+            <input id="otp" 
+                   style="border-radius: 15px; letter-spacing: 0.35em;"
+                   class="block w-full text-center border-2 border-indigo-200 bg-indigo-50/40 px-4 py-3 text-lg font-mono font-black text-indigo-950 placeholder-slate-400 transition focus:border-indigo-600 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-500/15" 
+                   type="text" 
+                   name="otp" 
+                   maxlength="6"
+                   value="{{ old('otp') }}" 
+                   required 
+                   autofocus 
+                   placeholder="000000" />
+            <x-input-error :messages="$errors->get('otp')" class="mt-1 text-xs" />
+        </div>
+
+        <!-- Password Baru -->
         <div x-data="{ showPass: false }">
             <label for="password" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
                 Kata Sandi Baru
             </label>
             <div class="scp-password-wrapper" style="position: relative; width: 100%; display: block;">
                 <input id="password" 
-                       class="block w-full border border-slate-200 bg-slate-50 pl-4 py-3 text-sm text-slate-800 transition focus:border-indigo-600 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-500/15" 
+                       class="block w-full border border-slate-200 bg-slate-50 pl-4 py-3 text-sm text-slate-800 transition focus:border-indigo-600 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-500/15 font-semibold" 
                        style="border-radius: 15px; padding-right: 48px; width: 100%;" 
                        :type="showPass ? 'text' : 'password'" 
                        name="password" 
@@ -55,14 +79,14 @@
             <x-input-error :messages="$errors->get('password')" class="mt-1 text-xs" />
         </div>
 
-        <!-- Confirm Password -->
+        <!-- Konfirmasi Password Baru -->
         <div x-data="{ showConfirm: false }">
             <label for="password_confirmation" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
                 Konfirmasi Kata Sandi Baru
             </label>
             <div class="scp-password-wrapper" style="position: relative; width: 100%; display: block;">
                 <input id="password_confirmation" 
-                       class="block w-full border border-slate-200 bg-slate-50 pl-4 py-3 text-sm text-slate-800 transition focus:border-indigo-600 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-500/15" 
+                       class="block w-full border border-slate-200 bg-slate-50 pl-4 py-3 text-sm text-slate-800 transition focus:border-indigo-600 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-500/15 font-semibold" 
                        style="border-radius: 15px; padding-right: 48px; width: 100%;" 
                        :type="showConfirm ? 'text' : 'password'" 
                        name="password_confirmation" 
@@ -77,13 +101,36 @@
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-1 text-xs" />
         </div>
 
-        <!-- Tombol Simpan (Sama persis seperti tombol Login) -->
+        <!-- Tombol Simpan Sandi Baru -->
         <div class="pt-3">
             <button type="submit" 
                     style="border-radius: 15px;"
-                    class="w-full inline-flex items-center justify-center py-4 px-6 font-black text-base scp-btn-gradient cursor-pointer tracking-wider uppercase shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all duration-200">
+                    class="w-full inline-flex items-center justify-center py-4 px-6 font-black text-sm scp-btn-gradient cursor-pointer tracking-wider uppercase shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all duration-200">
                 SIMPAN KATA SANDI BARU
             </button>
         </div>
     </form>
+
+    <!-- Opsi Jika Kode OTP Tidak Masuk / Minta Kode Lagi -->
+    <div class="mt-6 pt-4 border-t border-slate-100 text-center">
+        <p class="text-xs text-slate-500 mb-2 font-medium">
+            Tidak menerima email berisi kode OTP?
+        </p>
+        <form method="POST" action="{{ route('password.email') }}" class="inline-block">
+            @csrf
+            <input type="hidden" name="email" value="{{ old('email', $email) }}">
+            <button type="submit" 
+                    class="text-xs font-bold text-indigo-600 hover:text-indigo-800 hover:underline transition inline-flex items-center gap-1.5 cursor-pointer bg-indigo-50 hover:bg-indigo-100 px-3.5 py-2 rounded-xl border border-indigo-200/80">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                Kirim Ulang Kode OTP Baru
+            </button>
+        </form>
+    </div>
+
+    <!-- Kembali ke Halaman Login -->
+    <div class="text-center pt-4">
+        <a href="{{ route('login') }}" class="text-xs font-bold text-slate-500 hover:text-indigo-600 transition hover:underline">
+            ← Batalkan & Kembali ke Halaman Masuk
+        </a>
+    </div>
 </x-guest-layout>

@@ -155,6 +155,11 @@
                                             s/d {{ \Carbon\Carbon::parse($req->end_date)->translatedFormat('d M Y') }}
                                         @endif
                                     </p>
+                                    @if($req->status_approval === 'Rejected' && $req->rejection_note)
+                                        <p class="text-[11px] text-red-300 mt-1">
+                                            <span class="font-bold text-red-400">Alasan Ditolak:</span> {{ $req->rejection_note }}
+                                        </p>
+                                    @endif
                                 </div>
                             </div>
                             <div class="flex items-center gap-3 shrink-0 self-end sm:self-center">
