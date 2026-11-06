@@ -59,12 +59,8 @@ class FetTimetableParserService
             // A. Daftarkan seluruh legenda ruangan yang terdeteksi
             if (!empty($pyResult['rooms'])) {
                 foreach ($pyResult['rooms'] as $rItem) {
-                    $code = strtoupper(trim($rItem['code']));
                     $name = trim($rItem['name']);
                     $this->resolveRoom($name, $createdRooms);
-                    if ($code !== $name) {
-                        $this->resolveRoom($code, $createdRooms);
-                    }
                 }
             }
 
@@ -903,21 +899,23 @@ class FetTimetableParserService
             return "Laboratorium Komputer " . (int)$m[1];
         }
         if (preg_match('/^(?:LAB\s*IPA|L\.\s*IPA|ABORATORIUM)/i', $c)) return 'Laboratorium IPA';
-        if (preg_match('/^(?:OR\d*|LAPANGAN)$/i', $c)) return 'Lapangan Olahraga';
-        if ($c === 'HALL' || str_contains($c, 'MENARI')) return 'Ruang Hall / Tari';
-        if (preg_match('/^(\d+)$/', $c, $m)) return "Ruang " . (int)$m[1];
-        if (preg_match('/^R\.\s*(\d+)$/i', $c, $m)) return "Ruang " . (int)$m[1];
-        return $raw;
+        if (preg_match('/^(?:OR\d*|LAPANGAN|OLAHRAGA)$/i', $c)) return 'Lapangan Olahraga';
+        if ($c === 'HALL' || str_contains($c, 'MENARI') || str_contains($c, 'TARI')) return 'Ruang Seni Tari / Hall';
+        if (preg_match('/^(?:RUANG|R\.?)\s*(\d+)$/i', $c, $m) || preg_match('/^(\d+)$/', $c, $m)) {
+            return "Ruang " . (int)$m[1];
+        }
+        if ($c === 'L.PB' || str_contains($c, 'PENATAAN') || str_contains($c, 'BARANG')) return 'Laboratorium Penataan Barang';
+        return trim($raw);
     }
 
     /**
-     * Otomatis mencari atau membuat Ruangan
+     * Otomatis mencari atau membuat Ruangan (Case-Insensitive agar tidak duplikat)
      */
     public function resolveRoom(string $roomName, int &$createdCounter): Room
     {
         $clean = $this->canonicalRoomName($roomName);
 
-        $room = Room::where('room_name', $clean)->first();
+        $room = Room::whereRaw('UPPER(TRIM(room_name)) = ?', [strtoupper(trim($clean))])->first();
         if ($room) {
             return $room;
         }

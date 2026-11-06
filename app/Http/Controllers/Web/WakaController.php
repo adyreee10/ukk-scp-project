@@ -1092,9 +1092,10 @@ public function classesDestroy(SchoolClass $schoolClass)
         ini_set('memory_limit', '512M');
 
         $request->validate([
-            'files'   => ['nullable', 'array'],
-            'files.*' => ['file', 'mimes:csv,txt,xlsx,pdf', 'max:25600'],
-            'file'    => ['nullable', 'file', 'mimes:csv,txt,xlsx,pdf', 'max:25600'],
+            'files'            => ['nullable', 'array'],
+            'files.*'          => ['file', 'mimes:csv,txt,xlsx,pdf', 'max:25600'],
+            'file'             => ['nullable', 'file', 'mimes:csv,txt,xlsx,pdf', 'max:25600'],
+            'duplicate_action' => ['nullable', 'in:replace,keep'],
         ]);
 
         $uploadedFiles = [];
@@ -1108,6 +1109,11 @@ public function classesDestroy(SchoolClass $schoolClass)
             return redirect()->back()->with('error', 'Silakan pilih setidaknya satu file data ruangan (PDF / Excel / CSV).');
         }
 
+        $duplicateAction = $request->input('duplicate_action', 'replace');
+        if (!in_array($duplicateAction, ['replace', 'keep'])) {
+            $duplicateAction = 'replace';
+        }
+
         $totalCreated = 0;
         $totalExisting = 0;
         $processedFiles = 0;
@@ -1115,7 +1121,7 @@ public function classesDestroy(SchoolClass $schoolClass)
 
         foreach ($uploadedFiles as $file) {
             try {
-                $res = $documentService->importRooms($file);
+                $res = $documentService->importRooms($file, $duplicateAction);
                 $totalCreated += $res['created'] ?? 0;
                 $totalExisting += $res['existing'] ?? 0;
                 $processedFiles++;

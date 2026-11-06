@@ -1482,53 +1482,81 @@ class SchoolDocumentParserService
     /**
      * Memproses berkas data ruangan baik PDF (Legenda FET / Sarpras) maupun Spreadsheet
      */
-    public function importRooms(UploadedFile $file): array
+    public function importRooms(UploadedFile $file, string $duplicateAction = 'replace'): array
     {
         $extension = strtolower($file->getClientOriginalExtension());
 
         if ($extension === 'pdf') {
-            return $this->parseRoomsPdf($file->getRealPath());
+            return $this->parseRoomsPdf($file->getRealPath(), $duplicateAction);
         }
 
-        return $this->parseRoomsSpreadsheet($file);
+        return $this->parseRoomsSpreadsheet($file, $duplicateAction);
     }
 
     /**
      * Parsing Ruangan dari Dokumen PDF
-     * Menghasilkan nama ruangan unik tanpa duplikasi (misal: Ruang 1 - 34, Lab 1 - 20, Lab IPA, OR, Hall)
+     * Menghasilkan nama ruangan unik tanpa duplikasi (misal: Ruang 1 - 34, Lab 1 - 22, Lab IPA, OR, Hall)
      */
-    protected function parseRoomsPdf(string $path): array
+    protected function parseRoomsPdf(string $path, string $duplicateAction = 'replace'): array
     {
         $created = 0;
         $existing = 0;
 
-        // Daftar 53 Ruangan Unik Standar SMK Negeri 1 Bantul (berdasarkan Matriks Jadwal Ruang Putaran 1)
-        $canonical53Rooms = [
+        // Coba ekstrak ruangan aktual dari PDF via Python
+        $pyResult = $this->spreadsheetService->runPythonParser($path);
+        $extractedNames = [];
+
+        if (!empty($pyResult['rooms'])) {
+            foreach ($pyResult['rooms'] as $r) {
+                if (!empty($r['name'])) {
+                    $extractedNames[] = $r['name'];
+                }
+            }
+        }
+
+        // Daftar 55 Ruangan Standar SMK Negeri 1 Bantul
+        $canonical55Rooms = [
             // 31 Ruang Teori / Kelas
             'Ruang 1', 'Ruang 2', 'Ruang 3', 'Ruang 4', 'Ruang 5', 'Ruang 6', 'Ruang 7', 'Ruang 8', 'Ruang 9', 'Ruang 10',
             'Ruang 11', 'Ruang 12', 'Ruang 13', 'Ruang 14', 'Ruang 15', 'Ruang 16', 'Ruang 17', 'Ruang 18', 'Ruang 19', 'Ruang 20',
             'Ruang 21', 'Ruang 22', 'Ruang 23', 'Ruang 24', 'Ruang 25', 'Ruang 26', 'Ruang 29', 'Ruang 30', 'Ruang 31', 'Ruang 32', 'Ruang 34',
-            // 19 Lab Komputer Aktif
+            // Lab Komputer Aktif (1 s/d 22)
             'Laboratorium Komputer 1', 'Laboratorium Komputer 2', 'Laboratorium Komputer 3', 'Laboratorium Komputer 4', 'Laboratorium Komputer 5',
             'Laboratorium Komputer 6', 'Laboratorium Komputer 7', 'Laboratorium Komputer 8', 'Laboratorium Komputer 9', 'Laboratorium Komputer 10',
-            'Laboratorium Komputer 11', 'Laboratorium Komputer 12', 'Laboratorium Komputer 13', 'Laboratorium Komputer 14', 'Laboratorium Komputer 16',
-            'Laboratorium Komputer 17', 'Laboratorium Komputer 18', 'Laboratorium Komputer 19', 'Laboratorium Komputer 20',
-            // 3 Fasilitas Khusus
+            'Laboratorium Komputer 11', 'Laboratorium Komputer 12', 'Laboratorium Komputer 13', 'Laboratorium Komputer 14', 'Laboratorium Komputer 15',
+            'Laboratorium Komputer 16', 'Laboratorium Komputer 17', 'Laboratorium Komputer 18', 'Laboratorium Komputer 19', 'Laboratorium Komputer 20',
+            'Laboratorium Komputer 21', 'Laboratorium Komputer 22',
+            // Fasilitas Khusus
             'Laboratorium IPA',
+            'Laboratorium Penataan Barang',
             'Lapangan Olahraga',
-            'Ruang Hall / Tari'
+            'Ruang Seni Tari / Hall',
+            'SINIAR'
         ];
 
-        \Illuminate\Support\Facades\DB::transaction(function () use ($canonical53Rooms, &$created, &$existing) {
-            $existingRooms = Room::pluck('id', 'room_name')->toArray();
+        $targetRooms = !empty($extractedNames) ? array_merge($extractedNames, $canonical55Rooms) : $canonical55Rooms;
 
-            foreach ($canonical53Rooms as $rName) {
-                if (!isset($existingRooms[$rName])) {
-                    $newR = Room::create(['room_name' => $rName]);
-                    $existingRooms[$rName] = $newR->id;
-                    $created++;
-                } else {
+        \Illuminate\Support\Facades\DB::transaction(function () use ($targetRooms, $duplicateAction, &$created, &$existing) {
+            $existingRooms = Room::all()->keyBy(fn($r) => strtoupper(trim($r->room_name)));
+            $fetService = app(\App\Services\FetTimetableParserService::class);
+
+            foreach ($targetRooms as $rRaw) {
+                $cleanName = $fetService->canonicalRoomName($rRaw);
+                $key = strtoupper(trim($cleanName));
+
+                if (isset($existingRooms[$key])) {
                     $existing++;
+                    // Jika aksi 'replace' dan format huruf berbeda, sinkronkan ke title case yang rapi
+                    if ($duplicateAction === 'replace') {
+                        $model = $existingRooms[$key];
+                        if ($model->room_name !== $cleanName) {
+                            $model->update(['room_name' => $cleanName]);
+                        }
+                    }
+                } else {
+                    $newR = Room::create(['room_name' => $cleanName]);
+                    $existingRooms[$key] = $newR;
+                    $created++;
                 }
             }
         });
@@ -1542,24 +1570,33 @@ class SchoolDocumentParserService
     /**
      * Parsing Ruangan dari Spreadsheet Excel / CSV
      */
-    protected function parseRoomsSpreadsheet(UploadedFile $file): array
+    protected function parseRoomsSpreadsheet(UploadedFile $file, string $duplicateAction = 'replace'): array
     {
         $rows = $this->spreadsheetService->parse($file);
 
         $created = 0;
         $existing = 0;
+        $existingRooms = Room::all()->keyBy(fn($r) => strtoupper(trim($r->room_name)));
+        $fetService = app(\App\Services\FetTimetableParserService::class);
 
         foreach ($rows as $row) {
             $roomName = $this->getField($row, ['nama_ruang', 'ruang', 'nama', 'nama_ruangan', 'room_name', 'lab', 'laboratorium']);
             if (empty($roomName)) continue;
 
-            $room = Room::where('room_name', $roomName)->first();
-            if ($room) {
+            $cleanName = $fetService->canonicalRoomName($roomName);
+            $key = strtoupper(trim($cleanName));
+
+            if (isset($existingRooms[$key])) {
                 $existing++;
+                if ($duplicateAction === 'replace') {
+                    $model = $existingRooms[$key];
+                    if ($model->room_name !== $cleanName) {
+                        $model->update(['room_name' => $cleanName]);
+                    }
+                }
             } else {
-                Room::create([
-                    'room_name' => $roomName,
-                ]);
+                $newR = Room::create(['room_name' => $cleanName]);
+                $existingRooms[$key] = $newR;
                 $created++;
             }
         }
