@@ -21,6 +21,14 @@ echo "<pre style='background:#0f172a;color:#38bdf8;padding:20px;border-radius:10
 echo "=== UKK LARAVEL HOSTING HELPER ===\n\n";
 
 try {
+    if ($action === 'reset_rezky') {
+        echo "Mereset kata sandi Rezky Aditya (NIS 17821) ke 'password123'...\n";
+        \App\Models\User::where('nis', '17821')->orWhere('id', 16)->update([
+            'password' => \Illuminate\Support\Facades\Hash::make('password123')
+        ]);
+        echo "✔ BERHASIL! Sekarang akun Rezky Aditya (NIS: 17821) sudah bisa login dengan password: password123\n";
+    }
+
     if ($action === 'setup' || $action === 'storage_link') {
         echo "[1/3] Menjalankan php artisan storage:link ...\n";
         $kernel->call('storage:link');

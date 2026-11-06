@@ -1264,12 +1264,12 @@
                     </div>
 
                     <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-                        <!-- INDIKATOR PERIODE REALTIME GLOBAL UNTUK SEMUA USER (Kompak di Mobile) -->
+                        <!-- INDIKATOR PERIODE REALTIME GLOBAL UNTUK SEMUA USER -->
                         <div class="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700/80 text-[11px] sm:text-xs font-bold shadow-sm shrink-0">
                             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
                             <span class="text-amber-400 font-extrabold">{{ \App\Models\SystemConfiguration::current()->academic_year }}</span>
-                            <span class="hidden sm:inline text-slate-500">•</span>
-                            <span class="hidden sm:inline text-indigo-300 font-bold">{{ \App\Models\SystemConfiguration::current()->semester }}</span>
+                            <span class="text-slate-500">•</span>
+                            <span class="text-indigo-300 font-bold">{{ \App\Models\SystemConfiguration::current()->semester }}</span>
                         </div>
 
                         <!-- TOMBOL GANTI TEMA (DARK / LIGHT MODE TOGGLE) -->
