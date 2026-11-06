@@ -37,11 +37,3 @@ __pycache__/
 *.pyc
 *.sql
 *.xlsx
-PANDUAN_PENGEMBANGAN/
-scratch/
-/scratch
-public/artisan_runner.php
-__pycache__/
-*.pyc
-*.sql
-*.xlsx
