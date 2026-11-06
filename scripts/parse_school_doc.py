@@ -147,15 +147,24 @@ def parse_pdf(file_path):
     with pdfplumber.open(file_path) as pdf:
         total_pages = len(pdf.pages)
 
-        # 1. Deteksi cepat kategori dokumen dari halaman pertama
+        # 1. Deteksi cepat kategori dokumen dari nama berkas dan teks halaman pertama
         first_page_text = pdf.pages[0].extract_text() or ""
-        if "JADWAL RUANG" in first_page_text.upper() or "SMK NEGERI 1 BANTUL" in first_page_text:
-            if "JADWAL RUANG" in first_page_text.upper():
+        base_name_upper = os.path.basename(file_path).upper()
+        
+        if "RUANG" in base_name_upper or "RUANGAN" in base_name_upper or "JADWAL RUANG" in first_page_text.upper() or "JADWAL RUANGAN" in first_page_text.upper():
+            doc_category = "timetable_room"
+        elif "JADWAL RUANG" in first_page_text.upper() or "SMK NEGERI 1 BANTUL" in first_page_text:
+            if "JADWAL RUANG" in first_page_text.upper() or "JADWAL RUANGAN" in first_page_text.upper():
                 doc_category = "timetable_room"
             elif any(re.search(r'Kelas\s+X', first_page_text, re.I) for _ in [1]):
                 doc_category = "timetable_class"
             elif any(re.search(r'"\d+[\.,]', first_page_text) for _ in [1]):
                 doc_category = "timetable_teacher"
+
+        # Fallback jika judul dokumen adalah "JADWAL KBM" tetapi memiliki kolom Hari, Jam, Waktu dan kelas-kelas
+        if doc_category == "general":
+            if re.search(r'\bHari\b', first_page_text, re.I) and re.search(r'\bJam\b', first_page_text, re.I) and re.search(r'\bWaktu\b', first_page_text, re.I):
+                doc_category = "timetable_room"
 
         for idx, page in enumerate(pdf.pages):
             raw_text = page.extract_text() or ""

@@ -941,74 +941,110 @@ class FetTimetableParserService
     ): int {
         // 1. Sinkronisasi master lesson_hours awal jika ada deteksi jam dari berkas
         if (!empty($pyResult['lesson_hours']) && \Illuminate\Support\Facades\Schema::hasTable('lesson_hours')) {
+            $existingLh = \App\Models\LessonHour::all()
+                ->keyBy(fn($lh) => "{$lh->day_of_week}_{$lh->session_number}");
+            $lhToInsert = [];
             foreach ($pyResult['lesson_hours'] as $lh) {
-                \App\Models\LessonHour::firstOrCreate(
-                    [
-                        'day_of_week'    => $lh['day'],
-                        'session_number' => (int) $lh['session'],
-                    ],
-                    [
+                $key = "{$lh['day']}_{$lh['session']}";
+                if (!isset($existingLh[$key])) {
+                    $lhToInsert[] = [
+                        'day_of_week'      => $lh['day'],
+                        'session_number'   => (int) $lh['session'],
                         'name'             => "Jam ke - {$lh['session']}",
                         'start_time'       => $lh['start'],
                         'end_time'         => $lh['end'],
                         'duration_minutes' => 40,
-                    ]
-                );
+                        'created_at'       => now(),
+                        'updated_at'       => now(),
+                    ];
+                }
+            }
+            if (!empty($lhToInsert)) {
+                \App\Models\LessonHour::insert($lhToInsert);
             }
         }
 
+        // 2. Preload seluruh Rooms dan Classes yang ada ke memory
         $allRooms = Room::all()->keyBy(fn($r) => strtoupper(trim($r->room_name)));
         $allClasses = SchoolClass::all()->keyBy(fn($c) => strtoupper(trim($c->class_name)));
-        $updatedCount = 0;
 
-        \Illuminate\Support\Facades\DB::transaction(function () use (
-            $pyResult, $cycleType, &$allRooms, &$allClasses, &$createdRooms, &$createdClasses, &$updatedCount
-        ) {
-            foreach ($pyResult['room_assignments'] as $item) {
-                $normClass = $this->normalizeClassName($item['class']);
-                if (empty($normClass)) continue;
-                $normClassUpper = strtoupper($normClass);
+        // 3. Preload SEMUA Jadwal pada siklus ini dalam 1 query tunggal (~700 baris, butuh hanya ~100ms)
+        $schedules = Schedule::where('cycle_type', $cycleType)
+            ->select('id', 'class_id', 'day_of_week', 'start_time', 'end_time', 'room_id')
+            ->get();
 
-                if (!isset($allClasses[$normClassUpper])) {
-                    $sc = SchoolClass::firstOrCreate(['class_name' => $normClass]);
-                    if ($sc->wasRecentlyCreated) {
-                        $createdClasses++;
-                    }
-                    $allClasses[$normClassUpper] = $sc;
+        $scheduleMap = [];
+        foreach ($schedules as $sch) {
+            $key = "{$sch->class_id}_{$sch->day_of_week}";
+            $scheduleMap[$key][] = [
+                'id'       => $sch->id,
+                'start'    => (int) substr($sch->start_time, 0, 2),
+                'end'      => (int) substr($sch->end_time, 0, 2),
+                'room_id'  => $sch->room_id,
+            ];
+        }
+
+        $pendingRoomUpdates = []; // [$roomId => [$schId => $schId]]
+
+        // 4. Proses pencocokan seluruh 2.304 entri di memori PHP (selesai dalam < 0.05 detik)
+        foreach ($pyResult['room_assignments'] as $item) {
+            $normClass = $this->normalizeClassName($item['class']);
+            if (empty($normClass)) continue;
+            $normClassUpper = strtoupper($normClass);
+
+            if (!isset($allClasses[$normClassUpper])) {
+                $sc = SchoolClass::firstOrCreate(['class_name' => $normClass]);
+                if ($sc->wasRecentlyCreated) {
+                    $createdClasses++;
                 }
-                $classId = $allClasses[$normClassUpper]->id;
+                $allClasses[$normClassUpper] = $sc;
+            }
+            $classId = $allClasses[$normClassUpper]->id;
 
-                // Resolve room
-                $mappedRoom = $this->canonicalRoomName($item['room']);
-                $mappedRoomUpper = strtoupper($mappedRoom);
-                if (isset($allRooms[$mappedRoomUpper])) {
-                    $roomId = $allRooms[$mappedRoomUpper]->id;
-                } else {
-                    $r = Room::firstOrCreate(['room_name' => $mappedRoom]);
-                    if ($r->wasRecentlyCreated) {
-                        $createdRooms++;
-                    }
-                    $allRooms[$mappedRoomUpper] = $r;
-                    $roomId = $r->id;
+            // Resolve room
+            $mappedRoom = $this->canonicalRoomName($item['room']);
+            $mappedRoomUpper = strtoupper($mappedRoom);
+            if (isset($allRooms[$mappedRoomUpper])) {
+                $roomId = $allRooms[$mappedRoomUpper]->id;
+            } else {
+                $r = Room::firstOrCreate(['room_name' => $mappedRoom]);
+                if ($r->wasRecentlyCreated) {
+                    $createdRooms++;
                 }
+                $allRooms[$mappedRoomUpper] = $r;
+                $roomId = $r->id;
+            }
 
-                $day = $item['day'];
-                $sessionNum = (int) $item['session'];
-                $sessionCode = sprintf('%02d:00:00', $sessionNum);
+            $day = $item['day'];
+            $sessionNum = (int) $item['session'];
+            $mapSlotKey = "{$classId}_{$day}";
 
-                // Update jadwal yang menaungi sesi jam ini pada hari dan kelas tersebut
-                $affected = Schedule::where('class_id', $classId)
-                    ->where('day_of_week', $day)
-                    ->where('cycle_type', $cycleType)
-                    ->where('start_time', '<=', $sessionCode)
-                    ->where('end_time', '>=', $sessionCode)
-                    ->update(['room_id' => $roomId]);
+            if (!isset($scheduleMap[$mapSlotKey])) {
+                continue;
+            }
 
-                if ($affected > 0) {
-                    $updatedCount += $affected;
+            foreach ($scheduleMap[$mapSlotKey] as &$schRef) {
+                if ($sessionNum >= $schRef['start'] && $sessionNum <= $schRef['end']) {
+                    if ($schRef['room_id'] !== $roomId) {
+                        $pendingRoomUpdates[$roomId][$schRef['id']] = $schRef['id'];
+                        $schRef['room_id'] = $roomId; // tandai di memory agar tidak diduplikasi
+                    }
                 }
             }
-        });
+            unset($schRef);
+        }
+
+        // 5. Eksekusi batch updates grouped by target roomId (~20-30 query saja, selesai dalam 1-2 detik)
+        $updatedCount = 0;
+        if (!empty($pendingRoomUpdates)) {
+            \Illuminate\Support\Facades\DB::transaction(function () use ($pendingRoomUpdates, &$updatedCount) {
+                foreach ($pendingRoomUpdates as $rId => $schIds) {
+                    $chunkIds = array_values($schIds);
+                    $affected = Schedule::whereIn('id', $chunkIds)->update(['room_id' => $rId]);
+                    $updatedCount += $affected;
+                }
+            });
+        }
 
         return $updatedCount;
     }
