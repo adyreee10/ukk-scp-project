@@ -1295,7 +1295,7 @@
                 </header>
 
                 <!-- KONTEN HALAMAN -->
-                <main class="flex-1 p-4 sm:p-8 max-w-6xl w-full">
+                <main class="flex-1 p-4 sm:p-6 lg:p-8 w-full max-w-7xl 2xl:max-w-[1600px] mx-auto">
                     @if (session('success'))
                         <div class="mb-5 p-4 rounded-xl flash-success flex items-center justify-between shadow-md">
                             <div class="flex items-center gap-3">
