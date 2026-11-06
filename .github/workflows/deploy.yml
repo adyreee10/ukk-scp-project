@@ -1,4 +1,4 @@
-name: Deploy to Hosting via SFTP
+name: Deploy to Hosting via FTPS
 
 on:
   push:
@@ -8,12 +8,14 @@ on:
 
 jobs:
   deploy:
-    name: Build & Deploy via SFTP
+    name: Build & Deploy via FTPS
     runs-on: ubuntu-latest
 
     steps:
       - name: 1. Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
       - name: 2. Setup Node.js
         uses: actions/setup-node@v4
@@ -26,28 +28,23 @@ jobs:
           npm ci
           npm run build
 
-      - name: 4. Deploy Files to Hosting via SFTP
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+      - name: 4. Deploy Files to Hosting via FTPS
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: ${{ secrets.SFTP_HOST }}
-          port: ${{ secrets.SFTP_PORT }}
-          username: ${{ secrets.SFTP_USERNAME }}
-          password: ${{ secrets.SFTP_PASSWORD }}
-          local_path: './*'
-          remote_path: ${{ secrets.SFTP_REMOTE_PATH }}
-          sftp_only: true
-          delete_remote_files: false
+          server: ${{ secrets.FTP_SERVER || secrets.SFTP_HOST }}
+          username: ${{ secrets.FTP_USERNAME || secrets.SFTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD || secrets.SFTP_PASSWORD }}
+          port: 21
+          protocol: ftps
+          server-dir: 'public_html/'
           exclude: |
-            .git*
-            .git*/**
-            node_modules/**
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
             .env
             .env.*
             database/*.sqlite*
-            storage/framework/cache/**
-            storage/framework/sessions/**
-            storage/framework/views/**
-            storage/logs/**
+            storage/**
+            public/storage
             tests/**
             README.md
-
