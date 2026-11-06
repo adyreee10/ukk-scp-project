@@ -22,7 +22,10 @@ class AppServiceProvider extends ServiceProvider
         \Carbon\Carbon::setLocale('id');
         config(['app.locale' => 'id']);
 
-        // Pastikan rute tidak stuck pada cache basi saat di-deploy via FTPS
+        // Pastikan konfigurasi dan rute selalu membaca .env terbaru saat di-deploy via FTPS
+        if (file_exists(base_path('bootstrap/cache/config.php'))) {
+            @unlink(base_path('bootstrap/cache/config.php'));
+        }
         if (file_exists(base_path('bootstrap/cache/routes-v7.php'))) {
             @unlink(base_path('bootstrap/cache/routes-v7.php'));
         }
