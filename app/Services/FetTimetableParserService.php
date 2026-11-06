@@ -200,6 +200,24 @@ class FetTimetableParserService
                 ];
             }
 
+            // C2. Jika dokumen adalah Matriks Jadwal Ruang (2304 room assignments)
+            if (!empty($pyResult['room_assignments'])) {
+                $imported = $this->importRoomAssignments(
+                    $pyResult,
+                    $cycleType,
+                    $createdRooms,
+                    $createdClasses
+                );
+
+                return [
+                    'imported'         => $imported,
+                    'skipped'          => $skipped,
+                    'created_teachers' => $createdTeachers,
+                    'created_classes'  => $createdClasses,
+                    'created_rooms'    => $createdRooms,
+                ];
+            }
+
             // D. Fallback ke pembacaan baris per baris per halaman hasil Python
             if (!empty($pyResult['pages'])) {
                 foreach ($pyResult['pages'] as $pageData) {
@@ -908,6 +926,91 @@ class FetTimetableParserService
 
         $createdCounter++;
         return $room;
+    }
+
+    /**
+     * Memproses Matriks Jadwal Ruang (2.304 entri penempatan ruang per kelas/hari/sesi):
+     * 1. Menyelaraskan master lesson_hours jika belum terisi
+     * 2. Memetakan lokasi ruangan presisi (Ruang 12, LAB 16, HALL, Lapangan Olahraga, dll.) ke setiap jadwal kelas aktif
+     */
+    public function importRoomAssignments(
+        array $pyResult,
+        string $cycleType,
+        int &$createdRooms,
+        int &$createdClasses
+    ): int {
+        // 1. Sinkronisasi master lesson_hours awal jika ada deteksi jam dari berkas
+        if (!empty($pyResult['lesson_hours']) && \Illuminate\Support\Facades\Schema::hasTable('lesson_hours')) {
+            foreach ($pyResult['lesson_hours'] as $lh) {
+                \App\Models\LessonHour::firstOrCreate(
+                    [
+                        'day_of_week'    => $lh['day'],
+                        'session_number' => (int) $lh['session'],
+                    ],
+                    [
+                        'name'             => "Jam ke - {$lh['session']}",
+                        'start_time'       => $lh['start'],
+                        'end_time'         => $lh['end'],
+                        'duration_minutes' => 40,
+                    ]
+                );
+            }
+        }
+
+        $allRooms = Room::all()->keyBy(fn($r) => strtoupper(trim($r->room_name)));
+        $allClasses = SchoolClass::all()->keyBy(fn($c) => strtoupper(trim($c->class_name)));
+        $updatedCount = 0;
+
+        \Illuminate\Support\Facades\DB::transaction(function () use (
+            $pyResult, $cycleType, &$allRooms, &$allClasses, &$createdRooms, &$createdClasses, &$updatedCount
+        ) {
+            foreach ($pyResult['room_assignments'] as $item) {
+                $normClass = $this->normalizeClassName($item['class']);
+                if (empty($normClass)) continue;
+                $normClassUpper = strtoupper($normClass);
+
+                if (!isset($allClasses[$normClassUpper])) {
+                    $sc = SchoolClass::firstOrCreate(['class_name' => $normClass]);
+                    if ($sc->wasRecentlyCreated) {
+                        $createdClasses++;
+                    }
+                    $allClasses[$normClassUpper] = $sc;
+                }
+                $classId = $allClasses[$normClassUpper]->id;
+
+                // Resolve room
+                $mappedRoom = $this->canonicalRoomName($item['room']);
+                $mappedRoomUpper = strtoupper($mappedRoom);
+                if (isset($allRooms[$mappedRoomUpper])) {
+                    $roomId = $allRooms[$mappedRoomUpper]->id;
+                } else {
+                    $r = Room::firstOrCreate(['room_name' => $mappedRoom]);
+                    if ($r->wasRecentlyCreated) {
+                        $createdRooms++;
+                    }
+                    $allRooms[$mappedRoomUpper] = $r;
+                    $roomId = $r->id;
+                }
+
+                $day = $item['day'];
+                $sessionNum = (int) $item['session'];
+                $sessionCode = sprintf('%02d:00:00', $sessionNum);
+
+                // Update jadwal yang menaungi sesi jam ini pada hari dan kelas tersebut
+                $affected = Schedule::where('class_id', $classId)
+                    ->where('day_of_week', $day)
+                    ->where('cycle_type', $cycleType)
+                    ->where('start_time', '<=', $sessionCode)
+                    ->where('end_time', '>=', $sessionCode)
+                    ->update(['room_id' => $roomId]);
+
+                if ($affected > 0) {
+                    $updatedCount += $affected;
+                }
+            }
+        });
+
+        return $updatedCount;
     }
 
     /**

@@ -50,10 +50,21 @@ class JournalReminderService
             ->when($teacher, fn ($query) => $query->where('teacher_id', $teacher->id))
             ->whereDoesntHave('journals', fn ($query) => $query->whereDate('date', $today))
             ->get()
-            ->filter(function(Schedule $schedule) use ($now, $today) {
+            ->filter(function(Schedule $schedule) use ($now, $today, $day) {
                 // Ambil nomor jam pelajaran selesai (misal '04:00' -> 4)
                 $endPeriod = (int) substr($schedule->end_time, 0, 2);
-                $clockTime = self::BELL_END_TIMES[$endPeriod] ?? '15:30';
+
+                // Prioritaskan jam selesai resmi dari konfigurasi Master Jam Pembelajaran (lesson_hours)
+                static $lhCache = null;
+                if ($lhCache === null) {
+                    $lhCache = \Illuminate\Support\Facades\Schema::hasTable('lesson_hours')
+                        ? \App\Models\LessonHour::all()
+                        : collect();
+                }
+
+                $activeDay = $schedule->day_of_week ?? $day;
+                $matchedHour = $lhCache->first(fn($h) => $h->day_of_week === $activeDay && (int)$h->session_number === $endPeriod);
+                $clockTime = $matchedHour ? $matchedHour->end_time : (self::BELL_END_TIMES[$endPeriod] ?? '15:30');
 
                 // Batas toleransi: Jam selesai pelajaran + 30 menit
                 $deadline = Carbon::parse(

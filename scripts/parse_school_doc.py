@@ -108,17 +108,19 @@ def parse_spreadsheet(file_path, ext=None):
 
 def normalize_class_name(raw_name):
     """
-    Normalisasi nama kelas seperti 'X RPL1' -> 'X RPL 1'
+    Normalisasi nama kelas seperti 'X RPL1' atau '10 RPL 1' -> 'X RPL 1'
     """
     if not raw_name:
         return ""
     name = re.sub(r'[\r\n\t]+', ' ', str(raw_name)).strip()
     name = re.sub(r'\s*[:=]\s*', '', name)
     name = re.sub(r'\s+', ' ', name)
-    # Ubah format seperti 'X RPL1' atau 'XI TKJ2' menjadi 'X RPL 1'
-    m = re.match(r'^(XII|XI|X)\s*([A-Za-z]+)\s*(\d*)$', name, re.IGNORECASE)
+    m = re.match(r'^(XII|XI|X|12|11|10)\s*([A-Za-z]+)\s*(\d*)$', name, re.IGNORECASE)
     if m:
         grade = m.group(1).upper()
+        if grade == '10': grade = 'X'
+        elif grade == '11': grade = 'XI'
+        elif grade == '12': grade = 'XII'
         major = m.group(2).upper()
         num = m.group(3)
         return f"{grade} {major} {num}".strip()
@@ -136,6 +138,8 @@ def parse_pdf(file_path):
     extracted_teachers = {}
     extracted_rooms = {}
     extracted_classes = set()
+    extracted_room_assignments = []
+    detected_lesson_hours = []
     doc_category = "general"
 
     days_list = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat"]
@@ -224,6 +228,91 @@ def parse_pdf(file_path):
             fallback_teacher_name = re.sub(r'\s+', ' ', teacher_header_match.group(2)).strip().strip('"” ,.;-') if teacher_header_match else None
             if fallback_teacher_code and fallback_teacher_name:
                 extracted_teachers[fallback_teacher_code] = fallback_teacher_name
+
+            # --- C. JIKA DOKUMEN ADALAH MATRIKS JADWAL RUANG (PDF 3 Halaman) ---
+            if doc_category == "timetable_room":
+                for table in clean_tables:
+                    if len(table) < 3 or len(table[0]) < 15:
+                        continue
+
+                    header_row_idx = -1
+                    col_class_map = {}
+                    for r_idx in range(min(3, len(table))):
+                        temp_map = {}
+                        for c_idx, cell in enumerate(table[r_idx]):
+                            c_norm = normalize_class_name(cell)
+                            if re.match(r'^(XII|XI|X)\s+[A-Za-z]+', c_norm):
+                                temp_map[c_idx] = c_norm
+                        if len(temp_map) >= 15:
+                            header_row_idx = r_idx
+                            col_class_map = temp_map
+                            break
+
+                    if header_row_idx == -1:
+                        continue
+
+                    current_matrix_day = None
+                    for r_idx in range(header_row_idx + 1, len(table)):
+                        row = table[r_idx]
+                        if not row or len(row) < 4:
+                            continue
+
+                        day_cell = str(row[0] or '').strip()
+                        for d in days_list:
+                            if d.lower() in day_cell.lower():
+                                current_matrix_day = d
+                                break
+
+                        jam_cell = str(row[1] or '').strip()
+                        if not jam_cell.isdigit() or not current_matrix_day:
+                            continue
+                        session_num = int(jam_cell)
+
+                        waktu_cell = str(row[2] or '').strip()
+                        time_m = re.findall(r'(\d{1,2}[:.]\d{2})', waktu_cell)
+                        if len(time_m) >= 2:
+                            s_time = time_m[0].replace('.', ':')
+                            e_time = time_m[1].replace('.', ':')
+                            if not any(lh['day'] == current_matrix_day and lh['session'] == session_num for lh in detected_lesson_hours):
+                                detected_lesson_hours.append({
+                                    'day': current_matrix_day,
+                                    'session': session_num,
+                                    'start': s_time,
+                                    'end': e_time
+                                })
+
+                        for c_idx, c_name in col_class_map.items():
+                            if c_idx < len(row):
+                                rm_raw = str(row[c_idx] or '').strip()
+                                if not rm_raw or rm_raw in ['-', '---', 'IST', 'UPACARA', 'BENDERA', 'LITERASI']:
+                                    continue
+
+                                clean_rm = rm_raw.upper().replace(' ', '')
+                                if clean_rm in extracted_rooms:
+                                    resolved_rm = extracted_rooms[clean_rm]
+                                elif rm_raw.isdigit():
+                                    resolved_rm = f"Ruang {rm_raw}"
+                                elif clean_rm == 'OR':
+                                    resolved_rm = "Lapangan Olahraga"
+                                elif clean_rm == 'HALL':
+                                    resolved_rm = "Ruang Seni Tari / Hall"
+                                elif clean_rm == 'L.IPA':
+                                    resolved_rm = "Laboratorium IPA"
+                                elif clean_rm == 'L.PB':
+                                    resolved_rm = "Laboratorium Penataan Barang"
+                                elif clean_rm.startswith('L.'):
+                                    lab_num = clean_rm[2:]
+                                    resolved_rm = f"Laboratorium Komputer {lab_num}"
+                                else:
+                                    resolved_rm = rm_raw
+
+                                extracted_room_assignments.append({
+                                    'class': c_name,
+                                    'day': current_matrix_day,
+                                    'session': session_num,
+                                    'room': resolved_rm
+                                })
+                continue
 
             # Proses setiap tabel FET pada halaman ini
             for table in clean_tables:
@@ -366,7 +455,9 @@ def parse_pdf(file_path):
         "schedules": extracted_schedules,
         "teachers": [{"code": k, "name": v} for k, v in extracted_teachers.items()],
         "rooms": [{"code": k, "name": v} for k, v in extracted_rooms.items()],
-        "classes": list(extracted_classes)
+        "classes": list(extracted_classes),
+        "room_assignments": extracted_room_assignments,
+        "lesson_hours": detected_lesson_hours
     }
 
 def main():
