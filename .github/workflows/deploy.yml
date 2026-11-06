@@ -44,7 +44,6 @@ jobs:
             mobile/**
             PANDUAN_PENGEMBANGAN/**
             scratch/**
-            scripts/**
             *.md
             .env
             .env.*
