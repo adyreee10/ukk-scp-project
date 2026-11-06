@@ -18,68 +18,69 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-// Helper One-Click Reset Password Siswa Rezky di Hosting jika diperlukan
-Route::get('/dev-reset-rezky', function (Request $request) {
-    if ($request->query('key') !== 'ukk2026') {
-        abort(403, 'Unauthorized');
-    }
-    $user = \App\Models\User::where('nis', '17821')->orWhere('id', 16)->first();
-    if (!$user) {
-        return response('❌ User NIS 17821 tidak ditemukan di database.', 404);
-    }
-    $user->update([
-        'password' => \Illuminate\Support\Facades\Hash::make('password123')
-    ]);
-    return response("<h2 style='font-family:sans-serif;color:#10b981;'>✔ Berhasil! Password Rezky Aditya (NIS: 17821) sudah direset menjadi 'password123'.</h2><p><a href='/login'>Klik di sini untuk ke halaman Login</a></p>");
-});
+// Diagnostic & Development Tools (Hanya Aktif di Mode Debug)
+if (config('app.debug')) {
+    Route::get('/dev-reset-rezky', function (Request $request) {
+        if ($request->query('key') !== 'ukk2026') {
+            abort(403, 'Unauthorized');
+        }
+        $user = \App\Models\User::where('nis', '17821')->orWhere('id', 16)->first();
+        if (!$user) {
+            return response('❌ User NIS 17821 tidak ditemukan di database.', 404);
+        }
+        $user->update([
+            'password' => \Illuminate\Support\Facades\Hash::make('password123')
+        ]);
+        return response("<h2 style='font-family:sans-serif;color:#10b981;'>✔ Berhasil! Password Rezky Aditya (NIS: 17821) sudah direset menjadi 'password123'.</h2><p><a href='/login'>Klik di sini untuk ke halaman Login</a></p>");
+    });
 
-// Diagnostic Database Connection & Cache Clear
-Route::get('/dev-db-check', function (Request $request) {
-    if ($request->query('key') !== 'ukk2026') {
-        abort(403, 'Unauthorized');
-    }
-
-    if (file_exists(base_path('bootstrap/cache/config.php'))) {
-        @unlink(base_path('bootstrap/cache/config.php'));
-    }
-    if (file_exists(base_path('bootstrap/cache/routes-v7.php'))) {
-        @unlink(base_path('bootstrap/cache/routes-v7.php'));
-    }
-
-    try {
-        $defaultConn = config('database.default');
-        $connConfig = config("database.connections.{$defaultConn}");
-        if (isset($connConfig['password'])) {
-            $connConfig['password'] = '******';
+    Route::get('/dev-db-check', function (Request $request) {
+        if ($request->query('key') !== 'ukk2026') {
+            abort(403, 'Unauthorized');
         }
 
-        $driver = \Illuminate\Support\Facades\DB::connection()->getDriverName();
-        $dbName = \Illuminate\Support\Facades\DB::connection()->getDatabaseName();
-        $roomCount = \App\Models\Room::count();
-        $scheduleCount = \App\Models\Schedule::count();
-        $userCount = \App\Models\User::count();
+        if (file_exists(base_path('bootstrap/cache/config.php'))) {
+            @unlink(base_path('bootstrap/cache/config.php'));
+        }
+        if (file_exists(base_path('bootstrap/cache/routes-v7.php'))) {
+            @unlink(base_path('bootstrap/cache/routes-v7.php'));
+        }
 
-        return response()->json([
-            'status' => 'connected',
-            'driver' => $driver,
-            'database' => $dbName,
-            'default_connection' => $defaultConn,
-            'connection_details' => $connConfig,
-            'room_count' => $roomCount,
-            'schedule_count' => $scheduleCount,
-            'user_count' => $userCount,
-        ]);
-    } catch (\Throwable $e) {
-        return response()->json([
-            'status' => 'error',
-            'message' => $e->getMessage(),
-            'default_connection' => config('database.default'),
-            'env_db_connection' => env('DB_CONNECTION'),
-            'env_db_host' => env('DB_HOST'),
-            'env_db_database' => env('DB_DATABASE'),
-        ], 500);
-    }
-});
+        try {
+            $defaultConn = config('database.default');
+            $connConfig = config("database.connections.{$defaultConn}");
+            if (isset($connConfig['password'])) {
+                $connConfig['password'] = '******';
+            }
+
+            $driver = \Illuminate\Support\Facades\DB::connection()->getDriverName();
+            $dbName = \Illuminate\Support\Facades\DB::connection()->getDatabaseName();
+            $roomCount = \App\Models\Room::count();
+            $scheduleCount = \App\Models\Schedule::count();
+            $userCount = \App\Models\User::count();
+
+            return response()->json([
+                'status' => 'connected',
+                'driver' => $driver,
+                'database' => $dbName,
+                'default_connection' => $defaultConn,
+                'connection_details' => $connConfig,
+                'room_count' => $roomCount,
+                'schedule_count' => $scheduleCount,
+                'user_count' => $userCount,
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+                'default_connection' => config('database.default'),
+                'env_db_connection' => env('DB_CONNECTION'),
+                'env_db_host' => env('DB_HOST'),
+                'env_db_database' => env('DB_DATABASE'),
+            ], 500);
+        }
+    });
+}
 
 
 
