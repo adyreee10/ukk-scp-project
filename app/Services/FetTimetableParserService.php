@@ -146,9 +146,14 @@ class FetTimetableParserService
                         }
 
                         $day = $item['day'];
-                        $rawStart = $item['start_time'];
-                        $startSession = $this->mapTimeToSession($rawStart);
-                        $endSession = $this->calculateNextSession($startSession, $day);
+                        if (isset($item['start_session']) && isset($item['end_session'])) {
+                            $startSession = sprintf('%02d:00:00', (int)$item['start_session']);
+                            $endSession   = sprintf('%02d:00:00', (int)$item['end_session']);
+                        } else {
+                            $rawStart = $item['start_time'];
+                            $startSession = $this->mapTimeToSession($rawStart);
+                            $endSession = !empty($item['end_time']) ? $this->mapTimeToSession($item['end_time']) : $this->calculateNextSession($startSession, $day);
+                        }
 
                         $slotKey = "{$classId}_{$day}_{$startSession}";
 
@@ -157,12 +162,6 @@ class FetTimetableParserService
                             if ($duplicateAction === 'keep') {
                                 $skipped++;
                                 continue; // Pertahankan data awal yang ada di sistem, lewati data baru
-                            } else {
-                                // Ganti / perbarui yang baru: jadwalkan penghapusan jadwal lama yang bentrok
-                                $oldId = $existingScheduleMap[$slotKey];
-                                if (is_numeric($oldId)) {
-                                    $schedulesToDelete[] = $oldId;
-                                }
                             }
                         }
 
@@ -181,11 +180,14 @@ class FetTimetableParserService
                         $existingScheduleMap[$slotKey] = true;
                     }
 
-                    if (!empty($schedulesToDelete)) {
-                        Schedule::whereIn('id', array_unique($schedulesToDelete))->delete();
+                    if ($duplicateAction === 'replace' && !empty($schedulesToInsert)) {
+                        $targetClassIds = array_unique(array_column($schedulesToInsert, 'class_id'));
+                        Schedule::where('cycle_type', $cycleType)
+                            ->whereIn('class_id', $targetClassIds)
+                            ->delete();
                     }
 
-                    foreach (array_chunk($schedulesToInsert, 100) as $chunk) {
+                    foreach (array_chunk($schedulesToInsert, 200) as $chunk) {
                         Schedule::insert($chunk);
                         $imported += count($chunk);
                     }

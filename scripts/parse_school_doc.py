@@ -126,6 +126,63 @@ def normalize_class_name(raw_name):
         return f"{grade} {major} {num}".strip()
     return name
 
+def canonical_room_py(rm_raw, extracted_rooms=None):
+    if not rm_raw:
+        return 'Ruang Teori'
+    clean = rm_raw.upper().replace(' ', '')
+    if extracted_rooms and clean in extracted_rooms:
+        return extracted_rooms[clean]
+    if rm_raw.isdigit():
+        return f"Ruang {rm_raw}"
+    m_r = re.match(r'^(?:RUANG|R\.?)\s*(\d+)$', rm_raw, re.I)
+    if m_r:
+        return f"Ruang {m_r.group(1)}"
+    if clean in ['OR', 'OR1', 'OR2']:
+        return "Lapangan Olahraga"
+    if clean == 'HALL':
+        return "Ruang Seni Tari / Hall"
+    if clean in ['L.IPA', 'LABIPA']:
+        return "Laboratorium IPA"
+    if clean in ['L.PB', 'LABPB']:
+        return "Laboratorium Penataan Barang"
+    m_lab = re.match(r'^(?:LAB|L\.?)\s*(\d+)$', rm_raw, re.I)
+    if m_lab:
+        return f"Laboratorium Komputer {m_lab.group(1)}"
+    return rm_raw.strip()
+
+def _finalize_class_block(block, extracted_schedules, extracted_teachers, extracted_rooms):
+    raw = block['raw']
+    lines = [l.strip() for l in raw.split('\n') if l.strip()]
+    room = None
+    if len(lines) >= 2 and re.match(r'^(LAB\s*\d+|L\.\d+|OR\d*|HALL|LAB\s*IPA|L\.IPA|RUANG\s*\d+|R\.\s*\d+)$', lines[-1], re.I):
+        room = lines.pop()
+    text = '\n'.join(lines)
+    m = re.search(r'["“](\d{1,3})[\.,\s]*([A-Za-z].+?)(?:["”]|$)', text, re.DOTALL)
+    if m:
+        tcode = m.group(1).strip()
+        tname = re.sub(r'\s+', ' ', m.group(2)).strip('"” ,.;-')
+        subj = re.sub(r'\s+', ' ', text[:m.start()]).strip()
+        extracted_teachers[tcode] = tname
+    else:
+        tcode = None
+        tname = None
+        subj = re.sub(r'\s+', ' ', text).strip()
+
+    resolved_room = canonical_room_py(room, extracted_rooms)
+
+    extracted_schedules.append({
+        'class': block['class'],
+        'day': block['day'],
+        'start_session': block['start'],
+        'end_session': block['end'],
+        'start_time': f"{block['start']:02d}:00:00",
+        'end_time': f"{block['end']:02d}:00:00",
+        'subject': subj or 'Mata Pelajaran Umum',
+        'teacher_code': tcode,
+        'teacher_name': tname,
+        'room': resolved_room
+    })
+
 def parse_pdf(file_path):
     """
     Membaca dokumen PDF menggunakan pdfplumber.
@@ -321,6 +378,71 @@ def parse_pdf(file_path):
                                     'session': session_num,
                                     'room': resolved_rm
                                 })
+                continue
+
+            # --- D. JIKA DOKUMEN ADALAH JADWAL PER KELAS FET (1 Halaman per Kelas, Grid Matriks) ---
+            if doc_category == "timetable_class":
+                if idx == 0 or not clean_tables:
+                    continue
+                table = clean_tables[0]
+                if len(table) < 5:
+                    continue
+
+                # 1. Deteksi Kelas dari baris 0 atau fallback
+                c_name = None
+                for cell in table[0]:
+                    if cell and re.search(r'\b(X|XI|XII)\b', cell, re.I):
+                        c_name = normalize_class_name(cell)
+                        break
+                if not c_name and fallback_class:
+                    c_name = fallback_class
+                if c_name:
+                    extracted_classes.add(c_name)
+                else:
+                    continue
+
+                # 2. Deteksi Kolom Hari & Baris Jam
+                day_cols = {}
+                time_rows = []
+                for r_idx, row in enumerate(table):
+                    for c_idx, cell in enumerate(row):
+                        if cell and cell.strip() in days_list:
+                            day_cols[c_idx] = cell.strip()
+                    fc = (row[0] or '').strip()
+                    if re.match(r'^\d{1,2}[:.]\d{2}$', fc):
+                        time_rows.append((r_idx, fc))
+
+                if not day_cols or not time_rows:
+                    continue
+
+                # 3. Telusuri Blok Sel Vertikal per Kolom Hari
+                for c_idx, day_name in day_cols.items():
+                    curr_block = None
+                    for sess_idx, (r_idx, t_str) in enumerate(time_rows):
+                        session_num = sess_idx + 1 # Sesi 1 s.d 10
+                        cv = table[r_idx][c_idx]
+                        cc = cv.strip() if cv else ""
+
+                        if cc and cc not in ['-x-', '---', '-']:
+                            if curr_block:
+                                _finalize_class_block(curr_block, extracted_schedules, extracted_teachers, extracted_rooms)
+                            curr_block = {
+                                'class': c_name,
+                                'day': day_name,
+                                'raw': cc,
+                                'start': session_num,
+                                'end': session_num
+                            }
+                        elif cc in ['-x-', '---', '-']:
+                            if curr_block:
+                                _finalize_class_block(curr_block, extracted_schedules, extracted_teachers, extracted_rooms)
+                                curr_block = None
+                        else:
+                            # Sel kosong / None -> Perpanjangan dari sel merged di atasnya
+                            if curr_block:
+                                curr_block['end'] = session_num
+                    if curr_block:
+                        _finalize_class_block(curr_block, extracted_schedules, extracted_teachers, extracted_rooms)
                 continue
 
             # Proses setiap tabel FET pada halaman ini

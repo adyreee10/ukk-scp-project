@@ -308,6 +308,15 @@ class WakaController extends Controller
             return redirect()->back()->with('error', 'Silakan pilih setidaknya satu file dokumen jadwal.');
         }
 
+        // Urutkan berkas: pastikan berkas Jadwal Kelas diproses sebelum Jadwal Ruang (Room Assignments)
+        usort($uploadedFiles, function ($a, $b) {
+            $aName = method_exists($a, 'getClientOriginalName') ? $a->getClientOriginalName() : (string) $a;
+            $bName = method_exists($b, 'getClientOriginalName') ? $b->getClientOriginalName() : (string) $b;
+            $aIsRoom = str_contains(strtoupper($aName), 'RUANG');
+            $bIsRoom = str_contains(strtoupper($bName), 'RUANG');
+            return $aIsRoom <=> $bIsRoom;
+        });
+
         $cycleType = $request->input('cycle_type', $config->active_cycle ?? 'Putaran 1');
         $duplicateAction = $request->input('duplicate_action', 'replace');
         if (!in_array($duplicateAction, ['replace', 'keep'])) {
@@ -1445,33 +1454,18 @@ public function classesDestroy(SchoolClass $schoolClass)
 
         if (Schema::hasTable('lesson_hours')) {
             foreach ($daysToUpdate as $day) {
-                // Tentukan waktu mulai belajar hari tersebut
-                if ($day === 'Senin') {
-                    $currentTime = (8 * 60); // 08:00 (setelah upacara)
-                    $maxSessions = 10;
-                } elseif ($day === 'Selasa') {
-                    $currentTime = (7 * 60) + 30; // 07:30 (setelah literasi)
-                    $maxSessions = 10;
-                } elseif ($day === 'Jumat') {
-                    $currentTime = (7 * 60) + 15; // 07:15 (normal)
-                    $maxSessions = 8; // Jumat maksimal 8 jam
-                } else {
-                    $currentTime = (7 * 60) + 15; // 07:15 (Rabu & Kamis normal)
-                    $maxSessions = 10;
-                }
+                // Seluruh hari mulai tepat pukul 07:15 sesuai standar jadwal SMKN 1 Bantul
+                $currentTime = (7 * 60) + 15; // 07:15
+                $maxSessions = ($day === 'Jumat') ? 8 : 10; // Jumat 8 jam pelajaran, Senin-Kamis 10 jam pelajaran
 
                 for ($sessionNum = 1; $sessionNum <= $maxSessions; $sessionNum++) {
-                    // Sisipkan waktu istirahat sesuai agenda
+                    // Sisipkan waktu istirahat sesuai agenda SMKN 1 Bantul
                     if ($sessionNum === 4) {
-                        // Istirahat 1: 15 menit
+                        // Istirahat 1: 15 menit (09:30 - 09:45)
                         $currentTime += 15;
                     } elseif ($sessionNum === 7) {
-                        // Istirahat 2 (Ishoma / Sholat Jumat)
-                        if ($day === 'Jumat') {
-                            $currentTime = (12 * 60) + 40; // Terkunci mulai 12:40 setelah Sholat Jumat
-                        } else {
-                            $currentTime += 60; // 60 menit Ishoma
-                        }
+                        // Istirahat 2 (Ishoma / Sholat Jumat): 30 menit (12:00 - 12:30)
+                        $currentTime += 30;
                     }
 
                     $startH = str_pad(floor($currentTime / 60), 2, '0', STR_PAD_LEFT);
