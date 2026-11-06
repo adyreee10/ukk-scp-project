@@ -149,7 +149,7 @@
                                     <td class="p-4 text-center whitespace-nowrap">
                                                                         @if($j->photo_path)
                                         <button type="button" 
-                                                @click="openPreviewDoc('{{ asset('storage/' . $j->photo_path) }}', 'Foto Dokumentasi KBM: {{ addslashes($j->schedule?->subject ?? 'Jurnal') }} - {{ addslashes($j->schedule?->teacher?->name ?? 'Guru') }} ({{ addslashes($j->schedule?->schoolClass?->class_name ?? '') }})')"
+                                                @click="openPreviewDoc('{{ url('media/' . $j->photo_path) }}', 'Foto Dokumentasi KBM: {{ addslashes($j->schedule?->subject ?? 'Jurnal') }} - {{ addslashes($j->schedule?->teacher?->name ?? 'Guru') }} ({{ addslashes($j->schedule?->schoolClass?->class_name ?? '') }})')"
                                                 class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold btn-photo shadow-sm transition cursor-pointer">
                                             Lihat Foto
                                         </button>

@@ -142,7 +142,7 @@
                             @if($leave->document_path)
                                 <div class="mt-3">
                                     <button type="button" 
-                                            @click="openPreviewDoc('{{ asset('storage/' . $leave->document_path) }}', 'Surat Izin - {{ addslashes($leave->student_name) }}')"
+                                            @click="openPreviewDoc('{{ url('media/' . $leave->document_path) }}', 'Surat Izin - {{ addslashes($leave->student_name) }}')"
                                             class="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-400 hover:text-indigo-300 transition hover:underline cursor-pointer">
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                                         Lihat Surat Bukti Izin →
@@ -228,7 +228,7 @@
                                     <td class="p-4 text-center whitespace-nowrap">
                                         @if($leave->document_path)
                                             <button type="button" 
-                                                    @click="openPreviewDoc('{{ asset('storage/' . $leave->document_path) }}', 'Surat Izin - {{ addslashes($leave->student_name) }}')"
+                                                    @click="openPreviewDoc('{{ url('media/' . $leave->document_path) }}', 'Surat Izin - {{ addslashes($leave->student_name) }}')"
                                                     class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-950/60 border border-indigo-700/60 text-indigo-300 hover:bg-indigo-900/60 text-xs font-bold transition cursor-pointer">
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                                                 Lihat Berkas

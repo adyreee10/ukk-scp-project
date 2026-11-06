@@ -147,6 +147,47 @@ Route::middleware('auth')->group(function () {
 
 });
 
+// Route untuk menyajikan berkas dokumen dan foto secara andal (Bypass 403 Forbidden di cPanel)
+Route::get('/media/{path}', function (string $path) {
+    $cleanPath = str_replace(['../', '..\\'], '', $path);
+    $fullPath = storage_path('app/public/' . $cleanPath);
+
+    if (!file_exists($fullPath)) {
+        $altPath = storage_path('app/' . $cleanPath);
+        if (file_exists($altPath)) {
+            $fullPath = $altPath;
+        } else {
+            abort(404, 'Berkas tidak ditemukan.');
+        }
+    }
+
+    $mime = mime_content_type($fullPath) ?: 'application/octet-stream';
+    return response()->file($fullPath, [
+        'Content-Type' => $mime,
+        'Cache-Control' => 'public, max-age=86400',
+    ]);
+})->where('path', '.*')->name('media.serve');
+
+Route::get('/storage/{path}', function (string $path) {
+    $cleanPath = str_replace(['../', '..\\'], '', $path);
+    $fullPath = storage_path('app/public/' . $cleanPath);
+
+    if (!file_exists($fullPath)) {
+        $altPath = storage_path('app/' . $cleanPath);
+        if (file_exists($altPath)) {
+            $fullPath = $altPath;
+        } else {
+            abort(404, 'Berkas tidak ditemukan.');
+        }
+    }
+
+    $mime = mime_content_type($fullPath) ?: 'application/octet-stream';
+    return response()->file($fullPath, [
+        'Content-Type' => $mime,
+        'Cache-Control' => 'public, max-age=86400',
+    ]);
+})->where('path', '.*');
+
 
 // Rute Waka Kurikulum
 Route::middleware(['auth', 'role:Waka Kurikulum'])->group(function () {
@@ -378,6 +419,9 @@ Route::middleware(['auth', 'role:Wali Kelas,Guru BK,Waka Kurikulum'])->group(fun
         $selectedGrade  = $request->query('grade');
         $selectedMajor  = $request->query('major');
         $selectedRombel = $request->query('rombel');
+
+        $activeClass = null;
+        $majors = \App\Models\Major::orderBy('name')->get();
         $selectedClassId = $request->query('class_id');
 
         $processedQuery = LeaveRequest::with(['student.schoolClass', 'applicant', 'verifier'])
@@ -424,8 +468,6 @@ Route::middleware(['auth', 'role:Wali Kelas,Guru BK,Waka Kurikulum'])->group(fun
             }
         }
 
-        $majors = \App\Models\Major::orderBy('name')->get();
-
         $processedLeaves = $processedQuery->take(100)->get()->map(function ($leave) {
             return (object)[
                 'id'            => $leave->id,
@@ -456,6 +498,9 @@ Route::middleware(['auth', 'role:Wali Kelas,Guru BK,Waka Kurikulum'])->group(fun
         $selectedGrade  = $request->query('grade');
         $selectedMajor  = $request->query('major');
         $selectedRombel = $request->query('rombel');
+
+        $activeClass = null;
+        $majors = \App\Models\Major::orderBy('name')->get();
 
         if (!$isWaka) {
             // Wali Kelas & Guru BK dibatasi HANYA ke kelas perwaliannya
