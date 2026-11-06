@@ -12,8 +12,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Gunakan raw statement untuk Postgres agar aman tanpa dependensi doctrine/dbal
-        DB::statement('ALTER TABLE users ALTER COLUMN phone TYPE VARCHAR(50);');
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE users ALTER COLUMN phone TYPE VARCHAR(50);');
+        } else {
+            Schema::table('users', function (Blueprint $table) {
+                $table->string('phone', 50)->nullable()->change();
+            });
+        }
     }
 
     /**
@@ -21,6 +26,12 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::statement('ALTER TABLE users ALTER COLUMN phone TYPE VARCHAR(20);');
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE users ALTER COLUMN phone TYPE VARCHAR(20);');
+        } else {
+            Schema::table('users', function (Blueprint $table) {
+                $table->string('phone', 20)->nullable()->change();
+            });
+        }
     }
 };

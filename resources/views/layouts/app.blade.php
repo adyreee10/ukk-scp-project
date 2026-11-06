@@ -2,7 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>{{ config('app.name', 'SCP - School Class Progress') }}</title>
@@ -149,17 +149,19 @@
                 border-color: #e2e8f0 !important;
             }
 
-            /* Header Topbar Light Mode */
+            /* Header Topbar & Aside Input Light Mode */
             html.theme-light header {
                 background-color: #ffffff !important;
                 border-color: #e2e8f0 !important;
             }
-            html.theme-light header input {
+            html.theme-light header input,
+            html.theme-light aside input {
                 background-color: #f8fafc !important;
                 border-color: #cbd5e1 !important;
                 color: #0f172a !important;
             }
-            html.theme-light header input::placeholder {
+            html.theme-light header input::placeholder,
+            html.theme-light aside input::placeholder {
                 color: #94a3b8 !important;
             }
             html.theme-light .theme-toggle-btn {
@@ -706,13 +708,23 @@
             }
 
             /* Tombol Aksi Hapus di Tabel */
-            html.theme-light button.text-red-400 {
+            html.theme-light table button.text-red-400 {
                 color: #dc2626 !important;
                 border-color: #fca5a5 !important;
             }
-            html.theme-light button.text-red-400:hover {
+            html.theme-light table button.text-red-400:hover {
                 background-color: #dc2626 !important;
                 color: #ffffff !important;
+            }
+
+            /* Tombol Logout di Aside Light Mode */
+            html.theme-light aside button.text-red-400 {
+                color: #dc2626 !important;
+                border-color: transparent !important;
+            }
+            html.theme-light aside button.text-red-400:hover {
+                background-color: #fee2e2 !important;
+                color: #b91c1c !important;
             }
 
             /* Tabel Light Mode */
@@ -918,24 +930,32 @@
                      }
                  }
              }" 
+             x-init="$watch('sidebarOpen', val => { 
+                 if (val) {
+                     document.body.style.overflow = 'hidden';
+                 } else {
+                     document.body.style.overflow = '';
+                 }
+             })"
              class="flex min-h-screen w-full relative">
             
             <!-- BACKDROP GELAP DI LAYAR MOBILE -->
             <div x-show="sidebarOpen" 
                  @click="sidebarOpen = false" 
+                 @touchmove.prevent
                  x-cloak 
-                 class="fixed inset-0 bg-black/75 backdrop-blur-sm z-40 lg:hidden transition-opacity">
+                 class="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 lg:hidden transition-opacity">
             </div>
 
-                        <!-- SIDEBAR RESPONSIVE (Dinamis Sesuai Role Pengguna) -->
+            <!-- SIDEBAR RESPONSIVE (Dinamis Sesuai Role Pengguna) -->
             <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
-                   class="fixed lg:sticky top-0 left-0 h-screen w-64 min-w-[16rem] bg-[#0c1322] border-r border-slate-800 flex flex-col justify-between z-50 transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none">
+                   class="fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] h-full h-[100dvh] lg:sticky lg:top-0 lg:h-screen lg:w-64 lg:max-w-none bg-[#0c1322] border-r border-slate-800 flex flex-col justify-between transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none overscroll-contain">
                 
-                <div class="p-5 flex flex-col h-full overflow-y-auto no-scrollbar">
+                <div class="p-5 flex flex-col h-full overflow-y-auto overscroll-contain no-scrollbar">
                     <!-- Brand / Logo & Subtitle Role -->
-                    <div class="flex items-center justify-between mb-8">
+                    <div class="flex items-center justify-between mb-6">
                         <div class="flex items-center gap-3">
-                            <div class="h-10 w-10 scp-badge-gradient flex items-center justify-center font-black text-lg text-white shadow-lg" style="border-radius: 12px;">
+                            <div class="h-10 w-10 scp-badge-gradient flex items-center justify-center font-black text-lg text-white shadow-lg shrink-0" style="border-radius: 12px;">
                                 S
                             </div>
                             <div>
@@ -949,10 +969,24 @@
                         <!-- Tombol Silang [X] hanya di Mobile -->
                         <button @click="sidebarOpen = false" 
                                 type="button" 
-                                class="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
+                                class="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer shrink-0"
                                 title="Tutup Menu">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                         </button>
+                    </div>
+
+                    <!-- Search Input khusus Mobile Drawer -->
+                    <div class="lg:hidden mb-5">
+                        <form action="{{ route('search') }}" method="GET" class="relative w-full">
+                            <input type="text" 
+                                   name="q"
+                                   value="{{ request('q') }}"
+                                   placeholder="Cari guru, siswa, mapel..." 
+                                   class="w-full pl-9 pr-3.5 py-2 text-xs bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition" />
+                            <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </form>
                     </div>
 
                                         <!-- Navigation Links Berdasarkan Role -->
@@ -1204,19 +1238,20 @@
             <div class="flex-1 flex flex-col min-h-screen min-w-0">
                 
                 <!-- TOPBAR -->
-                <header class="h-16 bg-[#0c1322] border-b border-slate-800 px-4 sm:px-8 flex items-center justify-between sticky top-0 z-30 transition-colors duration-200">
-                    <div class="flex items-center gap-3">
+                <header class="h-16 bg-[#0c1322] border-b border-slate-800 px-3 sm:px-6 md:px-8 flex items-center justify-between sticky top-0 z-30 transition-colors duration-200">
+                    <div class="flex items-center gap-2 sm:gap-3 shrink-0">
                         <!-- Tombol Garis 3 (Mobile) -->
                         <button @click="sidebarOpen = true" 
                                 type="button" 
-                                class="lg:hidden p-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 focus:outline-none transition cursor-pointer" 
+                                class="lg:hidden p-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 focus:outline-none transition cursor-pointer shrink-0" 
                                 aria-label="Buka Menu Sidebar">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                             </svg>
                         </button>
 
-                        <form action="{{ route('search') }}" method="GET" class="w-40 sm:w-72 relative">
+                        <!-- Search bar di Header: Hanya tampil di layar desktop / tablet (sm ke atas) -->
+                        <form action="{{ route('search') }}" method="GET" class="hidden sm:block w-44 md:w-64 lg:w-72 relative">
                             <input type="text" 
                                    name="q"
                                    value="{{ request('q') }}"
@@ -1228,19 +1263,19 @@
                         </form>
                     </div>
 
-                    <div class="flex items-center gap-2.5 sm:gap-3">
-                        <!-- INDIKATOR PERIODE REALTIME GLOBAL UNTUK SEMUA USER -->
-                        <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700/80 text-xs font-bold shadow-sm">
-                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                        <!-- INDIKATOR PERIODE REALTIME GLOBAL UNTUK SEMUA USER (Kompak di Mobile) -->
+                        <div class="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700/80 text-[11px] sm:text-xs font-bold shadow-sm shrink-0">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
                             <span class="text-amber-400 font-extrabold">{{ \App\Models\SystemConfiguration::current()->academic_year }}</span>
-                            <span class="text-slate-500">•</span>
-                            <span class="text-indigo-300 font-bold">{{ \App\Models\SystemConfiguration::current()->semester }}</span>
+                            <span class="hidden sm:inline text-slate-500">•</span>
+                            <span class="hidden sm:inline text-indigo-300 font-bold">{{ \App\Models\SystemConfiguration::current()->semester }}</span>
                         </div>
 
                         <!-- TOMBOL GANTI TEMA (DARK / LIGHT MODE TOGGLE) -->
                         <button @click="toggleTheme()" 
                                 type="button" 
-                                class="theme-toggle-btn p-2 rounded-xl border border-slate-700 bg-slate-800/80 text-slate-300 hover:text-white hover:bg-slate-800 transition cursor-pointer flex items-center justify-center shadow-sm"
+                                class="theme-toggle-btn p-2 rounded-xl border border-slate-700 bg-slate-800/80 text-slate-300 hover:text-white hover:bg-slate-800 transition cursor-pointer flex items-center justify-center shadow-sm shrink-0"
                                 :title="theme === 'dark' ? 'Ganti ke Mode Terang' : 'Ganti ke Mode Gelap'">
                             <!-- Ikon Matahari: Muncul saat Mode Gelap aktif -->
                             <svg x-show="theme === 'dark'" class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1252,8 +1287,8 @@
                             </svg>
                         </button>
 
-                        <span class="user-name-label text-xs font-bold text-white hidden sm:inline">{{ auth()->user()->name }}</span>
-                        <div class="h-8 w-8 rounded-full bg-indigo-600 text-white font-bold text-xs flex items-center justify-center shadow-md">
+                        <span class="user-name-label text-xs font-bold text-white hidden md:inline truncate max-w-[120px]">{{ auth()->user()->name }}</span>
+                        <div class="h-8 w-8 rounded-full bg-indigo-600 text-white font-bold text-xs flex items-center justify-center shadow-md shrink-0">
                             {{ substr(auth()->user()->name, 0, 1) }}
                         </div>
                     </div>

@@ -2,7 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>{{ config('app.name', 'SCP - School Class Progress') }}</title>
@@ -15,9 +15,13 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
         <style>
+            html, body {
+                background-color: #090d16 !important;
+                min-height: 100% !important;
+                min-height: 100dvh !important;
+            }
             .scp-bg-gradient {
                 background: linear-gradient(135deg, #090d16 0%, #0f172a 50%, #1e293b 100%) !important;
-                min-height: 100vh;
             }
             .scp-btn-gradient {
                 background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%) !important;
@@ -67,13 +71,15 @@
             }
         </style>
     </head>
-    <body class="font-sans antialiased scp-bg-gradient min-h-screen flex items-center justify-center p-4 sm:p-6 py-8 sm:py-12 relative overflow-x-hidden overflow-y-auto">
-        <!-- Ambient Glowing Orbs -->
-        <div class="absolute -top-32 -right-32 h-96 w-96 rounded-full scp-glow-1 pointer-events-none"></div>
-        <div class="absolute -bottom-32 -left-32 h-96 w-96 rounded-full scp-glow-2 pointer-events-none"></div>
+    <body class="font-sans antialiased text-slate-100 min-h-screen min-h-[100dvh] flex flex-col items-center justify-center p-4 sm:p-6 py-8 sm:py-12 relative overflow-x-hidden">
+        <!-- Fixed Background Canvas: Never cuts off or shows black on mobile scroll -->
+        <div class="fixed inset-0 pointer-events-none -z-10 scp-bg-gradient overflow-hidden">
+            <div class="absolute -top-32 -right-32 h-96 w-96 rounded-full scp-glow-1"></div>
+            <div class="absolute -bottom-32 -left-32 h-96 w-96 rounded-full scp-glow-2"></div>
+        </div>
 
         <!-- Login Card with 15px Corner Radius -->
-        <div class="relative w-full sm:max-w-md bg-white p-8 sm:p-10 shadow-2xl border border-slate-200 my-auto" style="border-radius: 15px;">
+        <div class="relative w-full sm:max-w-md bg-white p-8 sm:p-10 shadow-2xl border border-slate-200 my-auto z-10" style="border-radius: 15px;">
             {{ $slot }}
         </div>
     </body>
