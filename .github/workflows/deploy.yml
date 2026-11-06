@@ -41,10 +41,15 @@ jobs:
             **/.git*
             **/.git*/**
             **/node_modules/**
+            mobile/**
+            PANDUAN_PENGEMBANGAN/**
+            scratch/**
+            scripts/**
+            *.md
             .env
             .env.*
             database/*.sqlite*
             storage/**
             public/storage
+            public/%SystemDrive%/**
             tests/**
-            README.md
