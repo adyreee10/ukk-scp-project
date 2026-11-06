@@ -16,6 +16,7 @@ if ($key !== $secretKey && $action !== 'setup') {
 require __DIR__ . '/../vendor/autoload.php';
 $app = require_once __DIR__ . '/../bootstrap/app.php';
 $kernel = $app->make(\Illuminate\Contracts\Console\Kernel::class);
+$kernel->bootstrap();
 
 echo "<pre style='background:#0f172a;color:#38bdf8;padding:20px;border-radius:10px;font-family:monospace;font-size:14px;'>";
 echo "=== UKK LARAVEL HOSTING HELPER ===\n\n";

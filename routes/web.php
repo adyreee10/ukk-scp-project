@@ -18,6 +18,21 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+// Helper One-Click Reset Password Siswa Rezky di Hosting jika diperlukan
+Route::get('/dev-reset-rezky', function (Request $request) {
+    if ($request->query('key') !== 'ukk2026') {
+        abort(403, 'Unauthorized');
+    }
+    $user = \App\Models\User::where('nis', '17821')->orWhere('id', 16)->first();
+    if (!$user) {
+        return response('❌ User NIS 17821 tidak ditemukan di database.', 404);
+    }
+    $user->update([
+        'password' => \Illuminate\Support\Facades\Hash::make('password123')
+    ]);
+    return response("<h2 style='font-family:sans-serif;color:#10b981;'>✔ Berhasil! Password Rezky Aditya (NIS: 17821) sudah direset menjadi 'password123'.</h2><p><a href='/login'>Klik di sini untuk ke halaman Login</a></p>");
+});
+
 
 
 Route::get('/dashboard', DashboardController::class)

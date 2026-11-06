@@ -19,7 +19,7 @@
                 min-height: 100% !important;
                 min-height: 100dvh !important;
                 background-color: #0f172a !important;
-                background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #0f172a 50%, #030712 100%) !important;
+                background: linear-gradient(135deg, #090d16 0%, #0f172a 30%, #1e1b4b 65%, #1e293b 100%) !important;
                 background-attachment: fixed !important;
                 background-size: cover !important;
             }
@@ -40,10 +40,10 @@
                 box-shadow: 0 8px 16px -4px rgba(79, 70, 229, 0.35) !important;
             }
             .scp-glow-1 {
-                background: radial-gradient(circle, rgba(99, 102, 241, 0.32) 0%, rgba(99, 102, 241, 0) 70%);
+                background: radial-gradient(circle, rgba(99, 102, 241, 0.35) 0%, rgba(99, 102, 241, 0) 70%);
             }
             .scp-glow-2 {
-                background: radial-gradient(circle, rgba(56, 189, 248, 0.22) 0%, rgba(56, 189, 248, 0) 70%);
+                background: radial-gradient(circle, rgba(56, 189, 248, 0.25) 0%, rgba(56, 189, 248, 0) 70%);
             }
             .scp-password-wrapper {
                 position: relative !important;
@@ -71,7 +71,7 @@
             }
         </style>
     </head>
-    <body class="font-sans antialiased text-slate-100 min-h-screen min-h-[100dvh] flex flex-col items-center justify-center p-4 sm:p-6 py-8 sm:py-12 relative overflow-x-hidden overflow-y-auto" style="background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #0f172a 50%, #030712 100%);">
+    <body class="font-sans antialiased text-slate-100 min-h-screen min-h-[100dvh] flex flex-col items-center justify-center p-4 sm:p-6 py-8 sm:py-12 relative overflow-x-hidden overflow-y-auto" style="background: linear-gradient(135deg, #090d16 0%, #0f172a 30%, #1e1b4b 65%, #1e293b 100%);">
         <!-- Ambient Glowing Orbs (Pinned to Viewport so they never scroll away) -->
         <div class="fixed -top-24 -right-24 h-[450px] w-[450px] rounded-full scp-glow-1 pointer-events-none z-0"></div>
         <div class="fixed -bottom-24 -left-24 h-[450px] w-[450px] rounded-full scp-glow-2 pointer-events-none z-0"></div>
