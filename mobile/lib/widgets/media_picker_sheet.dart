@@ -55,6 +55,7 @@ class MediaPickerSheet {
                   onTap: () async {
                     final XFile? photo = await picker.pickImage(
                       source: ImageSource.camera,
+                      preferredCameraDevice: CameraDevice.rear,
                       imageQuality: 80,
                       maxWidth: 1920,
                       maxHeight: 1080,

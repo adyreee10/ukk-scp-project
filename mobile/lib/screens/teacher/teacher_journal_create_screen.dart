@@ -54,6 +54,7 @@ class _TeacherJournalCreateScreenState extends State<TeacherJournalCreateScreen>
     try {
       final XFile? photo = await _picker.pickImage(
         source: ImageSource.camera,
+        preferredCameraDevice: CameraDevice.rear,
         imageQuality: 80,
         maxWidth: 1920,
         maxHeight: 1080,

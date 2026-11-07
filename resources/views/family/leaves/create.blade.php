@@ -257,12 +257,13 @@
                                 <!-- 2. Kondisi Kamera Aktif (Live Streaming Viewfinder) -->
                                 <div x-show="cameraActive && !docPreview" style="display: none;" class="relative">
                                     <div class="relative bg-black">
-                                        <video x-ref="docVideoPlayer" autoplay playsinline muted class="w-full h-64 sm:h-72 object-cover bg-black block"></video>
+                                        <video x-ref="docVideoPlayer" autoplay playsinline muted :style="isMirrored ? 'transform: scaleX(-1);' : 'transform: none;'" class="w-full h-64 sm:h-72 object-cover bg-black block"></video>
                                         
                                         <!-- Overlay Status Live -->
                                         <div class="absolute top-3 left-3 bg-slate-950/85 backdrop-blur-sm border border-slate-700 text-rose-400 px-3 py-1 rounded-full text-[10px] font-black tracking-wider uppercase flex items-center gap-1.5 shadow-md" style="z-index: 20;">
                                             <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
-                                            LIVE KAMERA SURAT IZIN
+                                            <span>LIVE KAMERA SURAT IZIN</span>
+                                            <span class="text-[9px] font-bold text-slate-300 ml-1.5 px-1.5 py-0.5 rounded bg-slate-800" x-text="isMirrored ? 'Mirror' : 'Tidak Mirror (Normal)'"></span>
                                         </div>
 
                                         <!-- Tombol Putar Kamera Depan/Belakang -->
@@ -280,6 +281,10 @@
                                         <button type="button" @click="switchCamera()" class="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 flex items-center gap-1.5 transition cursor-pointer" title="Putar Kamera Depan/Belakang">
                                             <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                                             <span>Putar Kamera</span>
+                                        </button>
+                                        <button type="button" @click="toggleMirror()" class="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 flex items-center gap-1.5 transition cursor-pointer" :title="isMirrored ? 'Kembalikan ke Mode Normal (Tidak Mirror)' : 'Balik Mode Cermin'">
+                                            <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                                            <span x-text="isMirrored ? 'Mode: Cermin' : 'Tidak Mirror (Normal)'"></span>
                                         </button>
                                         <button type="button" @click="stopCamera()" class="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white text-xs font-semibold border border-slate-700 flex items-center gap-1.5 transition cursor-pointer">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -299,15 +304,21 @@
                                         FOTO SURAT REAL-TIME TERCATAT
                                     </div>
 
-                                    <div class="p-3 bg-slate-900 border-t border-slate-800 flex items-center justify-between">
+                                    <div class="p-3 bg-slate-900 border-t border-slate-800 flex flex-wrap items-center justify-between gap-2">
                                         <span class="text-[11px] text-emerald-400 font-semibold flex items-center gap-1">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                                             Foto surat izin berhasil diambil & ter-watermark
                                         </span>
-                                        <button type="button" @click="retake()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white text-xs font-bold shadow-md transition flex items-center gap-1.5 cursor-pointer">
-                                            <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                                            <span>Foto Ulang Surat</span>
-                                        </button>
+                                        <div class="flex items-center gap-2">
+                                            <button type="button" @click="flipPreview()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-bold shadow-md transition flex items-center gap-1.5 cursor-pointer" title="Balik foto jika terbalik">
+                                                <svg class="w-3.5 h-3.5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                                                <span>Balik Kiri/Kanan</span>
+                                            </button>
+                                            <button type="button" @click="retake()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white text-xs font-bold shadow-md transition flex items-center gap-1.5 cursor-pointer">
+                                                <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                                <span>Foto Ulang Surat</span>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -408,6 +419,11 @@
             cameraActive: false,
             cameraError: null,
             facingMode: 'environment',
+            isMirrored: false,
+
+            toggleMirror() {
+                this.isMirrored = !this.isMirrored;
+            },
 
             async startCamera() {
                 this.cameraError = null;
@@ -447,6 +463,8 @@
 
             switchCamera() {
                 this.facingMode = this.facingMode === 'environment' ? 'user' : 'environment';
+                // Standar kamera depan & belakang: TIDAK MIRROR agar tulisan di surat tidak terbalik
+                this.isMirrored = false;
                 this.startCamera();
             },
 
@@ -458,7 +476,18 @@
                 canvas.width = video.videoWidth || 1280;
                 canvas.height = video.videoHeight || 720;
                 const ctx = canvas.getContext('2d');
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                // Jika mode cermin aktif, balik horizontal saat draw
+                if (this.isMirrored) {
+                    ctx.save();
+                    ctx.translate(canvas.width, 0);
+                    ctx.scale(-1, 1);
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    ctx.restore();
+                } else {
+                    // Default TIDAK MIRROR: Gambar normal/asli sehingga teks surat izin terbaca benar
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                }
 
                 // Watermark waktu real-time proporsional & terbaca jelas di HP/Laptop
                 const now = new Date();
@@ -510,6 +539,33 @@
                 } catch(e) {}
 
                 this.stopCamera();
+            },
+
+            flipPreview() {
+                if (!this.docPreview) return;
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.translate(canvas.width, 0);
+                    ctx.scale(-1, 1);
+                    ctx.drawImage(img, 0, 0);
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.90);
+                    this.docPreview = dataUrl;
+                    this.docBase64 = dataUrl;
+
+                    canvas.toBlob((blob) => {
+                        if (blob && this.$refs.docRealFileInput) {
+                            const file = new File([blob], 'Surat_Izin_Realtime_' + Date.now() + '.jpg', { type: 'image/jpeg' });
+                            const dt = new DataTransfer();
+                            dt.items.add(file);
+                            this.$refs.docRealFileInput.files = dt.files;
+                        }
+                    }, 'image/jpeg', 0.90);
+                };
+                img.src = this.docPreview;
             },
 
             retake() {
