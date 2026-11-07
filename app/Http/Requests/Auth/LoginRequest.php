@@ -79,12 +79,21 @@ class LoginRequest extends FormRequest
 
         // Cek apakah user ditemukan dan password cocok
         if (! $user || ! Hash::check($this->input('password'), $user->password)) {
-            RateLimiter::hit($this->throttleKey(), 60);
+            RateLimiter::hit($this->attemptsKey(), 600);
 
-            $attempts = RateLimiter::attempts($this->throttleKey());
+            $attempts = RateLimiter::attempts($this->attemptsKey());
             if ($attempts >= 5) {
+                // Tepat pada kegagalan ke-5: MULAI PENANGGUHAN 60 DETIK PENUH DARI DETIK INI
+                RateLimiter::clear($this->attemptsKey());
+                RateLimiter::clear($this->lockoutKey());
+                RateLimiter::hit($this->lockoutKey(), 60);
+
                 event(new Lockout($this));
-                $seconds = RateLimiter::availableIn($this->throttleKey());
+                $seconds = RateLimiter::availableIn($this->lockoutKey());
+                if ($seconds <= 0) $seconds = 60;
+
+                session()->flash('lockout_seconds', $seconds);
+
                 throw ValidationException::withMessages([
                     'login' => "Anda telah gagal login sebanyak 5 kali. Akun Anda ditangguhkan sementara selama {$seconds} detik demi keamanan server. Silakan coba lagi setelah 1 menit.",
                 ]);
@@ -96,10 +105,12 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        // Login berhasil: bersihkan counter percobaan dan status penangguhan
+        RateLimiter::clear($this->attemptsKey());
+        RateLimiter::clear($this->lockoutKey());
+
         // Login ke sesi web Laravel
         Auth::login($user, $this->boolean('remember'));
-
-        RateLimiter::clear($this->throttleKey());
     }
 
     /**
@@ -109,13 +120,16 @@ class LoginRequest extends FormRequest
      */
     public function ensureIsNotRateLimited(): void
     {
-        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
+        if (! RateLimiter::tooManyAttempts($this->lockoutKey(), 1)) {
             return;
         }
 
         event(new Lockout($this));
 
-        $seconds = RateLimiter::availableIn($this->throttleKey());
+        $seconds = RateLimiter::availableIn($this->lockoutKey());
+        if ($seconds <= 0) $seconds = 1;
+
+        session()->flash('lockout_seconds', $seconds);
 
         throw ValidationException::withMessages([
             'login' => "Akun Anda sedang ditangguhkan sementara karena 5 kali gagal login. Silakan tunggu {$seconds} detik lagi sebelum mencoba masuk kembali.",
@@ -128,5 +142,15 @@ class LoginRequest extends FormRequest
     public function throttleKey(): string
     {
         return Str::transliterate(Str::lower($this->string('login')).'|'.$this->ip());
+    }
+
+    public function attemptsKey(): string
+    {
+        return 'login_attempts:' . $this->throttleKey();
+    }
+
+    public function lockoutKey(): string
+    {
+        return 'login_lockout:' . $this->throttleKey();
     }
 }

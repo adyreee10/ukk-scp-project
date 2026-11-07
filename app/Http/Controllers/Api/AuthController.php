@@ -21,10 +21,13 @@ class AuthController extends Controller
         ]);
 
         $throttleKey = Str::transliterate(Str::lower($validated['username']) . '|' . $request->ip());
+        $attemptsKey = 'login_attempts:' . $throttleKey;
+        $lockoutKey  = 'login_lockout:' . $throttleKey;
 
         // Cek apakah akun sedang ditangguhkan
-        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
-            $seconds = RateLimiter::availableIn($throttleKey);
+        if (RateLimiter::tooManyAttempts($lockoutKey, 1)) {
+            $seconds = RateLimiter::availableIn($lockoutKey);
+            if ($seconds <= 0) $seconds = 1;
             return response()->json([
                 'message' => "Akun Anda sedang ditangguhkan sementara karena 5 kali gagal login. Silakan tunggu {$seconds} detik lagi.",
                 'retry_after' => $seconds,
@@ -41,11 +44,18 @@ class AuthController extends Controller
             ->first();
 
         if (!$user || !Hash::check($validated['password'], $user->password)) {
-            RateLimiter::hit($throttleKey, 60);
+            RateLimiter::hit($attemptsKey, 600);
 
-            $attempts = RateLimiter::attempts($throttleKey);
+            $attempts = RateLimiter::attempts($attemptsKey);
             if ($attempts >= 5) {
-                $seconds = RateLimiter::availableIn($throttleKey);
+                // Tepat pada kegagalan ke-5: MULAI PENANGGUHAN 60 DETIK PENUH DARI DETIK INI
+                RateLimiter::clear($attemptsKey);
+                RateLimiter::clear($lockoutKey);
+                RateLimiter::hit($lockoutKey, 60);
+
+                $seconds = RateLimiter::availableIn($lockoutKey);
+                if ($seconds <= 0) $seconds = 60;
+
                 return response()->json([
                     'message' => "Anda telah gagal login sebanyak 5 kali. Akun Anda ditangguhkan sementara selama {$seconds} detik demi keamanan server. Silakan coba lagi setelah 1 menit.",
                     'retry_after' => $seconds,
@@ -58,7 +68,8 @@ class AuthController extends Controller
             ], 401);
         }
 
-        RateLimiter::clear($throttleKey);
+        RateLimiter::clear($attemptsKey);
+        RateLimiter::clear($lockoutKey);
 
             $token = $user
                 ->createToken($validated['device_name'] ?? 'api-client'

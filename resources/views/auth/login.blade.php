@@ -81,11 +81,26 @@
         </div>
 
         <!-- Tombol Masuk Lebih Besar & Corner Radius 15px -->
-        <div class="pt-3">
+        <div class="pt-3" x-data="{
+            lockout: {{ (int) session('lockout_seconds', 0) }},
+            init() {
+                if (this.lockout > 0) {
+                    const timer = setInterval(() => {
+                        this.lockout--;
+                        if (this.lockout <= 0) {
+                            clearInterval(timer);
+                        }
+                    }, 1000);
+                }
+            }
+        }">
             <button type="submit" 
+                    :disabled="lockout > 0"
                     style="border-radius: 15px;"
-                    class="w-full inline-flex items-center justify-center py-4 px-6 font-black text-base scp-btn-gradient cursor-pointer tracking-wider uppercase shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all duration-200">
-                MASUK KE SISTEM
+                    :class="lockout > 0 ? 'opacity-60 cursor-not-allowed bg-slate-700 text-slate-300 shadow-none' : 'scp-btn-gradient cursor-pointer hover:shadow-indigo-500/40 shadow-lg shadow-indigo-500/25'"
+                    class="w-full inline-flex items-center justify-center py-4 px-6 font-black text-base tracking-wider uppercase transition-all duration-200">
+                <span x-show="lockout <= 0">MASUK KE SISTEM</span>
+                <span x-show="lockout > 0" x-cloak>AKUN DITANGGUHKAN (<span x-text="lockout"></span>s)</span>
             </button>
         </div>
     </form>
