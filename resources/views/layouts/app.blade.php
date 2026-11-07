@@ -8,9 +8,9 @@
         <title>{{ config('app.name', 'SCP - School Class Progress') }}</title>
 
         <!-- Favicon / Logo Aplikasi SCP -->
-        <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}">
-        <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
-        <link rel="apple-touch-icon" href="{{ asset('images/logo-sm.png') }}">
+        <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}?v=20261107">
+        <link rel="shortcut icon" href="{{ asset('favicon.ico') }}?v=20261107">
+        <link rel="apple-touch-icon" href="{{ asset('images/logo-sm.png') }}?v=20261107">
 
         <!-- Script Deteksi Tema Cepat (Mencegah Layar Berkedip saat Refresh) -->
         <script>
@@ -960,7 +960,7 @@
                     <!-- Brand / Logo & Subtitle Role -->
                     <div class="flex items-center justify-between mb-6">
                         <div class="flex items-center gap-3">
-                            <img src="{{ asset('images/logo-sm.png') }}" alt="Logo SCP" class="h-10 w-10 object-contain shrink-0 drop-shadow-md" />
+                            <img src="{{ asset('images/logo-sm.png') }}?v=20261107" alt="Logo SCP" class="h-10 w-10 object-contain shrink-0 drop-shadow-md" />
                             <div>
                                 <h2 class="text-base font-extrabold text-white leading-tight">SCP Sekolah</h2>
                                 <p class="text-[11px] font-bold text-indigo-400 tracking-wider uppercase">

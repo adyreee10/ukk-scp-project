@@ -2,7 +2,7 @@
     <!-- Header SCP -->
     <div class="text-center mb-6">
         <div class="inline-flex items-center justify-center mb-3">
-            <img src="{{ asset('images/logo.png') }}" alt="Logo SCP" class="h-20 w-20 object-contain drop-shadow-lg" />
+            <img src="{{ asset('images/logo.png') }}?v=20261107" alt="Logo SCP" class="h-20 w-20 object-contain drop-shadow-lg" />
         </div>
         <h2 class="text-2xl font-black text-slate-800 tracking-tight">Lupa Kata Sandi?</h2>
         <p class="text-xs font-semibold text-slate-500 mt-1.5 leading-relaxed">

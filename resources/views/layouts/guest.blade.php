@@ -8,9 +8,9 @@
         <title>{{ config('app.name', 'SCP - School Class Progress') }}</title>
 
         <!-- Favicon / Logo Aplikasi SCP -->
-        <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}">
-        <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
-        <link rel="apple-touch-icon" href="{{ asset('images/logo-sm.png') }}">
+        <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}?v=20261107">
+        <link rel="shortcut icon" href="{{ asset('favicon.ico') }}?v=20261107">
+        <link rel="apple-touch-icon" href="{{ asset('images/logo-sm.png') }}?v=20261107">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
