@@ -948,8 +948,29 @@ class WakaController extends Controller
             DB::transaction(function () use ($chunk, $parentRole, &$existingUsernames, &$nisHashes, &$createdCount) {
                 $now = now();
                 foreach ($chunk as $student) {
-                    $nis = trim((string)($student->nis ?? ''));
-                    $baseParentUser = $nis ? "ortu_{$nis}" : "ortu_" . $student->username;
+                    $nis = preg_replace('/[^0-9A-Za-z]/', '', (string)($student->nis ?? ''));
+                    $baseParentUser = $nis ? "ortu_{$nis}" : "ortu_" . preg_replace('/[^0-9A-Za-z_]/', '', (string)$student->username);
+                    $parentPasswordPlain = $nis ? "p{$nis}" : "portu123";
+
+                    // 1. Cek jika akun orang tua dengan username ini sudah pernah dibuat sebelumnya (misal diinput manual)
+                    $existingParent = DB::table('users')->where('username', $baseParentUser)->first();
+                    if ($existingParent) {
+                        if (!isset($nisHashes[$parentPasswordPlain])) {
+                            $nisHashes[$parentPasswordPlain] = password_hash($parentPasswordPlain, PASSWORD_BCRYPT, ['cost' => 10]);
+                        }
+                        DB::table('users')->where('id', $existingParent->id)->update([
+                            'password'   => $nisHashes[$parentPasswordPlain],
+                            'role_id'    => $parentRole->id,
+                            'name'       => 'Orang tua ' . trim($student->name),
+                            'updated_at' => $now,
+                        ]);
+                        DB::table('users')->where('id', $student->id)->update(['parent_id' => $existingParent->id]);
+                        $existingUsernames[strtolower($baseParentUser)] = true;
+                        $createdCount++;
+                        continue;
+                    }
+
+                    // 2. Jika belum ada, pastikan username unik sebelum membuat akun baru
                     $uniqueParentUser = substr($baseParentUser, 0, 45);
                     $pCounter = 1;
                     while (isset($existingUsernames[strtolower($uniqueParentUser)])) {
@@ -958,23 +979,42 @@ class WakaController extends Controller
                     }
                     $existingUsernames[strtolower($uniqueParentUser)] = true;
 
-                    $parentPasswordPlain = $nis ? "p{$nis}" : "portu123";
                     if (!isset($nisHashes[$parentPasswordPlain])) {
                         $nisHashes[$parentPasswordPlain] = password_hash($parentPasswordPlain, PASSWORD_BCRYPT, ['cost' => 10]);
                     }
                     $hash = $nisHashes[$parentPasswordPlain];
 
-                    $parentId = DB::table('users')->insertGetId([
-                        'name'           => 'Orang tua ' . trim($student->name),
-                        'username'       => $uniqueParentUser,
-                        'password'       => $hash,
-                        'role_id'        => $parentRole->id,
-                        'phone'          => $student->phone,
-                        'address'        => $student->address,
-                        'student_status' => 'Aktif',
-                        'created_at'     => $now,
-                        'updated_at'     => $now,
-                    ]);
+                    try {
+                        $parentId = DB::table('users')->insertGetId([
+                            'name'           => 'Orang tua ' . trim($student->name),
+                            'username'       => $uniqueParentUser,
+                            'password'       => $hash,
+                            'role_id'        => $parentRole->id,
+                            'phone'          => $student->phone,
+                            'address'        => $student->address,
+                            'student_status' => 'Aktif',
+                            'created_at'     => $now,
+                            'updated_at'     => $now,
+                        ]);
+                    } catch (\Throwable $ex) {
+                        $fallback = DB::table('users')->where('username', $uniqueParentUser)->first();
+                        if ($fallback) {
+                            $parentId = $fallback->id;
+                        } else {
+                            $uniqueParentUser = substr($baseParentUser, 0, 35) . '_' . rand(1000, 9999);
+                            $parentId = DB::table('users')->insertGetId([
+                                'name'           => 'Orang tua ' . trim($student->name),
+                                'username'       => $uniqueParentUser,
+                                'password'       => $hash,
+                                'role_id'        => $parentRole->id,
+                                'phone'          => $student->phone,
+                                'address'        => $student->address,
+                                'student_status' => 'Aktif',
+                                'created_at'     => $now,
+                                'updated_at'     => $now,
+                            ]);
+                        }
+                    }
 
                     DB::table('users')->where('id', $student->id)->update(['parent_id' => $parentId]);
                     $createdCount++;
@@ -1015,8 +1055,29 @@ class WakaController extends Controller
             DB::transaction(function () use ($chunk, $parentRole, &$existingUsernames, &$nisHashes, &$createdCount) {
                 $now = now();
                 foreach ($chunk as $student) {
-                    $nis = trim((string)($student->nis ?? ''));
-                    $baseParentUser = $nis ? "ortu_{$nis}" : "ortu_" . $student->username;
+                    $nis = preg_replace('/[^0-9A-Za-z]/', '', (string)($student->nis ?? ''));
+                    $baseParentUser = $nis ? "ortu_{$nis}" : "ortu_" . preg_replace('/[^0-9A-Za-z_]/', '', (string)$student->username);
+                    $parentPasswordPlain = $nis ? "p{$nis}" : "portu123";
+
+                    // 1. Cek jika akun orang tua sudah ada
+                    $existingParent = DB::table('users')->where('username', $baseParentUser)->first();
+                    if ($existingParent) {
+                        if (!isset($nisHashes[$parentPasswordPlain])) {
+                            $nisHashes[$parentPasswordPlain] = password_hash($parentPasswordPlain, PASSWORD_BCRYPT, ['cost' => 10]);
+                        }
+                        DB::table('users')->where('id', $existingParent->id)->update([
+                            'password'   => $nisHashes[$parentPasswordPlain],
+                            'role_id'    => $parentRole->id,
+                            'name'       => 'Orang tua ' . trim($student->name),
+                            'updated_at' => $now,
+                        ]);
+                        DB::table('users')->where('id', $student->id)->update(['parent_id' => $existingParent->id]);
+                        $existingUsernames[strtolower($baseParentUser)] = true;
+                        $createdCount++;
+                        continue;
+                    }
+
+                    // 2. Jika belum ada, buat baru
                     $uniqueParentUser = substr($baseParentUser, 0, 45);
                     $pCounter = 1;
                     while (isset($existingUsernames[strtolower($uniqueParentUser)])) {
@@ -1025,23 +1086,42 @@ class WakaController extends Controller
                     }
                     $existingUsernames[strtolower($uniqueParentUser)] = true;
 
-                    $parentPasswordPlain = $nis ? "p{$nis}" : "portu123";
                     if (!isset($nisHashes[$parentPasswordPlain])) {
                         $nisHashes[$parentPasswordPlain] = password_hash($parentPasswordPlain, PASSWORD_BCRYPT, ['cost' => 10]);
                     }
                     $hash = $nisHashes[$parentPasswordPlain];
 
-                    $parentId = DB::table('users')->insertGetId([
-                        'name'           => 'Orang tua ' . trim($student->name),
-                        'username'       => $uniqueParentUser,
-                        'password'       => $hash,
-                        'role_id'        => $parentRole->id,
-                        'phone'          => $student->phone,
-                        'address'        => $student->address,
-                        'student_status' => 'Aktif',
-                        'created_at'     => $now,
-                        'updated_at'     => $now,
-                    ]);
+                    try {
+                        $parentId = DB::table('users')->insertGetId([
+                            'name'           => 'Orang tua ' . trim($student->name),
+                            'username'       => $uniqueParentUser,
+                            'password'       => $hash,
+                            'role_id'        => $parentRole->id,
+                            'phone'          => $student->phone,
+                            'address'        => $student->address,
+                            'student_status' => 'Aktif',
+                            'created_at'     => $now,
+                            'updated_at'     => $now,
+                        ]);
+                    } catch (\Throwable $ex) {
+                        $fallback = DB::table('users')->where('username', $uniqueParentUser)->first();
+                        if ($fallback) {
+                            $parentId = $fallback->id;
+                        } else {
+                            $uniqueParentUser = substr($baseParentUser, 0, 35) . '_' . rand(1000, 9999);
+                            $parentId = DB::table('users')->insertGetId([
+                                'name'           => 'Orang tua ' . trim($student->name),
+                                'username'       => $uniqueParentUser,
+                                'password'       => $hash,
+                                'role_id'        => $parentRole->id,
+                                'phone'          => $student->phone,
+                                'address'        => $student->address,
+                                'student_status' => 'Aktif',
+                                'created_at'     => $now,
+                                'updated_at'     => $now,
+                            ]);
+                        }
+                    }
 
                     DB::table('users')->where('id', $student->id)->update(['parent_id' => $parentId]);
                     $createdCount++;
