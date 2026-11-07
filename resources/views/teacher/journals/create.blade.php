@@ -88,20 +88,7 @@
             this.photoPreview = null;
             this.photoBase64 = '';
             if (this.$refs.realFileInput) this.$refs.realFileInput.value = '';
-            if (this.$refs.mobileInput) this.$refs.mobileInput.value = '';
             this.startCamera();
-        },
-        onMobileCapture(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (evt) => {
-                    this.photoPreview = evt.target.result;
-                    this.photoBase64 = evt.target.result;
-                };
-                reader.readAsDataURL(file);
-                this.stopCamera();
-            }
         },
         updateCounts() {
             let h = 0, s = 0, i = 0, a = 0;
@@ -344,16 +331,10 @@
                                             <p class="text-[11px] text-slate-400 mt-0.5">Wajib jepret langsung foto suasana KBM saat ini (galeri dinonaktifkan)</p>
                                         </div>
                                         
-                                        <div class="flex flex-col sm:flex-row items-center justify-center gap-2 pt-1">
-                                            <button type="button" @click="startCamera()" class="w-full sm:w-auto px-5 py-2.5 rounded-xl scp-btn-gradient text-xs font-bold text-white shadow-md flex items-center justify-center gap-2 cursor-pointer transition">
+                                        <div class="flex items-center justify-center pt-1">
+                                            <button type="button" @click="startCamera()" class="px-6 py-2.5 rounded-xl scp-btn-gradient text-xs font-bold text-white shadow-lg flex items-center justify-center gap-2 cursor-pointer transition">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                                                <span>Nyalakan Kamera Real-Time</span>
-                                            </button>
-
-                                            <!-- Tombol Kamera Cepat HP (Native Capture) -->
-                                            <button type="button" @click="$refs.mobileInput.click()" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 border border-slate-700 flex items-center justify-center gap-2 cursor-pointer transition">
-                                                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
-                                                <span>Buka Kamera HP</span>
+                                                <span>Buka & Nyalakan Kamera Real-Time</span>
                                             </button>
                                         </div>
 
@@ -364,27 +345,34 @@
 
                                     <!-- 2. Kondisi Kamera Aktif (Live Streaming Viewfinder) -->
                                     <div x-show="cameraActive && !photoPreview" style="display: none;" class="relative">
-                                        <video x-ref="videoPlayer" autoplay playsinline muted class="w-full h-64 sm:h-72 object-cover bg-black"></video>
-                                        
-                                        <!-- Overlay Status Live -->
-                                        <div class="absolute top-3 left-3 bg-slate-950/80 backdrop-blur-sm border border-slate-700 text-rose-400 px-3 py-1 rounded-full text-[10px] font-black tracking-wider uppercase flex items-center gap-1.5 shadow-md">
-                                            <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
-                                            LIVE KAMERA AKTIF
+                                        <div class="relative bg-black">
+                                            <video x-ref="videoPlayer" autoplay playsinline muted class="w-full h-64 sm:h-72 object-cover bg-black block"></video>
+                                            
+                                            <!-- Overlay Status Live -->
+                                            <div class="absolute top-3 left-3 bg-slate-950/85 backdrop-blur-sm border border-slate-700 text-rose-400 px-3 py-1 rounded-full text-[10px] font-black tracking-wider uppercase flex items-center gap-1.5 shadow-md" style="z-index: 20;">
+                                                <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+                                                LIVE KAMERA AKTIF
+                                            </div>
+
+                                            <!-- Tombol Putar Kamera Depan/Belakang -->
+                                            <button type="button" @click="switchCamera()" class="absolute top-3 right-3 bg-slate-900/85 hover:bg-slate-800 text-white p-2 rounded-full text-xs font-bold border border-slate-700 shadow-md transition" style="z-index: 20;" title="Putar Kamera Depan/Belakang">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                            </button>
                                         </div>
 
-                                        <!-- Tombol Putar Kamera Depan/Belakang -->
-                                        <button type="button" @click="switchCamera()" class="absolute top-3 right-3 bg-slate-900/80 hover:bg-slate-800 text-white p-2 rounded-full text-xs font-bold border border-slate-700 shadow-md transition" title="Putar Kamera Depan/Belakang">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                                        </button>
-
-                                        <!-- Tombol Jepret Foto -->
-                                        <div class="absolute bottom-3 inset-x-0 flex items-center justify-center gap-3 px-4">
-                                            <button type="button" @click="snapPhoto()" class="px-6 py-2.5 rounded-full bg-rose-600 hover:bg-rose-500 text-white font-extrabold text-xs shadow-xl shadow-rose-950/60 flex items-center gap-2 transition transform active:scale-95 cursor-pointer">
+                                        <!-- Panel Tombol Kontrol Kamera (Tepat di Bawah Video, Selalu Terlihat & Mudah Ditekan) -->
+                                        <div class="p-3 bg-slate-900 border-t border-slate-800 flex flex-wrap items-center justify-center gap-2.5">
+                                            <button type="button" @click="snapPhoto()" class="px-6 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-extrabold text-xs shadow-lg shadow-rose-950/60 flex items-center gap-2 transition transform active:scale-95 cursor-pointer">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                                <span>Jepret Foto KBM Sekarang</span>
+                                                <span>Ambil Foto KBM Sekarang</span>
                                             </button>
-                                            <button type="button" @click="stopCamera()" class="p-2.5 rounded-full bg-slate-900/80 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-700 transition" title="Tutup Kamera">
+                                            <button type="button" @click="switchCamera()" class="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 flex items-center gap-1.5 transition cursor-pointer" title="Putar Kamera Depan/Belakang">
+                                                <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                                <span>Putar Kamera</span>
+                                            </button>
+                                            <button type="button" @click="stopCamera()" class="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white text-xs font-semibold border border-slate-700 flex items-center gap-1.5 transition cursor-pointer">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                <span>Tutup</span>
                                             </button>
                                         </div>
                                     </div>
@@ -398,8 +386,12 @@
                                             FOTO REAL-TIME TERCATAT
                                         </div>
 
-                                        <div class="absolute bottom-3 right-3 flex items-center gap-2">
-                                            <button type="button" @click="retake()" class="px-4 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-700 text-white text-xs font-bold shadow-lg transition flex items-center gap-1.5 cursor-pointer">
+                                        <div class="p-3 bg-slate-900 border-t border-slate-800 flex items-center justify-between">
+                                            <span class="text-[11px] text-emerald-400 font-semibold flex items-center gap-1">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                                Foto berhasil diambil & ter-watermark
+                                            </span>
+                                            <button type="button" @click="retake()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white text-xs font-bold shadow-md transition flex items-center gap-1.5 cursor-pointer">
                                                 <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                                                 <span>Ambil Ulang Foto</span>
                                             </button>
@@ -407,9 +399,8 @@
                                     </div>
                                 </div>
 
-                                <!-- Input Tersembunyi (Hanya Terima Jepretan Kamera Langsung) -->
+                                <!-- Input Tersembunyi (Menyimpan Hasil Jepretan Kamera) -->
                                 <input type="file" name="photo" x-ref="realFileInput" class="hidden" accept="image/*">
-                                <input type="file" name="photo_mobile" x-ref="mobileInput" capture="environment" accept="image/*" class="hidden" @change="onMobileCapture($event)">
                                 <input type="hidden" name="photo_base64" x-model="photoBase64">
                                 <x-input-error :messages="$errors->get('photo')" class="mt-1 text-xs" />
                             </div>
