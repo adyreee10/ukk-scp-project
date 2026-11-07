@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Services\JournalReminderService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use App\Models\Major;
 use App\Models\AcademicYear;
 use Illuminate\Support\Facades\Schema;
