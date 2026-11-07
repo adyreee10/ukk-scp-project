@@ -126,8 +126,21 @@
         <div class="bg-[#0f172a]/90 backdrop-blur-md border border-slate-800 shadow-xl overflow-hidden" style="border-radius: 15px;">
             <div class="p-5 border-b border-slate-800 flex items-center justify-between">
                 <div>
-                    <h2 class="text-base font-bold text-white">Pengajuan Izin Terkini</h2>
-                    <p class="text-xs text-slate-400 mt-0.5">3 permohonan izin terakhir yang diajukan</p>
+                    <div class="flex items-center gap-2">
+                        <h2 class="text-base font-bold text-white">Pengajuan Izin Terkini</h2>
+                        @if($recentLeaves->isNotEmpty())
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                                {{ $recentLeaves->count() }}
+                            </span>
+                        @endif
+                    </div>
+                    <p class="text-xs text-slate-400 mt-0.5">
+                        @if($recentLeaves->isEmpty())
+                            Belum ada permohonan izin yang diajukan
+                        @else
+                            {{ $recentLeaves->count() }} permohonan izin terakhir yang diajukan
+                        @endif
+                    </p>
                 </div>
                 <a href="{{ route('family.leaves.history') }}" class="text-xs font-bold text-indigo-400 hover:text-indigo-300 transition hover:underline">
                     Lihat Semua Riwayat →
@@ -135,9 +148,19 @@
             </div>
 
             @if($recentLeaves->isEmpty())
-                <div class="text-center py-10 bg-slate-900/40">
+                <div class="text-center py-10 px-4 bg-slate-900/30">
+                    <div class="w-12 h-12 mx-auto mb-3 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </div>
                     <p class="text-sm font-bold text-white">Belum Ada Pengajuan Izin</p>
-                    <p class="text-xs text-slate-400 mt-1">Siswa belum pernah mengajukan permohonan izin sakit atau keperluan.</p>
+                    <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto">Siswa belum pernah mengajukan permohonan izin sakit atau keperluan.</p>
+                    <div class="mt-4">
+                        <a href="{{ route('family.leaves.create') }}" 
+                           class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-md transition cursor-pointer">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            <span>Buat Pengajuan Izin Baru</span>
+                        </a>
+                    </div>
                 </div>
             @else
                 <div class="divide-y divide-slate-800/60">
