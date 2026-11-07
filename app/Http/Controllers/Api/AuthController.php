@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -18,16 +20,45 @@ class AuthController extends Controller
             'device_name' => ['nullable', 'string', 'max:100'],
         ]);
 
-        $user = User::with('role')
-        ->where('username', $validated['username'])
-        ->first();
+        $throttleKey = Str::transliterate(Str::lower($validated['username']) . '|' . $request->ip());
 
-        if (!$user || !Hash::check($validated['password'], $user->password)) 
-            {
+        // Cek apakah akun sedang ditangguhkan
+        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+            return response()->json([
+                'message' => "Akun Anda sedang ditangguhkan sementara karena 5 kali gagal login. Silakan tunggu {$seconds} detik lagi.",
+                'retry_after' => $seconds,
+            ], 429);
+        }
+
+        $user = User::with('role')
+            ->where(function ($query) use ($validated) {
+                $query->where('username', $validated['username'])
+                      ->orWhere('email', $validated['username'])
+                      ->orWhere('nis', $validated['username'])
+                      ->orWhere('nip', $validated['username']);
+            })
+            ->first();
+
+        if (!$user || !Hash::check($validated['password'], $user->password)) {
+            RateLimiter::hit($throttleKey, 60);
+
+            $attempts = RateLimiter::attempts($throttleKey);
+            if ($attempts >= 5) {
+                $seconds = RateLimiter::availableIn($throttleKey);
                 return response()->json([
-                    'message' => 'Username atau password salah.',
-                ], 401);
+                    'message' => "Anda telah gagal login sebanyak 5 kali. Akun Anda ditangguhkan sementara selama {$seconds} detik demi keamanan server. Silakan coba lagi setelah 1 menit.",
+                    'retry_after' => $seconds,
+                ], 429);
             }
+
+            $remaining = 5 - $attempts;
+            return response()->json([
+                'message' => "Username atau password salah. (Sisa percobaan: {$remaining} kali sebelum akun ditangguhkan 1 menit).",
+            ], 401);
+        }
+
+        RateLimiter::clear($throttleKey);
 
             $token = $user
                 ->createToken($validated['device_name'] ?? 'api-client'

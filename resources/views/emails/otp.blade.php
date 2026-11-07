@@ -15,8 +15,12 @@
                     <!-- Header Kartu -->
                     <tr>
                         <td align="center" style="background: linear-gradient(135deg, #090d16 0%, #1e293b 100%); padding: 35px 25px 30px 25px; text-align: center;">
-                            <div style="display: inline-block; background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%); color: #ffffff; font-weight: 900; font-size: 22px; width: 55px; height: 55px; line-height: 55px; border-radius: 14px; margin-bottom: 15px; box-shadow: 0 6px 16px rgba(79, 70, 229, 0.4);">
-                                SCP
+                            <div style="display: inline-block; margin-bottom: 15px; text-align: center;">
+                                <img src="{{ isset($message) ? $message->embed(public_path('images/logo.png')) : asset('images/logo.png') }}" 
+                                     alt="Logo SCP" 
+                                     width="68" 
+                                     height="68" 
+                                     style="display: block; margin: 0 auto; width: 68px; height: 68px; border-radius: 50%; border: 0;" />
                             </div>
                             <h1 style="margin: 0; color: #ffffff; font-size: 20px; font-weight: 800; letter-spacing: -0.5px;">
                                 Verifikasi Reset Kata Sandi
@@ -46,7 +50,7 @@
                                     {{ $otp }}
                                 </div>
                                 <span style="display: inline-block; margin-top: 10px; background-color: #fef3c7; color: #92400e; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px;">
-                                    Berlaku selama 15 menit
+                                    Berlaku selama 5 menit
                                 </span>
                             </div>
 

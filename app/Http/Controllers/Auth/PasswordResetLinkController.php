@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -34,12 +35,24 @@ class PasswordResetLinkController extends Controller
             'email.exists'   => 'Alamat email ini tidak terdaftar di sistem sekolah.',
         ]);
 
-        $email = $request->email;
+        $email = strtolower(trim($request->email));
 
-        // 1. Buat 6 digit kode OTP acak numerik
+        // 1. Cek jeda kirim ulang kode OTP (wajib tunggu 1 menit / 60 detik)
+        $existing = DB::table('password_reset_tokens')->where('email', $email)->first();
+        if ($existing && $existing->created_at) {
+            $secondsAgo = Carbon::now()->diffInSeconds(Carbon::parse($existing->created_at));
+            if ($secondsAgo < 60) {
+                $remainingSeconds = 60 - $secondsAgo;
+                return back()->withInput()->withErrors([
+                    'email' => "Mohon tunggu {$remainingSeconds} detik lagi sebelum mengirim ulang kode OTP baru.",
+                ])->with('otp_cooldown', $remainingSeconds);
+            }
+        }
+
+        // 2. Buat 6 digit kode OTP acak numerik
         $otp = (string) random_int(100000, 999999);
 
-        // 2. Simpan OTP ke tabel password_reset_tokens
+        // 3. Simpan OTP ke tabel password_reset_tokens dengan masa berlaku 5 menit
         DB::table('password_reset_tokens')->updateOrInsert(
             ['email' => $email],
             [
@@ -48,17 +61,16 @@ class PasswordResetLinkController extends Controller
             ]
         );
 
-        // 3. Simpan email di session agar form verifikasi langsung terisi
+        // 4. Simpan email di session agar form verifikasi langsung terisi
         session([
             'reset_email' => $email,
         ]);
 
-
-                // 4. Ambil data nama pengguna untuk pesan personal
+        // 5. Ambil data nama pengguna untuk pesan personal
         $user = User::where('email', $email)->first();
         $userName = $user ? $user->name : 'Pengguna';
 
-        // 5. Kirim email berisi OTP berformat HTML
+        // 6. Kirim email berisi OTP berformat HTML
         try {
             Mail::send('emails.otp', [
                 'otp'      => $otp,
@@ -73,6 +85,7 @@ class PasswordResetLinkController extends Controller
         }
 
         return redirect()->route('password.reset')
-            ->with('status', "Kode OTP 6 digit telah dikirimkan ke email {$email}.");
+            ->with('status', "Kode OTP 6 digit telah dikirimkan ke email {$email}. (Berlaku selama 5 menit)")
+            ->with('otp_cooldown', 60);
     }
 }

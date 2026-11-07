@@ -79,10 +79,20 @@ class LoginRequest extends FormRequest
 
         // Cek apakah user ditemukan dan password cocok
         if (! $user || ! Hash::check($this->input('password'), $user->password)) {
-            RateLimiter::hit($this->throttleKey());
+            RateLimiter::hit($this->throttleKey(), 60);
 
+            $attempts = RateLimiter::attempts($this->throttleKey());
+            if ($attempts >= 5) {
+                event(new Lockout($this));
+                $seconds = RateLimiter::availableIn($this->throttleKey());
+                throw ValidationException::withMessages([
+                    'login' => "Anda telah gagal login sebanyak 5 kali. Akun Anda ditangguhkan sementara selama {$seconds} detik demi keamanan server. Silakan coba lagi setelah 1 menit.",
+                ]);
+            }
+
+            $remaining = 5 - $attempts;
             throw ValidationException::withMessages([
-                'login' => 'Email, Username, NIS, NIP, atau kata sandi yang Anda masukkan salah.',
+                'login' => "Email, Username, NIS, NIP, atau kata sandi yang Anda masukkan salah. (Sisa percobaan: {$remaining} kali sebelum akun ditangguhkan 1 menit).",
             ]);
         }
 
@@ -108,10 +118,7 @@ class LoginRequest extends FormRequest
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
-            'login' => trans('auth.throttle', [
-                'seconds' => $seconds,
-                'minutes' => ceil($seconds / 60),
-            ]),
+            'login' => "Akun Anda sedang ditangguhkan sementara karena 5 kali gagal login. Silakan tunggu {$seconds} detik lagi sebelum mencoba masuk kembali.",
         ]);
     }
 

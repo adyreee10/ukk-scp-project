@@ -22,7 +22,21 @@ class NewPasswordController extends Controller
     public function create(Request $request): View
     {
         $email = session('reset_email', $request->query('email', ''));
-        return view('auth.reset-password', compact('email'));
+        $cooldown = 0;
+        if ($email) {
+            $existing = DB::table('password_reset_tokens')->where('email', strtolower(trim($email)))->first();
+            if ($existing && $existing->created_at) {
+                $secondsAgo = Carbon::now()->diffInSeconds(Carbon::parse($existing->created_at));
+                if ($secondsAgo < 60) {
+                    $cooldown = 60 - $secondsAgo;
+                }
+            }
+        }
+        if (session()->has('otp_cooldown')) {
+            $cooldown = max($cooldown, (int) session('otp_cooldown'));
+        }
+
+        return view('auth.reset-password', compact('email', 'cooldown'));
     }
 
     /**
@@ -42,7 +56,7 @@ class NewPasswordController extends Controller
             'password.confirmed'    => 'Konfirmasi kata sandi baru tidak cocok.',
         ]);
 
-        $email = $request->email;
+        $email = strtolower(trim($request->email));
         $otp   = trim($request->otp);
 
         // 1. Ambil token OTP dari database
@@ -54,12 +68,12 @@ class NewPasswordController extends Controller
             ]);
         }
 
-        // 2. Periksa masa kedaluwarsa (15 menit)
+        // 2. Periksa masa kedaluwarsa (5 menit)
         $createdAt = Carbon::parse($resetRecord->created_at);
-        if ($createdAt->addMinutes(15)->isPast()) {
+        if ($createdAt->addMinutes(5)->isPast()) {
             DB::table('password_reset_tokens')->where('email', $email)->delete();
             return back()->withInput()->withErrors([
-                'otp' => 'Kode OTP telah kedaluwarsa (hanya berlaku 15 menit). Silakan minta kode baru.',
+                'otp' => 'Kode OTP telah kedaluwarsa (hanya berlaku 5 menit). Silakan minta kode baru.',
             ]);
         }
 

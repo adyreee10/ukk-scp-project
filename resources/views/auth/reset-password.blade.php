@@ -6,7 +6,7 @@
         </div>
         <h2 class="text-2xl font-black text-slate-800 tracking-tight">Verifikasi OTP & Sandi Baru</h2>
         <p class="text-xs font-semibold text-slate-500 mt-1.5 leading-relaxed">
-            Masukkan 6 digit kode OTP yang telah dikirimkan ke email Anda beserta kata sandi baru.
+            Masukkan 6 digit kode OTP yang telah dikirimkan ke email Anda (berlaku selama 5 menit) beserta kata sandi baru.
         </p>
     </div>
 
@@ -111,8 +111,21 @@
         </div>
     </form>
 
-    <!-- Opsi Jika Kode OTP Tidak Masuk / Minta Kode Lagi -->
-    <div class="mt-6 pt-4 border-t border-slate-100 text-center">
+    <!-- Opsi Jika Kode OTP Tidak Masuk / Minta Kode Lagi (Jeda 1 Menit) -->
+    <div class="mt-6 pt-4 border-t border-slate-100 text-center"
+         x-data="{
+             cooldown: {{ (int) ($cooldown ?? 0) }},
+             init() {
+                 if (this.cooldown > 0) {
+                     const interval = setInterval(() => {
+                         this.cooldown--;
+                         if (this.cooldown <= 0) {
+                             clearInterval(interval);
+                         }
+                     }, 1000);
+                 }
+             }
+         }">
         <p class="text-xs text-slate-500 mb-2 font-medium">
             Tidak menerima email berisi kode OTP?
         </p>
@@ -120,11 +133,19 @@
             @csrf
             <input type="hidden" name="email" value="{{ old('email', $email) }}">
             <button type="submit" 
-                    class="text-xs font-bold text-indigo-600 hover:text-indigo-800 hover:underline transition inline-flex items-center gap-1.5 cursor-pointer bg-indigo-50 hover:bg-indigo-100 px-3.5 py-2 rounded-xl border border-indigo-200/80">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                Kirim Ulang Kode OTP Baru
+                    :disabled="cooldown > 0"
+                    :class="cooldown > 0 ? 'opacity-60 cursor-not-allowed bg-slate-100 text-slate-400 border-slate-200' : 'bg-indigo-50 hover:bg-indigo-100 text-indigo-600 hover:text-indigo-800 border-indigo-200/80 cursor-pointer'"
+                    class="text-xs font-bold transition inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border">
+                <svg class="w-3.5 h-3.5" :class="cooldown > 0 ? 'animate-spin text-slate-400' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+                <span x-show="cooldown <= 0">Kirim Ulang Kode OTP Baru</span>
+                <span x-show="cooldown > 0" x-cloak>Kirim Ulang (<span x-text="cooldown"></span>s)</span>
             </button>
         </form>
+        <div x-show="cooldown > 0" x-cloak class="mt-1.5 text-[11px] text-slate-400 font-semibold">
+            Tunggu <span x-text="cooldown" class="text-indigo-600 font-bold"></span> detik sebelum meminta kode baru
+        </div>
     </div>
 
     <!-- Kembali ke Halaman Login -->

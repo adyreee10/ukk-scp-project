@@ -6,7 +6,7 @@
         </div>
         <h2 class="text-2xl font-black text-slate-800 tracking-tight">Lupa Kata Sandi?</h2>
         <p class="text-xs font-semibold text-slate-500 mt-1.5 leading-relaxed">
-            Masukkan alamat email akun Anda. Kami akan mengirimkan 6 digit kode OTP untuk mengatur ulang kata sandi Anda.
+            Masukkan alamat email akun Anda. Kami akan mengirimkan 6 digit kode OTP (berlaku selama 5 menit) untuk mengatur ulang kata sandi Anda.
         </p>
     </div>
 
