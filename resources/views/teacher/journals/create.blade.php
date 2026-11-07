@@ -1,117 +1,5 @@
 <x-app-layout>
-    <div x-data="{ 
-        photoPreview: null,
-        photoBase64: '',
-        cameraStream: null,
-        cameraActive: false,
-        cameraError: null,
-        facingMode: 'environment',
-        searchStudent: '',
-        counts: { Hadir: 0, Sakit: 0, Izin: 0, Alpa: 0 },
-        async startCamera() {
-            this.cameraError = null;
-            try {
-                if (this.cameraStream) {
-                    this.stopCamera();
-                }
-                const constraints = {
-                    video: {
-                        facingMode: this.facingMode,
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 }
-                    },
-                    audio: false
-                };
-                this.cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
-                const video = this.$refs.videoPlayer;
-                if (video) {
-                    video.srcObject = this.cameraStream;
-                    await video.play();
-                    this.cameraActive = true;
-                }
-            } catch (err) {
-                console.error('Kamera error:', err);
-                this.cameraError = 'Gagal mengakses kamera langsung browser. Pastikan izin kamera aktif, atau klik tombol Kamera HP di bawah.';
-                this.cameraActive = false;
-            }
-        },
-        stopCamera() {
-            if (this.cameraStream) {
-                this.cameraStream.getTracks().forEach(t => t.stop());
-                this.cameraStream = null;
-            }
-            this.cameraActive = false;
-        },
-        switchCamera() {
-            this.facingMode = this.facingMode === 'environment' ? 'user' : 'environment';
-            this.startCamera();
-        },
-        snapPhoto() {
-            const video = this.$refs.videoPlayer;
-            if (!video || !this.cameraActive) return;
-
-            const canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth || 1280;
-            canvas.height = video.videoHeight || 720;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-            // Watermark waktu real-time
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) + ' • ' +
-                            now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' WIB';
-            
-            ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
-            ctx.fillRect(12, canvas.height - 42, 380, 30);
-            ctx.fillStyle = '#38bdf8';
-            ctx.font = 'bold 13px monospace';
-            ctx.fillText('SCP Real-Time • ' + dateStr, 22, canvas.height - 22);
-
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
-            this.photoPreview = dataUrl;
-            this.photoBase64 = dataUrl;
-
-            try {
-                canvas.toBlob((blob) => {
-                    if (blob && this.$refs.realFileInput) {
-                        const file = new File([blob], 'KBM_Realtime_' + Date.now() + '.jpg', { type: 'image/jpeg' });
-                        const dt = new DataTransfer();
-                        dt.items.add(file);
-                        this.$refs.realFileInput.files = dt.files;
-                    }
-                }, 'image/jpeg', 0.88);
-            } catch(e) {}
-
-            this.stopCamera();
-        },
-        retake() {
-            this.photoPreview = null;
-            this.photoBase64 = '';
-            if (this.$refs.realFileInput) this.$refs.realFileInput.value = '';
-            this.startCamera();
-        },
-        updateCounts() {
-            let h = 0, s = 0, i = 0, a = 0;
-            document.querySelectorAll('input[type=radio]:checked').forEach(el => {
-                if (el.value === 'Hadir') h++;
-                else if (el.value === 'Sakit') s++;
-                else if (el.value === 'Izin') i++;
-                else if (el.value === 'Alpa') a++;
-            });
-            this.counts = { Hadir: h, Sakit: s, Izin: i, Alpa: a };
-        },
-        setAll(status) {
-            document.querySelectorAll('input[type=radio][value=' + status + ']').forEach(el => {
-                if (!el.dataset.hasApprovedLeave || status !== 'Hadir') {
-                    el.checked = true;
-                }
-            });
-            this.updateCounts();
-        },
-        init() {
-            this.$nextTick(() => { this.updateCounts(); });
-        }
-    }" class="space-y-6">
+    <div x-data="teacherJournalManager()" class="space-y-6">
 
         <!-- Header & Navigasi Kembali (Judul Teks Putih) -->
         <div class="text-center pb-2" style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;">
@@ -379,7 +267,9 @@
 
                                     <!-- 3. Kondisi Foto Berhasil Diambil -->
                                     <div x-show="photoPreview" style="display: none;" class="relative">
-                                        <img :src="photoPreview" class="w-full h-64 sm:h-72 object-cover bg-black" alt="Hasil Foto Real-Time KBM">
+                                        <div class="relative bg-black flex items-center justify-center overflow-hidden">
+                                            <img :src="photoPreview" class="w-full max-h-80 sm:max-h-96 object-contain bg-black mx-auto block" alt="Hasil Foto Real-Time KBM">
+                                        </div>
                                         
                                         <div class="absolute top-3 left-3 bg-emerald-950/90 border border-emerald-600 text-emerald-300 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 shadow-md">
                                             <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
@@ -573,4 +463,153 @@
         @endif
 
     </div>
+
+    <script>
+    function teacherJournalManager() {
+        return {
+            photoPreview: null,
+            photoBase64: '',
+            cameraStream: null,
+            cameraActive: false,
+            cameraError: null,
+            facingMode: 'environment',
+            searchStudent: '',
+            counts: { Hadir: 0, Sakit: 0, Izin: 0, Alpa: 0 },
+
+            async startCamera() {
+                this.cameraError = null;
+                try {
+                    if (this.cameraStream) {
+                        this.stopCamera();
+                    }
+                    const constraints = {
+                        video: {
+                            facingMode: this.facingMode,
+                            width: { ideal: 1280 },
+                            height: { ideal: 720 }
+                        },
+                        audio: false
+                    };
+                    this.cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+                    const video = this.$refs.videoPlayer;
+                    if (video) {
+                        video.srcObject = this.cameraStream;
+                        await video.play();
+                        this.cameraActive = true;
+                    }
+                } catch (err) {
+                    console.error('Kamera error:', err);
+                    this.cameraError = 'Gagal mengakses kamera langsung browser. Pastikan izin kamera aktif pada browser Anda.';
+                    this.cameraActive = false;
+                }
+            },
+
+            stopCamera() {
+                if (this.cameraStream) {
+                    this.cameraStream.getTracks().forEach(t => t.stop());
+                    this.cameraStream = null;
+                }
+                this.cameraActive = false;
+            },
+
+            switchCamera() {
+                this.facingMode = this.facingMode === 'environment' ? 'user' : 'environment';
+                this.startCamera();
+            },
+
+            snapPhoto() {
+                const video = this.$refs.videoPlayer;
+                if (!video || !this.cameraActive) return;
+
+                const canvas = document.createElement('canvas');
+                canvas.width = video.videoWidth || 1280;
+                canvas.height = video.videoHeight || 720;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                // Watermark waktu real-time proporsional & terbaca jelas di HP/Laptop
+                const now = new Date();
+                const dateStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) + ' • ' +
+                                now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' WIB';
+
+                const w = canvas.width;
+                const h = canvas.height;
+                const minDim = Math.min(w, h);
+                const fontSize = Math.max(16, Math.round(minDim * 0.035));
+                const barHeight = Math.round(fontSize * 2.5);
+                const paddingX = Math.round(fontSize * 0.8);
+
+                // Strip pita gelap semi-transparan di bagian bawah foto
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.90)';
+                ctx.fillRect(0, h - barHeight, w, barHeight);
+
+                // Garis aksen neon rose di atas pita
+                ctx.fillStyle = '#e11d48';
+                ctx.fillRect(0, h - barHeight, w, Math.max(3, Math.round(fontSize * 0.12)));
+
+                // Indikator Titik Merah Real-Time
+                const dotRadius = Math.max(5, Math.round(fontSize * 0.28));
+                const centerY = h - (barHeight / 2);
+                ctx.fillStyle = '#ef4444';
+                ctx.beginPath();
+                ctx.arc(paddingX + dotRadius, centerY, dotRadius, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Teks Watermark
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold ' + fontSize + 'px system-ui, -apple-system, sans-serif';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('JURNAL KBM REAL-TIME • ' + dateStr, paddingX + (dotRadius * 2) + Math.round(fontSize * 0.5), centerY);
+
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.90);
+                this.photoPreview = dataUrl;
+                this.photoBase64 = dataUrl;
+
+                try {
+                    canvas.toBlob((blob) => {
+                        if (blob && this.$refs.realFileInput) {
+                            const file = new File([blob], 'KBM_Realtime_' + Date.now() + '.jpg', { type: 'image/jpeg' });
+                            const dt = new DataTransfer();
+                            dt.items.add(file);
+                            this.$refs.realFileInput.files = dt.files;
+                        }
+                    }, 'image/jpeg', 0.88);
+                } catch(e) {}
+
+                this.stopCamera();
+            },
+
+            retake() {
+                this.photoPreview = null;
+                this.photoBase64 = '';
+                if (this.$refs.realFileInput) this.$refs.realFileInput.value = '';
+                this.startCamera();
+            },
+
+            updateCounts() {
+                let h = 0, s = 0, i = 0, a = 0;
+                document.querySelectorAll('input[type=radio]:checked').forEach(el => {
+                    if (el.value === 'Hadir') h++;
+                    else if (el.value === 'Sakit') s++;
+                    else if (el.value === 'Izin') i++;
+                    else if (el.value === 'Alpa') a++;
+                });
+                this.counts = { Hadir: h, Sakit: s, Izin: i, Alpa: a };
+            },
+
+            setAll(status) {
+                document.querySelectorAll('input[type=radio][value=' + status + ']').forEach(el => {
+                    if (!el.dataset.hasApprovedLeave || status !== 'Hadir') {
+                        el.checked = true;
+                    }
+                });
+                this.updateCounts();
+            },
+
+            init() {
+                this.$nextTick(() => { this.updateCounts(); });
+            }
+        };
+    }
+    </script>
 </x-app-layout>
