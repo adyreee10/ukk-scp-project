@@ -18,6 +18,9 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+// Endpoint Satu-Klik Sinkronisasi Akun Orang Tua di Web Hosting (Dilindungi Secret Key)
+Route::get('/sync-parents-direct', [WakaController::class, 'studentsSyncParentsDirect']);
+
 // Diagnostic & Development Tools (Hanya Aktif di Mode Debug)
 if (config('app.debug')) {
     Route::get('/dev-reset-rezky', function (Request $request) {

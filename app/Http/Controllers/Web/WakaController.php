@@ -920,42 +920,144 @@ class WakaController extends Controller
      */
     public function studentsSyncParents(Request $request)
     {
+        set_time_limit(600);
+        ini_set('memory_limit', '512M');
+
         $parentRole = Role::where('role_name', 'Orang Tua')->firstOrFail();
         $unlinkedStudents = User::whereHas('role', fn($q) => $q->where('role_name', 'Siswa'))
             ->whereNull('parent_id')
+            ->select('id', 'name', 'username', 'nis', 'phone', 'address')
             ->get();
 
         if ($unlinkedStudents->isEmpty()) {
             return redirect()->route('waka.students.index')->with('success', 'Seluruh data siswa sudah memiliki akun orang tua yang terhubung.');
         }
 
+        // Cache username yang sudah ada ke array memori agar pencarian username sangat cepat tanpa query berulang
+        $existingUsernames = [];
+        foreach (User::pluck('username') as $u) {
+            $existingUsernames[strtolower($u)] = true;
+        }
+
         $createdCount = 0;
-        foreach ($unlinkedStudents as $student) {
-            $nis = trim((string)($student->nis ?? ''));
-            $baseParentUser = $nis ? "ortu_{$nis}" : "ortu_" . $student->username;
-            $uniqueParentUser = substr($baseParentUser, 0, 45);
-            $pCounter = 1;
-            while (User::where('username', $uniqueParentUser)->exists()) {
-                $uniqueParentUser = substr($baseParentUser, 0, 38) . "_{$pCounter}";
-                $pCounter++;
-            }
-            $parentPasswordPlain = $nis ? "p{$nis}" : "portu123";
+        $nisHashes = [];
 
-            $parent = User::create([
-                'name'           => 'Orang tua ' . trim($student->name),
-                'username'       => $uniqueParentUser,
-                'password'       => Hash::make($parentPasswordPlain),
-                'role_id'        => $parentRole->id,
-                'phone'          => $student->phone,
-                'address'        => $student->address,
-                'student_status' => 'Aktif',
-            ]);
+        // Proses per chunk 100 siswa dalam transaksi database untuk performa maksimal
+        foreach ($unlinkedStudents->chunk(100) as $chunk) {
+            DB::transaction(function () use ($chunk, $parentRole, &$existingUsernames, &$nisHashes, &$createdCount) {
+                $now = now();
+                foreach ($chunk as $student) {
+                    $nis = trim((string)($student->nis ?? ''));
+                    $baseParentUser = $nis ? "ortu_{$nis}" : "ortu_" . $student->username;
+                    $uniqueParentUser = substr($baseParentUser, 0, 45);
+                    $pCounter = 1;
+                    while (isset($existingUsernames[strtolower($uniqueParentUser)])) {
+                        $uniqueParentUser = substr($baseParentUser, 0, 38) . "_{$pCounter}";
+                        $pCounter++;
+                    }
+                    $existingUsernames[strtolower($uniqueParentUser)] = true;
 
-            $student->update(['parent_id' => $parent->id]);
-            $createdCount++;
+                    $parentPasswordPlain = $nis ? "p{$nis}" : "portu123";
+                    if (!isset($nisHashes[$parentPasswordPlain])) {
+                        $nisHashes[$parentPasswordPlain] = password_hash($parentPasswordPlain, PASSWORD_BCRYPT, ['cost' => 10]);
+                    }
+                    $hash = $nisHashes[$parentPasswordPlain];
+
+                    $parentId = DB::table('users')->insertGetId([
+                        'name'           => 'Orang tua ' . trim($student->name),
+                        'username'       => $uniqueParentUser,
+                        'password'       => $hash,
+                        'role_id'        => $parentRole->id,
+                        'phone'          => $student->phone,
+                        'address'        => $student->address,
+                        'student_status' => 'Aktif',
+                        'created_at'     => $now,
+                        'updated_at'     => $now,
+                    ]);
+
+                    DB::table('users')->where('id', $student->id)->update(['parent_id' => $parentId]);
+                    $createdCount++;
+                }
+            });
         }
 
         return redirect()->route('waka.students.index')->with('success', "Sukses! Berhasil membuat {$createdCount} akun orang tua baru dan menautkannya ke masing-masing siswa.");
+    }
+
+    /**
+     * Endpoint langsung (GET) untuk sinkronisasi akun orang tua via browser
+     */
+    public function studentsSyncParentsDirect(Request $request)
+    {
+        if ($request->get('key') !== 'ukk2026') {
+            abort(403, 'Akses ditolak. Gunakan key yang valid.');
+        }
+
+        set_time_limit(600);
+        ini_set('memory_limit', '512M');
+
+        $parentRole = Role::where('role_name', 'Orang Tua')->firstOrFail();
+        $unlinkedStudents = User::whereHas('role', fn($q) => $q->where('role_name', 'Siswa'))
+            ->whereNull('parent_id')
+            ->select('id', 'name', 'username', 'nis', 'phone', 'address')
+            ->get();
+
+        $existingUsernames = [];
+        foreach (User::pluck('username') as $u) {
+            $existingUsernames[strtolower($u)] = true;
+        }
+
+        $createdCount = 0;
+        $nisHashes = [];
+
+        foreach ($unlinkedStudents->chunk(100) as $chunk) {
+            DB::transaction(function () use ($chunk, $parentRole, &$existingUsernames, &$nisHashes, &$createdCount) {
+                $now = now();
+                foreach ($chunk as $student) {
+                    $nis = trim((string)($student->nis ?? ''));
+                    $baseParentUser = $nis ? "ortu_{$nis}" : "ortu_" . $student->username;
+                    $uniqueParentUser = substr($baseParentUser, 0, 45);
+                    $pCounter = 1;
+                    while (isset($existingUsernames[strtolower($uniqueParentUser)])) {
+                        $uniqueParentUser = substr($baseParentUser, 0, 38) . "_{$pCounter}";
+                        $pCounter++;
+                    }
+                    $existingUsernames[strtolower($uniqueParentUser)] = true;
+
+                    $parentPasswordPlain = $nis ? "p{$nis}" : "portu123";
+                    if (!isset($nisHashes[$parentPasswordPlain])) {
+                        $nisHashes[$parentPasswordPlain] = password_hash($parentPasswordPlain, PASSWORD_BCRYPT, ['cost' => 10]);
+                    }
+                    $hash = $nisHashes[$parentPasswordPlain];
+
+                    $parentId = DB::table('users')->insertGetId([
+                        'name'           => 'Orang tua ' . trim($student->name),
+                        'username'       => $uniqueParentUser,
+                        'password'       => $hash,
+                        'role_id'        => $parentRole->id,
+                        'phone'          => $student->phone,
+                        'address'        => $student->address,
+                        'student_status' => 'Aktif',
+                        'created_at'     => $now,
+                        'updated_at'     => $now,
+                    ]);
+
+                    DB::table('users')->where('id', $student->id)->update(['parent_id' => $parentId]);
+                    $createdCount++;
+                }
+            });
+        }
+
+        return response("<div style='font-family:system-ui,-apple-system,sans-serif;padding:30px;background:#0f172a;color:#38bdf8;border-radius:15px;max-width:550px;margin:50px auto;border:1px solid #1e293b;box-shadow:0 20px 25px -5px rgba(0,0,0,0.5);line-height:1.6;'>
+            <h2 style='color:#4ade80;margin-top:0;'>✔ Sinkronisasi Akun Orang Tua Berhasil!</h2>
+            <p style='color:#f8fafc;'>Berhasil memproses dan membuatkan <strong style='color:#38bdf8;'>{$createdCount}</strong> akun Orang Tua baru untuk semua siswa yang belum terhubung.</p>
+            <div style='background:#1e293b;padding:15px;border-radius:10px;margin:20px 0;font-size:13px;color:#cbd5e1;'>
+                <p style='margin:0 0 8px 0;font-weight:bold;color:#fff;'>Format Akun Orang Tua:</p>
+                <p style='margin:3px 0;'>• <strong>Username:</strong> <code style='color:#a5b4fc;'>ortu_[NIS]</code> (contoh: <code>ortu_17821</code>)</p>
+                <p style='margin:3px 0;'>• <strong>Password:</strong> <code style='color:#4ade80;'>p[NIS]</code> (contoh: <code>p17821</code>)</p>
+            </div>
+            <a href='/login' style='display:inline-block;padding:12px 24px;background:#6366f1;color:#fff;text-decoration:none;border-radius:10px;font-weight:bold;box-shadow:0 4px 6px -1px rgba(99,102,241,0.4);'>Masuk ke Halaman Login &rarr;</a>
+        </div>");
     }
 
     public function studentsDestroy(User $student)
