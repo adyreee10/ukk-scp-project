@@ -69,6 +69,8 @@
                                         <span class="text-indigo-600 font-bold">Kelas: {{ $user->schoolClass->class_name }}</span>
                                     @elseif($user->homeroomClass)
                                         <span class="text-slate-700 font-bold">Wali: {{ $user->homeroomClass->class_name }}</span>
+                                    @elseif($user->role?->role_name === 'Orang Tua' && $user->children->isNotEmpty())
+                                        <span class="text-violet-600 font-bold">Anak: {{ $user->children->first()->name }} ({{ $user->children->first()->schoolClass?->class_name ?? '-' }})</span>
                                     @else
                                         <span class="text-slate-400">-</span>
                                     @endif

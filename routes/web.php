@@ -256,6 +256,7 @@ Route::middleware(['auth', 'role:Waka Kurikulum'])->group(function () {
     Route::delete('/waka/students/{student}', [WakaController::class, 'studentsDestroy'])->name('waka.students.destroy');
     Route::post('/waka/students/delete-selected', [WakaController::class, 'studentsDeleteSelected'])->name('waka.students.delete-selected');
     Route::post('/waka/students/delete-all', [WakaController::class, 'studentsDeleteAll'])->name('waka.students.delete-all');
+    Route::post('/waka/students/sync-parents', [WakaController::class, 'studentsSyncParents'])->name('waka.students.sync-parents');
 
     // Master Data Kelas
     Route::get('/waka/classes', [WakaController::class, 'classesIndex'])->name('waka.classes.index');

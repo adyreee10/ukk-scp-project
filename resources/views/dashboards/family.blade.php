@@ -13,7 +13,7 @@
             <div>
                 <span class="inline-flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-[#0f172a]/90 border border-indigo-500/40 text-xs sm:text-sm font-bold text-indigo-300 shadow-md">
                     <span class="h-2.5 w-2.5 rounded-full bg-indigo-400 animate-pulse"></span>
-                    {{ auth()->user()->role?->role_name === 'Orang Tua' ? 'Wali Murid dari:' : 'Siswa:' }}
+                    {{ auth()->user()->role?->role_name === 'Orang Tua' ? 'Orang tua dari:' : 'Siswa:' }}
                     <strong class="text-white">{{ $student->name ?? auth()->user()->name }}</strong>
                     @if(isset($student->schoolClass))
                         • {{ $student->schoolClass->class_name }}

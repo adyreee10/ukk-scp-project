@@ -812,9 +812,35 @@ class WakaController extends Controller
         $validated['password'] = Hash::make('password123');
         $validated['role_id']  = $studentRole->id;
 
+        // Auto-create akun Orang Tua untuk siswa ini
+        $parentRole = Role::where('role_name', 'Orang Tua')->first();
+        if ($parentRole) {
+            $parentName = 'Orang tua ' . trim($validated['name']);
+            $nis = trim((string)($validated['nis'] ?? ''));
+            $baseParentUser = $nis ? "ortu_{$nis}" : "ortu_" . $validated['username'];
+            $uniqueParentUser = substr($baseParentUser, 0, 45);
+            $pCounter = 1;
+            while (User::where('username', $uniqueParentUser)->exists()) {
+                $uniqueParentUser = substr($baseParentUser, 0, 38) . "_{$pCounter}";
+                $pCounter++;
+            }
+            $parentPasswordPlain = $nis ? "p{$nis}" : "portu123";
+
+            $parent = User::create([
+                'name'           => $parentName,
+                'username'       => $uniqueParentUser,
+                'password'       => Hash::make($parentPasswordPlain),
+                'role_id'        => $parentRole->id,
+                'phone'          => $validated['phone'] ?? null,
+                'address'        => $validated['address'] ?? null,
+                'student_status' => 'Aktif',
+            ]);
+            $validated['parent_id'] = $parent->id;
+        }
+
         User::create($validated);
 
-        return redirect()->route('waka.students.index')->with('success', 'Data siswa berhasil ditambahkan dengan kata sandi awal: password123');
+        return redirect()->route('waka.students.index')->with('success', 'Data siswa berhasil ditambahkan dan otomatis dibuatkan akun Orang Tua (Password siswa: password123, Password orang tua: p[NIS]).');
     }
 
     public function studentsUpdate(Request $request, User $student)
@@ -854,7 +880,82 @@ class WakaController extends Controller
 
         $student->update($validated);
 
+        // Pastikan nama akun orang tua sinkron atau buatkan jika belum ada
+        if ($student->parent) {
+            $student->parent->update([
+                'name' => 'Orang tua ' . trim($student->name),
+            ]);
+        } elseif (!$student->parent_id) {
+            $parentRole = Role::where('role_name', 'Orang Tua')->first();
+            if ($parentRole) {
+                $parentName = 'Orang tua ' . trim($student->name);
+                $nis = trim((string)($student->nis ?? ''));
+                $baseParentUser = $nis ? "ortu_{$nis}" : "ortu_" . $student->username;
+                $uniqueParentUser = substr($baseParentUser, 0, 45);
+                $pCounter = 1;
+                while (User::where('username', $uniqueParentUser)->exists()) {
+                    $uniqueParentUser = substr($baseParentUser, 0, 38) . "_{$pCounter}";
+                    $pCounter++;
+                }
+                $parentPasswordPlain = $nis ? "p{$nis}" : "portu123";
+
+                $parent = User::create([
+                    'name'           => $parentName,
+                    'username'       => $uniqueParentUser,
+                    'password'       => Hash::make($parentPasswordPlain),
+                    'role_id'        => $parentRole->id,
+                    'phone'          => $student->phone,
+                    'address'        => $student->address,
+                    'student_status' => 'Aktif',
+                ]);
+                $student->update(['parent_id' => $parent->id]);
+            }
+        }
+
         return redirect()->route('waka.students.index')->with('success', 'Data siswa berhasil diperbarui.');
+    }
+
+    /**
+     * Sinkronisasi massal seluruh akun Orang Tua untuk siswa yang belum memiliki akun orang tua
+     */
+    public function studentsSyncParents(Request $request)
+    {
+        $parentRole = Role::where('role_name', 'Orang Tua')->firstOrFail();
+        $unlinkedStudents = User::whereHas('role', fn($q) => $q->where('role_name', 'Siswa'))
+            ->whereNull('parent_id')
+            ->get();
+
+        if ($unlinkedStudents->isEmpty()) {
+            return redirect()->route('waka.students.index')->with('success', 'Seluruh data siswa sudah memiliki akun orang tua yang terhubung.');
+        }
+
+        $createdCount = 0;
+        foreach ($unlinkedStudents as $student) {
+            $nis = trim((string)($student->nis ?? ''));
+            $baseParentUser = $nis ? "ortu_{$nis}" : "ortu_" . $student->username;
+            $uniqueParentUser = substr($baseParentUser, 0, 45);
+            $pCounter = 1;
+            while (User::where('username', $uniqueParentUser)->exists()) {
+                $uniqueParentUser = substr($baseParentUser, 0, 38) . "_{$pCounter}";
+                $pCounter++;
+            }
+            $parentPasswordPlain = $nis ? "p{$nis}" : "portu123";
+
+            $parent = User::create([
+                'name'           => 'Orang tua ' . trim($student->name),
+                'username'       => $uniqueParentUser,
+                'password'       => Hash::make($parentPasswordPlain),
+                'role_id'        => $parentRole->id,
+                'phone'          => $student->phone,
+                'address'        => $student->address,
+                'student_status' => 'Aktif',
+            ]);
+
+            $student->update(['parent_id' => $parent->id]);
+            $createdCount++;
+        }
+
+        return redirect()->route('waka.students.index')->with('success', "Sukses! Berhasil membuat {$createdCount} akun orang tua baru dan menautkannya ke masing-masing siswa.");
     }
 
     public function studentsDestroy(User $student)

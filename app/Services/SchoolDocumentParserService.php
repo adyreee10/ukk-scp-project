@@ -1400,6 +1400,30 @@ class SchoolDocumentParserService
                 $updateData['email'] = $email;
             }
 
+            // Jika siswa sudah ada namun belum memiliki akun orang tua, buatkan otomatis
+            $existingStudent = User::find($studentId);
+            if ($existingStudent && !$existingStudent->parent_id) {
+                $baseParentUser = $nis ? "ortu_{$nis}" : "ortu_" . $existingStudent->username;
+                $uniqueParentUser = substr($baseParentUser, 0, 45);
+                $pCounter = 1;
+                while (User::where('username', $uniqueParentUser)->exists()) {
+                    $uniqueParentUser = substr($baseParentUser, 0, 38) . "_{$pCounter}";
+                    $pCounter++;
+                }
+                $parentPasswordPlain = $nis ? "p{$nis}" : "portu123";
+                $parentUser = User::create([
+                    'name'           => 'Orang tua ' . $cleanName,
+                    'username'       => $uniqueParentUser,
+                    'password'       => Hash::make($parentPasswordPlain),
+                    'role_id'        => $parentRole->id,
+                    'phone'          => $cleanPhone,
+                    'address'        => $address,
+                    'student_status' => 'Aktif',
+                ]);
+                $updateData['parent_id'] = $parentUser->id;
+                $createdParents++;
+            }
+
             User::where('id', $studentId)->update($updateData);
             $updated++;
         } else {
@@ -1426,8 +1450,37 @@ class SchoolDocumentParserService
             $finalEmail = !empty($email) ? $email : null;
             $passHash = $cache['passwordHash'] ?? Hash::make('password123');
 
-            // Tidak perlu otomatis membuat akun Orang Tua saat import siswa (sesuai instruksi)
-            $parentId = null;
+            // Otomatis buatkan akun Orang Tua siswa
+            $baseParentUser = $nis ? "ortu_{$nis}" : "ortu_{$uniqueUser}";
+            $uniqueParentUser = substr($baseParentUser, 0, 45);
+            $pCounter = 1;
+            if ($cache) {
+                while (isset($cache['existingUsernames'][strtolower($uniqueParentUser)])) {
+                    $uniqueParentUser = substr($baseParentUser, 0, 38) . "_{$pCounter}";
+                    $pCounter++;
+                }
+                $cache['existingUsernames'][strtolower($uniqueParentUser)] = true;
+            } else {
+                while (User::where('username', $uniqueParentUser)->exists()) {
+                    $uniqueParentUser = substr($baseParentUser, 0, 38) . "_{$pCounter}";
+                    $pCounter++;
+                }
+            }
+
+            $parentPasswordPlain = $nis ? "p{$nis}" : "portu123";
+            $parentPassHash = Hash::make($parentPasswordPlain);
+
+            $parentUser = User::create([
+                'name'           => 'Orang tua ' . $cleanName,
+                'username'       => $uniqueParentUser,
+                'password'       => $parentPassHash,
+                'role_id'        => $parentRole->id,
+                'phone'          => $cleanPhone,
+                'address'        => $address,
+                'student_status' => 'Aktif',
+            ]);
+            $parentId = $parentUser->id;
+            $createdParents++;
 
             if ($cache && isset($cache['batchNew'])) {
                 $cache['batchNew'][] = [
@@ -1436,7 +1489,7 @@ class SchoolDocumentParserService
                     'nis'            => $nis,
                     'email'          => $finalEmail,
                     'class_id'       => $schoolClassId,
-                    'parent_id'      => null,
+                    'parent_id'      => $parentId,
                     'phone'          => $cleanPhone,
                     'address'        => $address,
                     'birth_date'     => $formattedBirth,
@@ -1456,7 +1509,7 @@ class SchoolDocumentParserService
                     'nis'            => $nis,
                     'email'          => $finalEmail,
                     'class_id'       => $schoolClassId,
-                    'parent_id'      => null,
+                    'parent_id'      => $parentId,
                     'phone'          => $cleanPhone,
                     'address'        => $address,
                     'birth_date'     => $formattedBirth,
