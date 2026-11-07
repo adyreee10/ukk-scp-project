@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\View\View;
 
 class PasswordResetLinkController extends Controller
@@ -36,13 +37,13 @@ class PasswordResetLinkController extends Controller
         ]);
 
         $email = strtolower(trim($request->email));
+        $throttleKey = 'otp-resend:' . $email;
 
-        // 1. Cek jeda kirim ulang kode OTP (wajib tunggu 1 menit / 60 detik)
-        $existing = DB::table('password_reset_tokens')->where('email', $email)->first();
-        if ($existing && $existing->created_at) {
-            $secondsAgo = Carbon::now()->diffInSeconds(Carbon::parse($existing->created_at));
-            if ($secondsAgo < 60) {
-                $remainingSeconds = 60 - $secondsAgo;
+        // 1. Jeda waktu 1 menit (60 detik) HANYA berlaku jika ini aksi KIRIM ULANG kode OTP (is_resend = 1).
+        // Permintaan awal di halaman /forgot-password selalu langsung diproses tanpa jeda waktu.
+        if ($request->boolean('is_resend')) {
+            if (RateLimiter::tooManyAttempts($throttleKey, 1)) {
+                $remainingSeconds = RateLimiter::availableIn($throttleKey);
                 return back()->withInput()->withErrors([
                     'email' => "Mohon tunggu {$remainingSeconds} detik lagi sebelum mengirim ulang kode OTP baru.",
                 ])->with('otp_cooldown', $remainingSeconds);
@@ -61,7 +62,11 @@ class PasswordResetLinkController extends Controller
             ]
         );
 
-        // 4. Simpan email di session agar form verifikasi langsung terisi
+        // 4. Pasang jeda waktu 60 detik untuk kirim ulang kode OTP berikutnya
+        RateLimiter::clear($throttleKey);
+        RateLimiter::hit($throttleKey, 60);
+
+        // 5. Simpan email di session agar form verifikasi langsung terisi
         session([
             'reset_email' => $email,
         ]);

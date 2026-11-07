@@ -10,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
@@ -24,12 +25,9 @@ class NewPasswordController extends Controller
         $email = session('reset_email', $request->query('email', ''));
         $cooldown = 0;
         if ($email) {
-            $existing = DB::table('password_reset_tokens')->where('email', strtolower(trim($email)))->first();
-            if ($existing && $existing->created_at) {
-                $secondsAgo = Carbon::now()->diffInSeconds(Carbon::parse($existing->created_at));
-                if ($secondsAgo < 60) {
-                    $cooldown = 60 - $secondsAgo;
-                }
+            $throttleKey = 'otp-resend:' . strtolower(trim($email));
+            if (RateLimiter::tooManyAttempts($throttleKey, 1)) {
+                $cooldown = RateLimiter::availableIn($throttleKey);
             }
         }
         if (session()->has('otp_cooldown')) {
@@ -99,6 +97,7 @@ class NewPasswordController extends Controller
 
         // 5. Hapus OTP yang sudah digunakan agar tidak bisa dipakai ulang
         DB::table('password_reset_tokens')->where('email', $email)->delete();
+        RateLimiter::clear('otp-resend:' . $email);
         session()->forget(['reset_email']);
 
         event(new PasswordReset($user));

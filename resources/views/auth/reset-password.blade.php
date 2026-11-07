@@ -132,6 +132,7 @@
         <form method="POST" action="{{ route('password.email') }}" class="inline-block">
             @csrf
             <input type="hidden" name="email" value="{{ old('email', $email) }}">
+            <input type="hidden" name="is_resend" value="1">
             <button type="submit" 
                     :disabled="cooldown > 0"
                     :class="cooldown > 0 ? 'opacity-60 cursor-not-allowed bg-slate-100 text-slate-400 border-slate-200' : 'bg-indigo-50 hover:bg-indigo-100 text-indigo-600 hover:text-indigo-800 border-indigo-200/80 cursor-pointer'"
