@@ -7,6 +7,11 @@
 
         <title>{{ config('app.name', 'SCP - School Class Progress') }}</title>
 
+        <!-- Favicon / Logo Aplikasi SCP -->
+        <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}">
+        <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
+        <link rel="apple-touch-icon" href="{{ asset('images/logo-sm.png') }}">
+
         <!-- Script Deteksi Tema Cepat (Mencegah Layar Berkedip saat Refresh) -->
         <script>
             if (localStorage.getItem('scp_theme') === 'light') {
@@ -955,9 +960,7 @@
                     <!-- Brand / Logo & Subtitle Role -->
                     <div class="flex items-center justify-between mb-6">
                         <div class="flex items-center gap-3">
-                            <div class="h-10 w-10 scp-badge-gradient flex items-center justify-center font-black text-lg text-white shadow-lg shrink-0" style="border-radius: 12px;">
-                                S
-                            </div>
+                            <img src="{{ asset('images/logo-sm.png') }}" alt="Logo SCP" class="h-10 w-10 object-contain shrink-0 drop-shadow-md" />
                             <div>
                                 <h2 class="text-base font-extrabold text-white leading-tight">SCP Sekolah</h2>
                                 <p class="text-[11px] font-bold text-indigo-400 tracking-wider uppercase">

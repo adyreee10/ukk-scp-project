@@ -1,8 +1,8 @@
 <x-guest-layout>
     <!-- Header SCP -->
     <div class="text-center mb-6">
-        <div class="inline-flex h-14 w-14 items-center justify-center scp-badge-gradient font-black text-2xl mb-3.5 ring-4 ring-indigo-100/80 text-white" style="border-radius: 15px;">
-            SCP
+        <div class="inline-flex items-center justify-center mb-3">
+            <img src="{{ asset('images/logo.png') }}" alt="Logo SCP" class="h-20 w-20 object-contain drop-shadow-lg" />
         </div>
         <h2 class="text-2xl font-black text-slate-800 tracking-tight">Verifikasi OTP & Sandi Baru</h2>
         <p class="text-xs font-semibold text-slate-500 mt-1.5 leading-relaxed">
