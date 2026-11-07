@@ -666,9 +666,10 @@ Route::middleware(['auth', 'role:Wali Kelas,Guru BK,Waka Kurikulum'])->group(fun
         $studentId = $user->role?->role_name === 'Siswa' ? $user->id : ($user->children()->first()?->id ?? $user->id);
 
         $rules = [
-            'leave_type' => ['required', 'in:Sakit,Izin,Potong Jam Pelajaran,Dispensasi'],
-            'reason'     => ['required', 'string', 'max:255'],
-            'document'   => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:2048'],
+            'leave_type'        => ['required', 'in:Sakit,Izin,Potong Jam Pelajaran,Dispensasi'],
+            'reason'            => ['required', 'string', 'max:255'],
+            'document'          => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'document_base64'   => ['nullable', 'string'],
         ];
 
         if ($request->leave_type === 'Potong Jam Pelajaran') {
@@ -695,8 +696,25 @@ Route::middleware(['auth', 'role:Wali Kelas,Guru BK,Waka Kurikulum'])->group(fun
             $endTime   = null;
         }
 
-        // Upload dokumen bukti izin
-        $docPath = $request->file('document')->store('leave_documents', 'public');
+        // Simpan foto bukti izin dari kamera real-time
+        $docFile = $request->file('document');
+        $docBase64 = $request->input('document_base64');
+
+        if (!$docFile && !$docBase64) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['document' => 'Wajib mengambil foto surat bukti izin secara real-time dari kamera.']);
+        }
+
+        if ($docFile) {
+            $docPath = $docFile->store('leave_documents', 'public');
+        } else {
+            $imgData = preg_replace('/^data:image\/\w+;base64,/', '', $docBase64);
+            $imgDecoded = base64_decode($imgData);
+            $filename = 'leave_documents/' . \Illuminate\Support\Str::random(40) . '.jpg';
+            \Illuminate\Support\Facades\Storage::disk('public')->put($filename, $imgDecoded);
+            $docPath = $filename;
+        }
 
         LeaveRequest::create([
             'student_id'      => $studentId,

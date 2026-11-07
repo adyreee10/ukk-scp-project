@@ -72,26 +72,6 @@ class _TeacherJournalCreateScreenState extends State<TeacherJournalCreateScreen>
     }
   }
 
-  Future<void> _pickGalleryPhoto() async {
-    try {
-      final XFile? photo = await _picker.pickImage(
-        source: ImageSource.gallery,
-        imageQuality: 80,
-      );
-      if (photo != null) {
-        setState(() {
-          _capturedPhoto = File(photo.path);
-          _photoName = 'Foto_Galeri_${DateTime.now().millisecondsSinceEpoch}.jpg';
-          _errorMessage = null;
-        });
-      }
-    } catch (e) {
-      setState(() {
-        _errorMessage = 'Gagal memilih foto: ${e.toString()}';
-      });
-    }
-  }
-
   Future<void> _handleSubmit() async {
     if (_selectedSchedule == null) {
       setState(() => _errorMessage = 'Harap pilih jadwal mengajar.');
@@ -304,26 +284,22 @@ class _TeacherJournalCreateScreenState extends State<TeacherJournalCreateScreen>
               const SizedBox(height: 12),
             ],
 
-            // Tombol Kamera Realtime (Paling Menonjol)
-            Row(
+            // Tombol Kamera Realtime (Wajib Kamera Langsung)
+            CustomButton(
+              text: _capturedPhoto == null ? 'Ambil Foto Kamera Real-Time' : 'Ambil Ulang Foto Kamera',
+              icon: Icons.camera_alt_rounded,
+              onPressed: _takeRealtimeKbmPhoto,
+            ),
+            const SizedBox(height: 6),
+            const Row(
               children: [
+                Icon(Icons.lock_clock_rounded, size: 14, color: AppTheme.warning),
+                SizedBox(width: 6),
                 Expanded(
-                  child: CustomButton(
-                    text: 'Jepret Kamera Realtime',
-                    icon: Icons.camera_alt_rounded,
-                    onPressed: _takeRealtimeKbmPhoto,
+                  child: Text(
+                    'Wajib foto langsung saat KBM. Pilihan galeri dinonaktifkan untuk mencegah kecurangan.',
+                    style: TextStyle(fontSize: 10, color: AppTheme.textSecondary),
                   ),
-                ),
-                const SizedBox(width: 10),
-                OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppTheme.textSecondary,
-                    side: const BorderSide(color: AppTheme.borderDark),
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  ),
-                  onPressed: _pickGalleryPhoto,
-                  child: const Icon(Icons.photo_library_rounded, size: 20),
                 ),
               ],
             ),

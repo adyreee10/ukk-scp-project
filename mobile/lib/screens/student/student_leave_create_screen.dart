@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:file_picker/file_picker.dart';
 import '../../core/api/api_client.dart';
 import '../../core/api/api_endpoints.dart';
 import '../../core/theme/app_theme.dart';
@@ -90,27 +89,6 @@ class _StudentLeaveCreateScreenState extends State<StudentLeaveCreateScreen> {
     }
   }
 
-  // 2. Pilih Dokumen atau Galeri
-  Future<void> _pickDocumentOrGallery() async {
-    try {
-      final result = await FilePicker.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png'],
-      );
-      if (result != null && result.files.single.path != null) {
-        setState(() {
-          _selectedFile = File(result.files.single.path!);
-          _selectedFileName = result.files.single.name;
-          _errorMessage = null;
-        });
-      }
-    } catch (e) {
-      setState(() {
-        _errorMessage = 'Gagal memilih dokumen: ${e.toString()}';
-      });
-    }
-  }
-
   Future<void> _handleSubmit() async {
     final reason = _reasonController.text.trim();
     if (reason.isEmpty) {
@@ -118,7 +96,7 @@ class _StudentLeaveCreateScreenState extends State<StudentLeaveCreateScreen> {
       return;
     }
     if (_selectedFile == null) {
-      setState(() => _errorMessage = 'Wajib melampirkan foto realtime kamera atau dokumen bukti izin.');
+      setState(() => _errorMessage = 'Wajib mengambil foto fisik surat keterangan izin melalui kamera.');
       return;
     }
 
@@ -365,39 +343,36 @@ class _StudentLeaveCreateScreenState extends State<StudentLeaveCreateScreen> {
               const SizedBox(height: 12),
             ],
 
-            // 2 Tombol Pilihan: Kamera Realtime vs Berkas
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: AppTheme.primaryIndigo,
-                      side: const BorderSide(color: AppTheme.primaryIndigo),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                    icon: const Icon(Icons.camera_alt_rounded, size: 18),
-                    label: const Text('Foto Realtime', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                    onPressed: _takeCameraPhoto,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: AppTheme.textSecondary,
-                      side: const BorderSide(color: AppTheme.borderDark),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                    icon: const Icon(Icons.folder_open_rounded, size: 18),
-                    label: const Text('Pilih Berkas', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                    onPressed: _pickDocumentOrGallery,
-                  ),
-                ),
-              ],
+            // Tombol Kamera Realtime Wajib (Galeri & File Ditiadakan Mencegah Kecurangan)
+            CustomButton(
+              text: _selectedFile == null
+                  ? 'Ambil Foto Surat Izin (Kamera Real-Time)'
+                  : 'Foto Ulang Surat Izin',
+              icon: Icons.camera_alt_rounded,
+              onPressed: _takeCameraPhoto,
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: AppTheme.warning.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: AppTheme.warning.withValues(alpha: 0.3)),
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.lock_clock_rounded, size: 14, color: AppTheme.warning),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Wajib foto fisik surat keterangan izin secara langsung via kamera. Pilihan galeri & dokumen dinonaktifkan untuk mencegah manipulasi lampiran.',
+                      style: TextStyle(fontSize: 10.5, color: AppTheme.textSecondary),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
 
             // Submit Button
             CustomButton(

@@ -14,6 +14,8 @@ use App\Support\IndonesianDay;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class TeacherController extends Controller
 {
@@ -164,11 +166,20 @@ class TeacherController extends Controller
             'schedule_id'       => ['required', 'exists:schedules,id'],
             'date'              => ['required', 'date', 'before_or_equal:today'],
             'topic_description' => ['required', 'string', 'max:5000'],
-            'photo'             => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:3072'],
+            'photo'             => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'photo_base64'      => ['nullable', 'string'],
             'attendances'       => ['nullable', 'array'],
             'attendance_notes'  => ['nullable', 'array'],
         ]);
 
+        $photoFile = $request->file('photo');
+        $photoBase64 = $request->input('photo_base64');
+
+        if (!$photoFile && !$photoBase64) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['photo' => 'Wajib mengambil foto bukti KBM secara real-time dari kamera.']);
+        }
 
         $schedule = Schedule::where('teacher_id', auth()->id())->findOrFail($validated['schedule_id']);
         $date = Carbon::parse($validated['date'])->startOfDay();
@@ -179,7 +190,15 @@ class TeacherController extends Controller
                 ->with('error', 'Jurnal pembelajaran untuk kelas dan tanggal ini sudah pernah diisi sebelumnya.');
         }
 
-        $photoPath = $request->file('photo')->store('journals', 'public');
+        if ($photoFile) {
+            $photoPath = $photoFile->store('journals', 'public');
+        } else {
+            $imgData = preg_replace('/^data:image\/\w+;base64,/', '', $photoBase64);
+            $imgDecoded = base64_decode($imgData);
+            $filename = 'journals/' . Str::random(40) . '.jpg';
+            Storage::disk('public')->put($filename, $imgDecoded);
+            $photoPath = $filename;
+        }
 
         DB::transaction(function () use ($schedule, $date, $validated, $photoPath, $attendanceService) {
             $journal = Journal::create([
