@@ -1039,6 +1039,61 @@
                 border-color: #e2e8f0 !important;
             }
 
+            /* Tombol Navigasi Halaman Ringkas (Table Pagination Buttons) */
+            .table-page-btn, .table-page-active, .table-page-disabled {
+                transition: all 0.15s ease !important;
+            }
+            html.theme-light .table-page-btn {
+                background-color: #ffffff !important;
+                border: 1px solid #cbd5e1 !important;
+                color: #334155 !important;
+            }
+            html.theme-light .table-page-btn:hover {
+                background-color: #f1f5f9 !important;
+                border-color: #94a3b8 !important;
+                color: #0f172a !important;
+            }
+            html.theme-light .table-page-active {
+                background-color: #4f46e5 !important;
+                border: 1px solid #4338ca !important;
+                color: #ffffff !important;
+            }
+            html.theme-light .table-page-disabled {
+                background-color: #f8fafc !important;
+                border: 1px solid #e2e8f0 !important;
+                color: #94a3b8 !important;
+            }
+            html.theme-light .table-page-dots {
+                color: #64748b !important;
+            }
+
+            /* ===================================================
+               KOTAK PERINGATAN MODAL HAPUS DI MODE TERANG
+               (bg-rose-950, text-rose-200, text-rose-300, text-rose-400)
+               =================================================== */
+            html.theme-light [class*="bg-rose-950"] {
+                background-color: #fff1f2 !important; /* Soft rose / red light background */
+                border-color: #fecdd3 !important;      /* Soft rose border */
+                color: #9f1239 !important;             /* Dark rose / crimson text */
+            }
+            html.theme-light [class*="bg-rose-950"] * {
+                color: #9f1239 !important;
+            }
+            html.theme-light [class*="bg-rose-950"] strong {
+                color: #881337 !important;             /* Darker crimson strong text */
+                font-weight: 800 !important;
+            }
+            html.theme-light .text-rose-200,
+            html.theme-light .text-rose-300 {
+                color: #9f1239 !important;
+            }
+            html.theme-light .text-rose-400 {
+                color: #be123c !important;             /* Crisp dark rose */
+            }
+            html.theme-light [class*="border-rose-800"] {
+                border-color: #fecdd3 !important;
+            }
+
             /* ===================================================
                TRANSFORMASI WARNA KUNING DI MODE TERANG (SEMUA ROLE)
                (Kuning terang diubah menjadi Amber pekat kontras tinggi)

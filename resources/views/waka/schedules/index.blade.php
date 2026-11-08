@@ -710,10 +710,16 @@
                     <div>
                         <label class="block font-bold text-slate-300 mb-1.5">Cakupan Putaran / Siklus:</label>
                         <select name="scope" class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2.5 text-xs font-semibold text-white focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500">
-                            <option value="active_cycle">Hanya Jadwal di {{ $config->active_cycle }} (Putaran Aktif)</option>
-                            <option value="all_cycles">⚠️ Hapus SELURUH Jadwal di SEMUA Putaran (Putaran 1 & Putaran 2)</option>
+                            <option value="cycle_1" {{ $config->active_cycle == 'Putaran 1' ? 'selected' : '' }}>
+                                Hanya Jadwal di Putaran 1{{ $config->active_cycle == 'Putaran 1' ? ' (Putaran Aktif)' : '' }}
+                            </option>
+                            <option value="cycle_2" {{ $config->active_cycle == 'Putaran 2' ? 'selected' : '' }}>
+                                Hanya Jadwal di Putaran 2{{ $config->active_cycle == 'Putaran 2' ? ' (Putaran Aktif)' : '' }}
+                            </option>
+                            <option value="all_cycles">
+                                ⚠️ Hapus SELURUH Jadwal di SEMUA Putaran (Putaran 1 & Putaran 2)
+                            </option>
                         </select>
-                        <input type="hidden" name="cycle_type" value="{{ $config->active_cycle }}">
                     </div>
 
                     <div>

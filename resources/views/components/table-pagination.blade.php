@@ -44,10 +44,70 @@
         </span>
     </div>
 
-    <!-- Link Navigasi Halaman (Hanya Tampil Jika Data Melebihi 1 Halaman) -->
+    <!-- Link Navigasi Halaman Ringkas (Compact Pagination: Tidak Terlalu Banyak Halaman Agar Tidak Overwrite) -->
     @if($paginator->hasPages())
-        <div class="shrink-0">
-            {{ $paginator->links() }}
+        @php
+            $currentPage = $paginator->currentPage();
+            $lastPage = $paginator->lastPage();
+            
+            // Logika slider ringkas: maksimal 5 nomor halaman ditampilkan + tanda titik elipsis
+            if ($lastPage <= 7) {
+                $pages = range(1, $lastPage);
+            } else {
+                if ($currentPage <= 3) {
+                    $pages = [1, 2, 3, 4, '...', $lastPage];
+                } elseif ($currentPage >= $lastPage - 2) {
+                    $pages = [1, '...', $lastPage - 3, $lastPage - 2, $lastPage - 1, $lastPage];
+                } else {
+                    $pages = [1, '...', $currentPage - 1, $currentPage, $currentPage + 1, '...', $lastPage];
+                }
+            }
+        @endphp
+
+        <div class="flex items-center gap-1 sm:gap-1.5 flex-wrap justify-end">
+            {{-- Tombol Sebelumnya (Previous) --}}
+            @if ($paginator->onFirstPage())
+                <span class="table-page-disabled w-8 h-8 rounded-lg flex items-center justify-center text-slate-600 border border-slate-800/80 bg-slate-900/40 cursor-not-allowed" title="Halaman Pertama">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                </span>
+            @else
+                <a href="{{ $paginator->previousPageUrl() }}" 
+                   class="table-page-btn w-8 h-8 rounded-lg flex items-center justify-center text-slate-300 border border-slate-700 bg-slate-900 hover:bg-slate-800 hover:text-white transition shadow-sm"
+                   title="Halaman Sebelumnya">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                </a>
+            @endif
+
+            {{-- Nomor-Nomor Halaman --}}
+            @foreach ($pages as $p)
+                @if (is_string($p))
+                    <span class="table-page-dots w-7 h-8 flex items-center justify-center text-slate-500 font-bold select-none text-xs">
+                        &hellip;
+                    </span>
+                @elseif ($p == $currentPage)
+                    <span class="table-page-active w-8 h-8 rounded-lg flex items-center justify-center bg-indigo-600 text-white font-extrabold border border-indigo-500 shadow-md text-xs cursor-default">
+                        {{ $p }}
+                    </span>
+                @else
+                    <a href="{{ $paginator->url($p) }}" 
+                       class="table-page-btn w-8 h-8 rounded-lg flex items-center justify-center text-slate-300 border border-slate-700 bg-slate-900 hover:bg-slate-800 hover:text-white transition font-semibold text-xs">
+                        {{ $p }}
+                    </a>
+                @endif
+            @endforeach
+
+            {{-- Tombol Selanjutnya (Next) --}}
+            @if ($paginator->hasMorePages())
+                <a href="{{ $paginator->nextPageUrl() }}" 
+                   class="table-page-btn w-8 h-8 rounded-lg flex items-center justify-center text-slate-300 border border-slate-700 bg-slate-900 hover:bg-slate-800 hover:text-white transition shadow-sm"
+                   title="Halaman Selanjutnya">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </a>
+            @else
+                <span class="table-page-disabled w-8 h-8 rounded-lg flex items-center justify-center text-slate-600 border border-slate-800/80 bg-slate-900/40 cursor-not-allowed" title="Halaman Terakhir">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </span>
+            @endif
         </div>
     @endif
 </div>

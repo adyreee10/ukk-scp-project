@@ -317,8 +317,14 @@ class WakaController extends Controller
 
         $query = Schedule::query();
 
-        $scope = $request->input('scope', 'active_cycle');
-        if ($scope === 'active_cycle') {
+        $scope = $request->input('scope', 'cycle_1');
+        if ($scope === 'cycle_1' || $scope === 'Putaran 1') {
+            $query->where('cycle_type', 'Putaran 1');
+            $scopeDesc = "di Putaran 1";
+        } elseif ($scope === 'cycle_2' || $scope === 'Putaran 2') {
+            $query->where('cycle_type', 'Putaran 2');
+            $scopeDesc = "di Putaran 2";
+        } elseif ($scope === 'active_cycle') {
             $cycle = $request->input('cycle_type', $config->active_cycle);
             $query->where('cycle_type', $cycle);
             $scopeDesc = "di {$cycle}";
