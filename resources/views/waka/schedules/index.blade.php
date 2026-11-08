@@ -717,7 +717,7 @@
                                 Hanya Jadwal di Putaran 2{{ $config->active_cycle == 'Putaran 2' ? ' (Putaran Aktif)' : '' }}
                             </option>
                             <option value="all_cycles">
-                                ⚠️ Hapus SELURUH Jadwal di SEMUA Putaran (Putaran 1 & Putaran 2)
+                                Hapus SELURUH Jadwal di SEMUA Putaran (Putaran 1 & Putaran 2)
                             </option>
                         </select>
                     </div>
