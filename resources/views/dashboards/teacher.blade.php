@@ -1,12 +1,17 @@
 <x-app-layout>
     <div class="space-y-6">
 
-        <!-- Header Dashboard Guru -->
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <!-- Header Dashboard Wali Kelas / Guru (Ukuran Font Persis Milik Waka) -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-7">
             <div>
-                <h1 class="text-xl sm:text-2xl font-black text-white tracking-tight">Dashboard Guru</h1>
-                <p class="text-xs font-semibold text-slate-400 mt-0.5">
-                    Selamat mengajar, <strong class="text-white">{{ auth()->user()->name }}</strong> • {{ now()->translatedFormat('l, d F Y') }}
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                    {{ auth()->user()->role?->role_name === 'Wali Kelas' ? 'Dashboard Wali Kelas' : (auth()->user()->role?->role_name === 'Guru BK' ? 'Dashboard Guru BK' : 'Dashboard Guru') }}
+                </h1>
+                <p class="text-sm sm:text-base text-slate-800 dark:text-slate-300 font-semibold mt-2 flex items-center flex-wrap gap-2">
+                    <span>Selamat mengajar,</span>
+                    <strong class="font-extrabold text-indigo-600 dark:text-indigo-400 text-base sm:text-lg">{{ auth()->user()->name }}</strong>
+                    <span class="text-slate-400 dark:text-slate-500">•</span>
+                    <span class="text-black dark:text-white font-extrabold tracking-wide">{{ now()->translatedFormat('l, d F Y') }}</span>
                 </p>
             </div>
             <!-- BADGE SIKLUS PUTARAN (DIPERBESAR & KONTRAS LEBIH JELAS) -->
@@ -150,6 +155,7 @@
                             <tr class="text-left text-xs font-bold text-slate-400 uppercase tracking-wider">
                                 <th class="p-4">Tanggal KBM</th>
                                 <th class="p-4">Mapel & Kelas</th>
+                                <th class="p-4 text-center">Status Jurnal</th>
                                 <th class="p-4">Topik Materi Pembelajaran</th>
                                 <th class="p-4 text-center">Status Presensi</th>
                             </tr>
@@ -163,6 +169,12 @@
                                     <td class="p-4">
                                         <div class="font-bold text-white text-xs">{{ $journal->schedule?->subject }}</div>
                                         <div class="text-[11px] text-slate-400">{{ $journal->schedule?->schoolClass?->class_name }} • {{ $journal->schedule?->room?->room_name }}</div>
+                                    </td>
+                                    <td class="p-4 text-center whitespace-nowrap">
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-black bg-emerald-950/70 text-emerald-300 border border-emerald-600/60 shadow-sm">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                                            <span>Mengisi Jurnal</span>
+                                        </span>
                                     </td>
                                     <td class="p-4 text-xs text-slate-300 max-w-xs truncate">
                                         {{ $journal->topic_description }}

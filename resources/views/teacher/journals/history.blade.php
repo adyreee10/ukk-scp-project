@@ -55,6 +55,16 @@
         <!-- FILTER BAR -->
         <div class="bg-[#0f172a]/90 backdrop-blur-md p-4 rounded-2xl border border-slate-800 shadow-xl">
             <form method="GET" action="{{ route('teacher.journals.history') }}" class="flex flex-wrap items-center gap-3 text-xs">
+                <!-- Filter Status Pengisian -->
+                <div class="flex items-center gap-1.5 bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-700">
+                    <span class="text-slate-400 font-bold uppercase text-[10px]">Status:</span>
+                    <select name="status" onchange="this.form.submit()" class="bg-transparent text-white text-xs font-semibold focus:outline-none cursor-pointer">
+                        <option value="all" {{ ($statusFilter ?? 'all') === 'all' ? 'selected' : '' }} class="bg-slate-900 text-white">Semua Status</option>
+                        <option value="filled" {{ ($statusFilter ?? '') === 'filled' ? 'selected' : '' }} class="bg-slate-900 text-white">Mengisi Jurnal (Hijau)</option>
+                        <option value="unfilled" {{ ($statusFilter ?? '') === 'unfilled' ? 'selected' : '' }} class="bg-slate-900 text-white">Tidak Mengisi Jurnal (Merah)</option>
+                    </select>
+                </div>
+
                 <!-- Filter Kelas -->
                 <div class="flex items-center gap-1.5 bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-700">
                     <span class="text-slate-400 font-bold uppercase text-[10px]">Kelas:</span>
@@ -71,10 +81,10 @@
                 <!-- Filter Bulan -->
                 <div class="flex items-center gap-1.5 bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-700">
                     <span class="text-slate-400 font-bold uppercase text-[10px]">Bulan:</span>
-                    <input type="month" name="month" value="{{ request('month') }}" onchange="this.form.submit()" class="bg-transparent text-white text-xs font-semibold focus:outline-none cursor-pointer">
+                    <input type="month" name="month" value="{{ $monthInput ?? request('month', now()->format('Y-m')) }}" onchange="this.form.submit()" class="bg-transparent text-white text-xs font-semibold focus:outline-none cursor-pointer">
                 </div>
 
-                @if(request()->hasAny(['class_id', 'month']))
+                @if(request()->filled('class_id') || (request()->filled('status') && request('status') !== 'all') || (request()->filled('month') && request('month') !== now()->format('Y-m')))
                     <a href="{{ route('teacher.journals.history') }}" class="px-2.5 py-1.5 rounded-xl bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20 font-bold text-xs">
                         ✕ Reset Filter
                     </a>
@@ -87,7 +97,7 @@
             @if($journals->isEmpty())
                 <div class="text-center py-16 text-slate-400 text-xs">
                     <p class="font-bold text-white text-sm mb-1">Belum Ada Riwayat Jurnal</p>
-                    <p>Anda belum mengisi jurnal KBM untuk kriteria pencarian ini.</p>
+                    <p>Tidak ditemukan sesi KBM untuk kriteria pencarian yang Anda pilih.</p>
                 </div>
             @else
                 <div class="overflow-x-auto">
@@ -96,6 +106,7 @@
                             <tr class="text-left text-xs font-bold text-slate-400 uppercase tracking-wider">
                                 <th class="p-4">Tanggal KBM</th>
                                 <th class="p-4">Kelas & Mapel</th>
+                                <th class="p-4 text-center">Status Jurnal</th>
                                 <th class="p-4">Materi Pembelajaran</th>
                                 <th class="p-4 text-center">Foto Bukti</th>
                                 <th class="p-4 text-center">Kehadiran Siswa</th>
@@ -109,13 +120,32 @@
                                     </td>
                                     <td class="p-4">
                                         <p class="font-bold text-white text-xs">{{ $j->schedule?->subject ?? 'Mata Pelajaran' }}</p>
-                                        <p class="text-[11px] text-slate-400">Kelas {{ $j->schedule?->schoolClass?->class_name ?? '-' }} • {{ $j->schedule?->room?->room_name ?? 'Ruang Teori' }}</p>
-                                    </td>
-                                    <td class="p-4 max-w-sm text-xs text-slate-300">
-                                        {{ $j->topic_description }}
+                                        <p class="text-[11px] text-slate-400">Kelas {{ $j->schedule?->schoolClass?->class_name ?? '-' }} • {{ $j->schedule?->room?->room_name ?? 'Ruang Teori' }} ({{ $j->schedule?->period_label }})</p>
                                     </td>
                                     <td class="p-4 text-center whitespace-nowrap">
-                                        @if($j->photo_path)
+                                        @if($j->is_filled)
+                                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black bg-emerald-950/70 text-emerald-300 border border-emerald-600/60 shadow-sm">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                                                <span>Mengisi Jurnal</span>
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black bg-rose-950/70 text-rose-300 border border-rose-700/60 shadow-sm">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
+                                                <span>Tidak Mengisi Jurnal</span>
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td class="p-4 max-w-sm text-xs text-slate-300">
+                                        @if($j->is_filled)
+                                            {{ $j->topic_description }}
+                                        @else
+                                            <span class="text-rose-400/90 italic font-medium">
+                                                {{ $j->topic_description }}
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td class="p-4 text-center whitespace-nowrap">
+                                        @if($j->is_filled && $j->photo_path)
                                             <button type="button" 
                                                     @click="openPreviewDoc('{{ url('media/' . $j->photo_path) }}', 'Foto Dokumentasi KBM - {{ addslashes($j->schedule?->subject ?? '') }} ({{ addslashes($j->schedule?->schoolClass?->class_name ?? '') }})')"
                                                     class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold btn-photo shadow-sm transition cursor-pointer">
@@ -126,10 +156,14 @@
                                         @endif
                                     </td>
                                     <td class="p-4 text-center whitespace-nowrap text-xs font-mono">
-                                        <span class="text-emerald-400 font-bold">H: {{ $j->attendances->where('status', 'Hadir')->count() }}</span> •
-                                        <span class="text-amber-400 font-bold">S: {{ $j->attendances->where('status', 'Sakit')->count() }}</span> •
-                                        <span class="text-blue-400 font-bold">I: {{ $j->attendances->where('status', 'Izin')->count() }}</span> •
-                                        <span class="text-red-400 font-bold">A: {{ $j->attendances->where('status', 'Alpa')->count() }}</span>
+                                        @if($j->is_filled && $j->attendances->isNotEmpty())
+                                            <span class="text-emerald-400 font-bold">H: {{ $j->attendances->where('status', 'Hadir')->count() }}</span> •
+                                            <span class="text-amber-400 font-bold">S: {{ $j->attendances->where('status', 'Sakit')->count() }}</span> •
+                                            <span class="text-blue-400 font-bold">I: {{ $j->attendances->where('status', 'Izin')->count() }}</span> •
+                                            <span class="text-red-400 font-bold">A: {{ $j->attendances->where('status', 'Alpa')->count() }}</span>
+                                        @else
+                                            <span class="text-slate-500 text-xs italic">-</span>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach

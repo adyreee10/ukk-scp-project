@@ -286,6 +286,7 @@ Route::middleware(['auth', 'role:Guru,Wali Kelas,Guru BK'])->group(function () {
     Route::get('/teacher/schedules', [TeacherController::class, 'schedulesIndex'])->name('teacher.schedules.index');
     Route::get('/teacher/journals/create', [TeacherController::class, 'createJournal'])->name('teacher.journals.create');
     Route::post('/teacher/journals', [TeacherController::class, 'storeJournal'])->name('teacher.journals.store');
+    Route::put('/teacher/journals/{journal}/attendance', [TeacherController::class, 'updateJournalAttendance'])->name('teacher.journals.update-attendance');
     Route::get('/teacher/journals/history', [TeacherController::class, 'journalsHistory'])->name('teacher.journals.history');
 });
 

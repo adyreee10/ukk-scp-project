@@ -90,22 +90,15 @@
                                     <h3 class="font-bold text-white text-sm mt-1.5">{{ $schedule->subject }}</h3>
                                     <p class="text-xs text-slate-400">{{ $schedule->schoolClass->class_name }} • {{ $schedule->room->room_name }}</p>
                                 </div>
-                                <span class="text-xs font-mono font-bold text-slate-300 shrink-0">
+                                <span class="text-xs font-mono font-bold text-blue-600 dark:text-indigo-400 shrink-0">
                                     {{ $schedule->period_label }}
                                 </span>
-                            </div>
-                            <div class="mt-3 pt-3 border-t border-slate-800/80 flex justify-end">
-                                <a href="{{ route('teacher.journals.create', ['schedule_id' => $schedule->id]) }}" 
-                                   class="w-full text-center px-4 py-2 rounded-xl scp-btn-gradient text-xs font-bold shadow-md transition"
-                                   style="color: #ffffff !important;">
-                                    <span style="color: #ffffff !important;">Isi Jurnal & Absen →</span>
-                                </a>
                             </div>
                         </div>
                     @endforeach
                 </div>
 
-                <!-- Tampilan Desktop (Table View) -->
+                <!-- Tampilan Desktop (Table View Tanpa Kolom Aksi / Isi Jurnal) -->
                 <div class="hidden md:block overflow-x-auto">
                     <table class="min-w-full divide-y divide-slate-800 text-sm">
                         <thead class="bg-slate-900/70">
@@ -114,33 +107,24 @@
                                 <th class="p-4">Mata Pelajaran</th>
                                 <th class="p-4">Kelas</th>
                                 <th class="p-4">Ruang</th>
-                                <th class="p-4 text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-800/60">
                             @foreach ($schedules as $schedule)
                                 <tr class="hover:bg-slate-800/30 transition">
-                                    <td class="p-4">
+                                    <td class="p-4 whitespace-nowrap">
                                         <div class="font-bold text-white">{{ $schedule->day_of_week }}</div>
-                                        <div class="text-xs font-mono text-slate-400">
+                                        <div class="text-xs font-mono font-bold text-blue-600 dark:text-indigo-400 mt-0.5">
                                             {{ $schedule->period_label }}
                                         </div>
                                     </td>
                                     <td class="p-4 font-semibold text-white">{{ $schedule->subject }}</td>
-                                    <td class="p-4">
-                                        <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-indigo-950/60 text-indigo-300 border border-indigo-800/60">
+                                    <td class="p-4 whitespace-nowrap">
+                                        <span class="px-3 py-1 rounded-md text-xs font-bold bg-indigo-950/60 text-indigo-300 border border-indigo-800/60 whitespace-nowrap inline-flex items-center shadow-xs">
                                             {{ $schedule->schoolClass->class_name }}
                                         </span>
                                     </td>
                                     <td class="p-4 text-slate-300 text-xs">{{ $schedule->room->room_name }}</td>
-                                    <td class="p-4 text-center">
-                                        <!-- TOMBOL AKSI DENGAN TEKS PUTIH SOLID (#ffffff) -->
-                                        <a href="{{ route('teacher.journals.create', ['schedule_id' => $schedule->id]) }}" 
-                                           class="inline-flex items-center justify-center px-4 py-2 rounded-xl scp-btn-gradient text-xs font-bold shadow-md hover:shadow-lg transition cursor-pointer whitespace-nowrap"
-                                           style="color: #ffffff !important;">
-                                            <span style="color: #ffffff !important;">Isi Jurnal & Absen →</span>
-                                        </a>
-                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>

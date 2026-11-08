@@ -1382,6 +1382,20 @@
                 }
             }
 
+            /* Pastikan Sidebar Desktop Selalu Terkunci Permanen di Viewport (Anti-Scroll) */
+            @media (min-width: 1024px) {
+                aside {
+                    position: fixed !important;
+                    top: 0 !important;
+                    bottom: 0 !important;
+                    left: 0 !important;
+                    height: 100vh !important;
+                    height: 100dvh !important;
+                    transform: none !important;
+                    z-index: 50 !important;
+                }
+            }
+
         </style>
     </head>
     <body class="min-h-screen text-slate-100 antialiased font-sans transition-colors duration-200">
@@ -1424,8 +1438,8 @@
             </div>
 
             <!-- SIDEBAR RESPONSIVE (Dinamis Sesuai Role Pengguna) -->
-            <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
-                   class="fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] h-full h-[100dvh] lg:sticky lg:top-0 lg:h-screen lg:w-64 lg:max-w-none bg-[#0c1322] border-r border-slate-800 flex flex-col justify-between transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none overscroll-contain">
+            <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:transform-none'"
+                   class="fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] h-full h-[100dvh] lg:w-64 lg:max-w-none bg-[#0c1322] border-r border-slate-800 flex flex-col justify-between transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none overscroll-contain">
                 
                 <div class="p-5 flex flex-col h-full overflow-y-auto overscroll-contain no-scrollbar">
                     <!-- Brand / Logo & Subtitle Role -->
@@ -1465,7 +1479,7 @@
                                     <a href="{{ route('teacher.dashboard') }}" 
                                        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs transition {{ request()->routeIs('teacher.dashboard') ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-600/30' : 'text-slate-100 hover:bg-slate-800/80 hover:text-white font-semibold' }}">
                                         <svg class="w-4 h-4 {{ request()->routeIs('teacher.dashboard') ? 'text-white' : 'text-slate-300' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                                        Dashboard Guru
+                                        Dashboard
                                     </a>
 
                                     <a href="{{ route('teacher.schedules.index') }}" 
@@ -1697,7 +1711,7 @@
 
 
             <!-- AREA KONTEN UTAMA -->
-            <div class="flex-1 flex flex-col min-h-screen min-w-0">
+            <div class="flex-1 flex flex-col min-h-screen min-w-0 lg:pl-64">
                 
                 <!-- TOPBAR -->
                 <header class="h-16 bg-[#0c1322] border-b border-slate-800 px-3 sm:px-6 md:px-8 flex items-center justify-between sticky top-0 z-30 transition-colors duration-200">
@@ -1742,7 +1756,7 @@
                 </header>
 
                 <!-- KONTEN HALAMAN -->
-                <main class="flex-1 p-4 sm:p-6 lg:p-8 w-full max-w-7xl 2xl:max-w-[1600px] mx-auto">
+                <main class="flex-1 p-3 sm:p-5 lg:p-6 w-full max-w-7xl 2xl:max-w-[1600px] mx-auto">
                     @if (session('success'))
                         <div class="mb-5 p-4 rounded-xl flash-success flex items-center justify-between shadow-md">
                             <div class="flex items-center gap-3">
