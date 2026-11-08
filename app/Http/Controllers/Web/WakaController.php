@@ -37,10 +37,48 @@ class WakaController extends Controller
         ]);
 
         $lateTeachers = $service->overdueFor();
-        $teacherCount = User::whereHas('role', fn($q) => $q->where('role_name', 'Guru'))->count();
+
+        // 1. Total Seluruh Guru (Guru Pengajar, Wali Kelas, Guru BK)
+        $teacherCount = User::whereHas('role', fn($q) => $q->whereIn('role_name', ['Guru', 'Wali Kelas', 'Guru BK']))->count();
+
+        // 2. Total Siswa Aktif
         $studentCount = User::whereHas('role', fn($q) => $q->where('role_name', 'Siswa'))->count();
 
-        return view('dashboards.waka', compact('configuration', 'lateTeachers', 'teacherCount', 'studentCount'));
+        // 3. Total Ruangan Sekolah
+        $roomCount = Room::count();
+
+        // 4. Total Rombel / Kelas
+        $classCount = SchoolClass::count();
+
+        // 5. Total Mata Pelajaran Terdaftar
+        $subjectCount = Schedule::whereNotNull('subject')->where('subject', '!=', '')->distinct()->count('subject');
+
+        // 6. Jurnal KBM yang Harus Disubmit Hari Ini & Realisasi
+        $activeCycle = $configuration->active_cycle ?? 'Putaran 1';
+        $todayDate   = now()->toDateString();
+        $dayName     = \App\Support\IndonesianDay::from(now());
+
+        $todaySchedulesQuery = Schedule::where('cycle_type', $activeCycle)->where('day_of_week', $dayName);
+        $targetJournalsToday = (clone $todaySchedulesQuery)->count();
+        $filledJournalsToday = (clone $todaySchedulesQuery)->whereHas('journals', fn($q) => $q->whereDate('date', $todayDate))->count();
+
+        $isWeekend = in_array($dayName, ['Sabtu', 'Minggu']);
+        $mondayTarget = $isWeekend ? Schedule::where('cycle_type', $activeCycle)->where('day_of_week', 'Senin')->count() : $targetJournalsToday;
+
+        return view('dashboards.waka', compact(
+            'configuration',
+            'lateTeachers',
+            'teacherCount',
+            'studentCount',
+            'roomCount',
+            'classCount',
+            'subjectCount',
+            'targetJournalsToday',
+            'filledJournalsToday',
+            'dayName',
+            'isWeekend',
+            'mondayTarget'
+        ));
     }
 
     /**
@@ -116,7 +154,27 @@ class WakaController extends Controller
             $query->where('day_of_week', $request->day_of_week);
         }
 
-        if ($request->filled('class_id')) {
+        // Filter 1: Tingkat Kelas (X, XI, XII)
+        if ($request->filled('grade') && $request->grade !== 'all') {
+            $gradeMap = ['10' => 'X', '11' => 'XI', '12' => 'XII', 'X' => 'X', 'XI' => 'XI', 'XII' => 'XII'];
+            $gradeVal = $gradeMap[$request->grade] ?? $request->grade;
+            $query->whereHas('schoolClass', fn($q) => $q->where('class_name', 'like', "{$gradeVal} %"));
+        }
+
+        // Filter 2: Jurusan
+        if ($request->filled('major') && $request->major !== 'all') {
+            $major = trim($request->major);
+            $query->whereHas('schoolClass', fn($q) => $q->where('class_name', 'like', "% {$major} %")->orWhere('class_name', 'like', "% {$major}"));
+        }
+
+        // Filter 3: Rombel
+        if ($request->filled('rombel') && $request->rombel !== 'all') {
+            $rombel = trim($request->rombel);
+            $query->whereHas('schoolClass', fn($q) => $q->where('class_name', 'like', "% {$rombel}"));
+        }
+
+        // Kompatibilitas filter class_id langsung
+        if ($request->filled('class_id') && $request->class_id !== 'all') {
             $query->where('class_id', $request->class_id);
         }
 
@@ -124,15 +182,35 @@ class WakaController extends Controller
             $query->where('teacher_id', $request->teacher_id);
         }
 
-            $schedules = $query->orderByRaw("CASE day_of_week WHEN 'Senin' THEN 1 WHEN 'Selasa' THEN 2 WHEN 'Rabu' THEN 3 WHEN 'Kamis' THEN 4 WHEN 'Jumat' THEN 5 END")
+        $perPage = in_array((int)$request->input('per_page'), [50, 100, 500, 1000]) ? (int)$request->input('per_page') : 50;
+
+        $schedules = $query->orderByRaw("CASE day_of_week WHEN 'Senin' THEN 1 WHEN 'Selasa' THEN 2 WHEN 'Rabu' THEN 3 WHEN 'Kamis' THEN 4 WHEN 'Jumat' THEN 5 END")
             ->orderBy('start_time')
-            ->paginate(20)
+            ->paginate($perPage)
             ->withQueryString();
 
-        $teachers = User::with('role')->whereHas('role', fn($q) => $q->whereIn('role_name', ['Guru', 'Wali Kelas', 'Guru BK']))->orderBy('name')->get();        $classes = SchoolClass::orderBy('class_name')->get();
+        $teachers = User::with('role')->whereHas('role', fn($q) => $q->whereIn('role_name', ['Guru', 'Wali Kelas', 'Guru BK']))->orderBy('name')->get();
+        $classes = SchoolClass::orderBy('class_name')->get();
         $rooms = Room::orderBy('room_name')->get();
 
-        return view('waka.schedules.index', compact('schedules', 'teachers', 'classes', 'rooms', 'config'));
+        // Opsi Dropdown Filter 3 Kolom
+        $availableGrades = ['X', 'XI', 'XII'];
+        $availableMajors = Major::orderBy('code')->pluck('code')->toArray();
+        if (empty($availableMajors)) {
+            $availableMajors = ['RPL', 'TKJ', 'AKL', 'BD', 'MP'];
+        }
+        $availableRombels = ['1', '2', '3', '4'];
+
+        return view('waka.schedules.index', compact(
+            'schedules', 
+            'teachers', 
+            'classes', 
+            'rooms', 
+            'config',
+            'availableGrades',
+            'availableMajors',
+            'availableRombels'
+        ));
     }
 
     public function schedulesStore(Request $request)
@@ -402,19 +480,21 @@ class WakaController extends Controller
             $query->whereHas('role', fn($q) => $q->where('role_name', $roleFilter));
         }
 
-        // Pencarian teks
+        // Pencarian teks menyeluruh & Case-Insensitive (tidak sensitif huruf kapital)
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = strtolower(trim($request->search));
             $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('username', 'like', "%{$search}%")
-                  ->orWhere('nip', 'like', "%{$search}%")
-                  ->orWhere('phone', 'like', "%{$search}%");
+                $q->whereRaw('LOWER(name) LIKE ?', ["%{$search}%"])
+                  ->orWhereRaw('LOWER(email) LIKE ?', ["%{$search}%"])
+                  ->orWhereRaw('LOWER(username) LIKE ?', ["%{$search}%"])
+                  ->orWhereRaw('LOWER(COALESCE(nip, \'\')) LIKE ?', ["%{$search}%"])
+                  ->orWhereRaw('LOWER(COALESCE(phone, \'\')) LIKE ?', ["%{$search}%"]);
             });
         }
 
-        $teachers = $query->orderBy('name')->paginate(15)->withQueryString();
+        $perPage = in_array((int)$request->input('per_page'), [50, 100, 500, 1000]) ? (int)$request->input('per_page') : 50;
+
+        $teachers = $query->orderBy('name')->paginate($perPage)->withQueryString();
         $classes = SchoolClass::orderBy('class_name')->get();
         $roles = Role::whereIn('role_name', ['Guru', 'Wali Kelas', 'Guru BK'])->get();
         $structuredClasses = $this->getStructuredClasses();
@@ -745,27 +825,66 @@ class WakaController extends Controller
         $query = User::whereHas('role', fn($q) => $q->where('role_name', 'Siswa'))
             ->with(['schoolClass', 'parent']);
 
-        if ($request->filled('class_id')) {
+        // Filter 1: Tingkat (X, XI, XII atau 10, 11, 12)
+        if ($request->filled('grade') && $request->grade !== 'all') {
+            $gradeMap = ['10' => 'X', '11' => 'XI', '12' => 'XII', 'X' => 'X', 'XI' => 'XI', 'XII' => 'XII'];
+            $gradeVal = $gradeMap[$request->grade] ?? $request->grade;
+            $query->whereHas('schoolClass', fn($q) => $q->where('class_name', 'like', "{$gradeVal} %"));
+        }
+
+        // Filter 2: Jurusan (RPL, TKJ, AKL, BD, MP, dll)
+        if ($request->filled('major') && $request->major !== 'all') {
+            $major = trim($request->major);
+            $query->whereHas('schoolClass', fn($q) => $q->where('class_name', 'like', "% {$major} %")->orWhere('class_name', 'like', "% {$major}"));
+        }
+
+        // Filter 3: Rombel (1, 2, 3, 4)
+        if ($request->filled('rombel') && $request->rombel !== 'all') {
+            $rombel = trim($request->rombel);
+            $query->whereHas('schoolClass', fn($q) => $q->where('class_name', 'like', "% {$rombel}"));
+        }
+
+        // Kompatibilitas class_id langsung
+        if ($request->filled('class_id') && $request->class_id !== 'all') {
             $query->where('class_id', $request->class_id);
         }
 
+        // Pencarian Teks Menyeluruh & Case-Insensitive (tidak sensitif huruf kapital)
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = strtolower(trim($request->search));
             $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('username', 'like', "%{$search}%")
-                  ->orWhere('nis', 'like', "%{$search}%")
-                  ->orWhere('phone', 'like', "%{$search}%");
+                $q->whereRaw('LOWER(name) LIKE ?', ["%{$search}%"])
+                  ->orWhereRaw('LOWER(email) LIKE ?', ["%{$search}%"])
+                  ->orWhereRaw('LOWER(username) LIKE ?', ["%{$search}%"])
+                  ->orWhereRaw('LOWER(COALESCE(nis, \'\')) LIKE ?', ["%{$search}%"])
+                  ->orWhereRaw('LOWER(COALESCE(phone, \'\')) LIKE ?', ["%{$search}%"]);
             });
         }
 
-        $students = $query->orderBy('name')->paginate(15)->withQueryString();
+        $perPage = in_array((int)$request->input('per_page'), [50, 100, 500, 1000]) ? (int)$request->input('per_page') : 50;
+
+        $students = $query->orderBy('name')->paginate($perPage)->withQueryString();
         $classes = SchoolClass::orderBy('class_name')->get();
         $studentRole = Role::where('role_name', 'Siswa')->first();
         $structuredClasses = $this->getStructuredClasses();
 
-        return view('waka.students.index', compact('students', 'classes', 'structuredClasses', 'studentRole'));
+        // Opsi Dropdown Filter 3 Kolom
+        $availableGrades = ['X', 'XI', 'XII'];
+        $availableMajors = Major::orderBy('code')->pluck('code')->toArray();
+        if (empty($availableMajors)) {
+            $availableMajors = $structuredClasses->pluck('major')->unique()->filter()->values()->toArray();
+        }
+        $availableRombels = ['1', '2', '3', '4'];
+
+        return view('waka.students.index', compact(
+            'students', 
+            'classes', 
+            'structuredClasses', 
+            'studentRole',
+            'availableGrades',
+            'availableMajors',
+            'availableRombels'
+        ));
     }
 
         public function studentsStore(Request $request)
@@ -1936,16 +2055,22 @@ public function classesDestroy(SchoolClass $schoolClass)
             }
         }
 
-        // Filter Pencarian Teks
+        // Filter Pencarian Teks Menyeluruh & Case-Insensitive (tidak sensitif huruf kapital)
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = strtolower(trim($request->search));
             $query->where(function ($q) use ($search) {
-                $q->where('class_name', 'like', "%{$search}%")
-                  ->orWhereHas('homeroomTeachers', fn($sq) => $sq->where('name', 'like', "%{$search}%"));
+                $q->whereRaw('LOWER(class_name) LIKE ?', ["%{$search}%"])
+                  ->orWhereHas('homeroomTeachers', function ($sq) use ($search) {
+                      $sq->whereRaw('LOWER(name) LIKE ?', ["%{$search}%"])
+                        ->orWhereRaw('LOWER(username) LIKE ?', ["%{$search}%"])
+                        ->orWhereRaw('LOWER(COALESCE(nip, \'\')) LIKE ?', ["%{$search}%"]);
+                  });
             });
         }
 
-        $classes = $query->orderBy('class_name')->paginate(20)->withQueryString();
+        $perPage = in_array((int)$request->input('per_page'), [50, 100, 500, 1000]) ? (int)$request->input('per_page') : 50;
+
+        $classes = $query->orderBy('class_name')->paginate($perPage)->withQueryString();
 
         // Daftar Guru untuk Dropdown Wali Kelas
         $teachers = User::whereHas('role', fn($q) => $q->whereIn('role_name', ['Guru', 'Wali Kelas']))
@@ -2062,18 +2187,22 @@ public function classesDestroy(SchoolClass $schoolClass)
             });
         }
 
-        // Filter Pencarian Teks
+        // Filter Pencarian Teks Menyeluruh & Case-Insensitive (tidak sensitif huruf kapital)
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = strtolower(trim($request->search));
             $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('nis', 'like', "%{$search}%")
-                  ->orWhere('username', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                $q->whereRaw('LOWER(name) LIKE ?', ["%{$search}%"])
+                  ->orWhereRaw('LOWER(COALESCE(nis, \'\')) LIKE ?', ["%{$search}%"])
+                  ->orWhereRaw('LOWER(username) LIKE ?', ["%{$search}%"])
+                  ->orWhereRaw('LOWER(email) LIKE ?', ["%{$search}%"])
+                  ->orWhereRaw('LOWER(COALESCE(phone, \'\')) LIKE ?', ["%{$search}%"])
+                  ->orWhereHas('schoolClass', fn($sq) => $sq->whereRaw('LOWER(class_name) LIKE ?', ["%{$search}%"]));
             });
         }
 
-        $students = $query->orderBy('name')->paginate(20)->withQueryString();
+        $perPage = in_array((int)$request->input('per_page'), [50, 100, 500, 1000]) ? (int)$request->input('per_page') : 50;
+
+        $students = $query->orderBy('name')->paginate($perPage)->withQueryString();
         $majors = Major::orderBy('name')->get();
         $allClasses = SchoolClass::orderBy('class_name')->get();
 

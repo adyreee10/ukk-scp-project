@@ -1,0 +1,53 @@
+@props(['paginator'])
+
+<div class="p-4 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+    <!-- Pilihan Jumlah Baris per Halaman (50, 100, 500, 1000) & Total Record -->
+    <div class="flex items-center gap-3">
+        <div class="relative" x-data="{ open: false }">
+            <button @click="open = !open" 
+                    @click.away="open = false" 
+                    type="button" 
+                    class="table-rows-btn inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-700 bg-slate-900 text-slate-200 font-bold hover:bg-slate-800 transition cursor-pointer shadow-sm text-xs">
+                <span>{{ request('per_page', 50) }} rows</span>
+                <svg class="w-3.5 h-3.5 text-slate-400 transition-transform duration-200" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+            </button>
+
+            <!-- Popover Menu Pilihan Jumlah Baris (50, 100, 500, 1000) Muncul Melayang ke Atas -->
+            <div x-show="open" 
+                 x-cloak 
+                 x-transition:enter="transition ease-out duration-100"
+                 x-transition:enter-start="transform opacity-0 scale-95"
+                 x-transition:enter-end="transform opacity-100 scale-100"
+                 x-transition:leave="transition ease-in duration-75"
+                 x-transition:leave-start="transform opacity-100 scale-100"
+                 x-transition:leave-end="transform opacity-0 scale-95"
+                 class="table-rows-popover absolute bottom-full mb-1.5 left-0 w-36 rounded-xl bg-[#0f172a] border border-slate-800 shadow-2xl py-1 z-30">
+                <div class="px-3 py-1 text-[10px] uppercase font-bold text-slate-500 border-b border-slate-800/80 mb-0.5">
+                    Tampilkan Baris:
+                </div>
+                @foreach([50, 100, 500, 1000] as $opt)
+                    <a href="{{ request()->fullUrlWithQuery(['per_page' => $opt, 'page' => 1]) }}" 
+                       class="w-full text-left px-3 py-1.5 text-xs font-semibold hover:bg-indigo-600 hover:text-white transition cursor-pointer flex items-center justify-between {{ request('per_page', 50) == $opt ? 'is-active bg-indigo-600/30 text-indigo-300 font-bold' : 'text-slate-300' }}">
+                        <span>{{ $opt }} rows</span>
+                        @if(request('per_page', 50) == $opt)
+                            <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                        @endif
+                    </a>
+                @endforeach
+            </div>
+        </div>
+
+        <span class="text-slate-400 font-bold font-mono text-xs">
+            {{ number_format($paginator->total()) }} records
+        </span>
+    </div>
+
+    <!-- Link Navigasi Halaman (Hanya Tampil Jika Data Melebihi 1 Halaman) -->
+    @if($paginator->hasPages())
+        <div class="shrink-0">
+            {{ $paginator->links() }}
+        </div>
+    @endif
+</div>

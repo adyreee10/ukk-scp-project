@@ -472,10 +472,26 @@ Route::middleware(['auth', 'role:Wali Kelas,Guru BK,Waka Kurikulum'])->group(fun
             }
         }
 
+        $search = trim($request->query('search', ''));
+        if ($search !== '') {
+            $searchLower = strtolower($search);
+            $processedQuery->where(function ($sq) use ($searchLower) {
+                $sq->whereHas('student', function ($stQ) use ($searchLower) {
+                    $stQ->whereRaw('LOWER(name) LIKE ?', ["%{$searchLower}%"])
+                        ->orWhereRaw("LOWER(COALESCE(nis, '')) LIKE ?", ["%{$searchLower}%"])
+                        ->orWhereHas('schoolClass', function ($scQ) use ($searchLower) {
+                            $scQ->whereRaw('LOWER(class_name) LIKE ?', ["%{$searchLower}%"]);
+                        });
+                })->orWhereRaw('LOWER(reason) LIKE ?', ["%{$searchLower}%"])
+                  ->orWhereRaw('LOWER(leave_type) LIKE ?', ["%{$searchLower}%"]);
+            });
+        }
+
         $processedLeaves = $processedQuery->take(100)->get()->map(function ($leave) {
             return (object)[
                 'id'            => $leave->id,
                 'student_name'  => $leave->student?->name ?? 'Siswa',
+                'student_nis'   => $leave->student?->nis ?? '',
                 'class_name'    => $leave->student?->schoolClass?->class_name ?? '-',
                 'leave_type'    => $leave->leave_type,
                 'start_date'    => $leave->start_date?->toDateString() ?? (string)$leave->start_date,

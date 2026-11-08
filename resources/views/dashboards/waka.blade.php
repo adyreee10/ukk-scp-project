@@ -1,43 +1,135 @@
 <x-app-layout>
-    <!-- Header Title & Subtitle -->
-    <div class="mb-6">
-        <h1 class="text-2xl font-extrabold text-white tracking-tight">Dashboard Waka Kurikulum</h1>
-        <p class="text-xs text-slate-400 mt-1 font-medium">
-            Selamat datang kembali, <strong class="font-bold text-slate-200">{{ auth()->user()->name }}</strong> • {{ now()->translatedFormat('l, d F Y') }}
+    <!-- Header Title & Subtitle (Diperbesar Lebih Jelas & Mudah Dibaca) -->
+    <div class="mb-7">
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Dashboard Waka Kurikulum</h1>
+        <p class="text-sm sm:text-base text-slate-800 dark:text-slate-300 font-semibold mt-2 flex items-center flex-wrap gap-2">
+            <span>Selamat datang kembali,</span>
+            <strong class="font-extrabold text-indigo-600 dark:text-indigo-400 text-base sm:text-lg">{{ auth()->user()->name }}</strong>
+            <span class="text-slate-400 dark:text-slate-500">•</span>
+            <span class="text-black dark:text-white font-extrabold tracking-wide">{{ now()->translatedFormat('l, d F Y') }}</span>
         </p>
     </div>
 
-    <!-- 2 Stat Cards (Murni Angka & Tulisan Bersih Tanpa Emoji) -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
-        <!-- Kartu 1: Guru Pengajar -->
-        <div class="bg-[#0f172a]/90 backdrop-blur-md p-6 border border-slate-800 shadow-xl transition hover:border-slate-700" style="border-radius: 15px;">
-            <div class="flex items-center justify-between mb-3">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Tenaga Pendidik</span>
-                <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full badge-academic shadow-sm">
-                    Akademik
-                </span> 
+    <!-- 6 Stat Cards (Dibagi 3 : 3 -> Baris Atas: Guru, Siswa, Ruangan; Baris Bawah: Kelas, Mapel, Jurnal) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 mb-7">
+        <!-- Kartu 1: Semua Guru -->
+        <div class="bg-[#0f172a]/90 backdrop-blur-md p-5 border border-slate-800 shadow-xl transition hover:border-slate-700 flex flex-col justify-between" style="border-radius: 15px;">
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Pendidik</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full badge-active shadow-sm">
+                        Guru
+                    </span> 
+                </div>
+                <div class="text-3xl sm:text-4xl font-black text-white tracking-tight my-1">
+                    {{ $teacherCount ?? 0 }}
+                </div>
             </div>
-            <div class="text-4xl font-black text-white tracking-tight my-1">
-                {{ $teacherCount ?? 0 }}
-            </div>
-            <div class="text-xs font-semibold text-slate-400 mt-1">
-                Guru Pengajar Terdaftar
+            <div class="text-[11px] font-semibold text-slate-400 mt-2">
+                Guru, Wali Kelas & BK
             </div>
         </div>
 
         <!-- Kartu 2: Siswa Terdaftar -->
-        <div class="bg-[#0f172a]/90 backdrop-blur-md p-6 border border-slate-800 shadow-xl transition hover:border-slate-700" style="border-radius: 15px;">
-            <div class="flex items-center justify-between mb-3">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Peserta Didik</span>
-                <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full badge-active shadow-sm">
-                    Aktif
-                </span> 
+        <div class="bg-[#0f172a]/90 backdrop-blur-md p-5 border border-slate-800 shadow-xl transition hover:border-slate-700 flex flex-col justify-between" style="border-radius: 15px;">
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Peserta Didik</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full badge-active shadow-sm">
+                        Siswa
+                    </span> 
+                </div>
+                <div class="text-3xl sm:text-4xl font-black text-white tracking-tight my-1">
+                    {{ $studentCount ?? 0 }}
+                </div>
             </div>
-            <div class="text-4xl font-black text-white tracking-tight my-1">
-                {{ $studentCount ?? 0 }}
+            <div class="text-[11px] font-semibold text-slate-400 mt-2">
+                Siswa Seluruh Rombel
             </div>
-            <div class="text-xs font-semibold text-slate-400 mt-1">
-                Siswa di Seluruh Kelas
+        </div>
+
+        <!-- Kartu 3: Ruangan -->
+        <div class="bg-[#0f172a]/90 backdrop-blur-md p-5 border border-slate-800 shadow-xl transition hover:border-slate-700 flex flex-col justify-between" style="border-radius: 15px;">
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Sarpras</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full badge-active shadow-sm">
+                        Ruang
+                    </span> 
+                </div>
+                <div class="text-3xl sm:text-4xl font-black text-white tracking-tight my-1">
+                    {{ $roomCount ?? 0 }}
+                </div>
+            </div>
+            <div class="text-[11px] font-semibold text-slate-400 mt-2">
+                Ruang Teori & Lab
+            </div>
+        </div>
+
+        <!-- Kartu 4: Kelas / Rombel -->
+        <div class="bg-[#0f172a]/90 backdrop-blur-md p-5 border border-slate-800 shadow-xl transition hover:border-slate-700 flex flex-col justify-between" style="border-radius: 15px;">
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Rombel</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full badge-active shadow-sm">
+                        Kelas
+                    </span> 
+                </div>
+                <div class="text-3xl sm:text-4xl font-black text-white tracking-tight my-1">
+                    {{ $classCount ?? 0 }}
+                </div>
+            </div>
+            <div class="text-[11px] font-semibold text-slate-400 mt-2">
+                Kelas X, XI, & XII
+            </div>
+        </div>
+
+        <!-- Kartu 5: Mata Pelajaran -->
+        <div class="bg-[#0f172a]/90 backdrop-blur-md p-5 border border-slate-800 shadow-xl transition hover:border-slate-700 flex flex-col justify-between" style="border-radius: 15px;">
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Kurikulum</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full badge-active shadow-sm">
+                        Mapel
+                    </span> 
+                </div>
+                <div class="text-3xl sm:text-4xl font-black text-white tracking-tight my-1">
+                    {{ $subjectCount ?? 0 }}
+                </div>
+            </div>
+            <div class="text-[11px] font-semibold text-slate-400 mt-2">
+                Mata Pelajaran KBM
+            </div>
+        </div>
+
+        <!-- Kartu 6: Progress Jurnal KBM Hari Ini -->
+        <div class="bg-[#0f172a]/90 backdrop-blur-md p-5 border border-slate-800 shadow-xl transition hover:border-slate-700 flex flex-col justify-between" style="border-radius: 15px;">
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Jurnal Hari Ini</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full badge-active shadow-sm">
+                        {{ $isWeekend ? 'Libur KBM' : $dayName }}
+                    </span> 
+                </div>
+                <div class="text-3xl sm:text-4xl font-black text-emerald-400 tracking-tight my-1 flex items-baseline gap-1">
+                    <span>{{ $filledJournalsToday ?? 0 }}</span>
+                    <span class="text-xl sm:text-2xl text-slate-500 font-bold">/{{ $targetJournalsToday ?? 0 }}</span>
+                </div>
+            </div>
+            <div class="mt-2">
+                @if($targetJournalsToday > 0)
+                    @php $pct = round(($filledJournalsToday / $targetJournalsToday) * 100); @endphp
+                    <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mb-1">
+                        <div class="bg-emerald-500 h-full transition-all duration-500" style="width: {{ $pct }}%;"></div>
+                    </div>
+                    <div class="text-[10px] font-bold text-slate-400">
+                        {{ $pct }}% Jurnal Terisi
+                    </div>
+                @else
+                    <div class="text-[11px] font-bold text-slate-500 dark:text-slate-400">
+                        {{ $isWeekend ? 'Senin: ' . ($mondayTarget ?? 0) . ' jurnal' : 'Nihil jadwal KBM' }}
+                    </div>
+                @endif
             </div>
         </div>
     </div>

@@ -124,7 +124,7 @@
                         <!-- Filter Angkatan Masuk Sekolah -->
                         <form method="GET" action="{{ route('waka.academic-year.index') }}" class="flex items-center gap-2">
                             <label class="text-xs font-bold text-slate-300 whitespace-nowrap">Angkatan Masuk:</label>
-                            <select name="entry_year" onchange="this.form.submit()" class="rounded-xl border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs font-bold text-amber-400 focus:border-indigo-500">
+                            <select name="entry_year" onchange="this.form.submit()" class="rounded-xl border border-slate-700 bg-slate-900 pl-3.5 pr-9 py-1.5 text-xs font-bold text-amber-400 focus:border-indigo-500 cursor-pointer min-w-[145px]">
                                 @foreach([2022, 2023, 2024, 2025, 2026] as $yr)
                                     <option value="{{ $yr }}" {{ $selectedEntryYear == $yr ? 'selected' : '' }}>
                                         Angkatan {{ $yr }}

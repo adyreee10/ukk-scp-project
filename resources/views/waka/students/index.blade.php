@@ -70,17 +70,17 @@
                 <p class="text-xs font-semibold text-slate-400 mt-0.5">Kelola data peserta didik, penautan orang tua, pembagian kelas, dan akun login siswa</p>
             </div>
             <div class="flex items-center gap-2 shrink-0 flex-wrap">
-                <!-- Tombol Hapus Semua Siswa -->
-                <button @click="deleteAllModalOpen = true" type="button" class="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/40 text-xs sm:text-sm font-bold shadow-md cursor-pointer transition flex items-center gap-1.5 whitespace-nowrap">
-                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                    <span>Hapus Semua Siswa</span>
+                <!-- Tombol Hapus Semua Siswa (Merah Solid & Kontras di Mode Terang Maupun Gelap) -->
+                <button @click="deleteAllModalOpen = true" type="button" class="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold text-xs sm:text-sm shadow-md shadow-red-950/30 cursor-pointer transition flex items-center gap-1.5 whitespace-nowrap">
+                    <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    <span class="text-white">Hapus Semua Siswa</span>
                 </button>
-                <!-- Tombol Sinkronisasi Akun Orang Tua -->
+                <!-- Tombol Sinkronisasi Akun Orang Tua (Solid & Jelas di Mode Terang Maupun Gelap) -->
                 <form method="POST" action="{{ route('waka.students.sync-parents') }}" onsubmit="return confirm('Apakah Anda ingin menyinkronkan dan membuatkan akun Orang Tua bagi semua siswa yang belum memilikinya?')">
                     @csrf
-                    <button type="submit" class="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white border border-indigo-500/40 text-xs sm:text-sm font-bold shadow-md cursor-pointer transition flex items-center gap-1.5 whitespace-nowrap" title="Buat akun orang tua otomatis untuk siswa yang belum terhubung">
-                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                        <span>Sinkronisasi Orang Tua</span>
+                    <button type="submit" class="sync-parent-btn px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs sm:text-sm shadow-md shadow-blue-950/30 cursor-pointer transition flex items-center gap-1.5 whitespace-nowrap" title="Buat akun orang tua otomatis untuk siswa yang belum terhubung">
+                        <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                        <span class="text-white font-bold">Sinkronisasi Orang Tua</span>
                     </button>
                 </form>
                 <button @click="importModalOpen = true" type="button" class="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs sm:text-sm font-bold text-white shadow-md shadow-emerald-950/40 cursor-pointer transition flex items-center gap-1.5">
@@ -93,22 +93,66 @@
             </div>
         </div>
 
-        <!-- Filter & Pencarian -->
-        <div class="bg-[#0f172a]/90 backdrop-blur-md p-4 border border-slate-800 shadow-xl" style="border-radius: 15px;">
-            <form method="GET" action="{{ route('waka.students.index') }}" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div class="sm:col-span-2">
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama, NIS, NISN, atau nomor HP siswa..." class="w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-2.5 text-xs sm:text-sm text-white placeholder-slate-400 focus:border-indigo-500 focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" />
-                </div>
-                <div class="flex gap-2">
-                    <select name="class_id" class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-xs font-bold text-white focus:border-indigo-500 focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
-                        <option value="" class="bg-slate-900 text-white">Semua Kelas</option>
-                        @foreach($classes as $c)
-                            <option value="{{ $c->id }}" {{ request('class_id') == $c->id ? 'selected' : '' }} class="bg-slate-900 text-white">{{ $c->class_name }}</option>
-                        @endforeach
-                    </select>
-                    <button type="submit" class="rounded-xl scp-btn-gradient px-6 py-2.5 text-xs font-bold text-white transition shadow-sm cursor-pointer">
-                        Filter
-                    </button>
+        <!-- Filter & Pencarian Siswa (Dipecah Tingkat, Jurusan, Rombel + Search Case-Insensitive) -->
+        <div class="bg-[#0f172a]/90 backdrop-blur-md p-4 sm:p-5 border border-slate-800 shadow-xl" style="border-radius: 15px;">
+            <form method="GET" action="{{ route('waka.students.index') }}" class="space-y-3">
+                @if(request('per_page'))
+                    <input type="hidden" name="per_page" value="{{ request('per_page') }}">
+                @endif
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2.5 sm:gap-3 items-center">
+                    <!-- Search Input (Menyeluruh & Case-Insensitive) -->
+                    <div class="lg:col-span-4 relative">
+                        <input type="text" 
+                               name="search" 
+                               value="{{ request('search') }}" 
+                               placeholder="Cari nama, NIS, atau no HP..." 
+                               class="w-full rounded-xl border border-slate-700 bg-slate-900 pl-9 pr-4 py-2.5 text-xs sm:text-sm text-white placeholder-slate-400 focus:border-indigo-500 focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" />
+                        <svg class="w-4 h-4 text-slate-400 absolute left-3 top-3 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+
+                    <!-- Filter 1: Tingkat -->
+                    <div class="lg:col-span-2">
+                        <select name="grade" class="w-full rounded-xl border border-slate-700 bg-slate-900 pl-3 pr-7 py-2.5 text-xs font-bold text-white focus:border-indigo-500 focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                            <option value="all" {{ request('grade', 'all') === 'all' ? 'selected' : '' }} class="bg-slate-900 text-white">Semua Tingkat</option>
+                            @foreach($availableGrades as $g)
+                                <option value="{{ $g }}" {{ request('grade') === $g ? 'selected' : '' }} class="bg-slate-900 text-white">Kelas {{ $g }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Filter 2: Jurusan -->
+                    <div class="lg:col-span-2">
+                        <select name="major" class="w-full rounded-xl border border-slate-700 bg-slate-900 pl-3 pr-7 py-2.5 text-xs font-bold text-white focus:border-indigo-500 focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                            <option value="all" {{ request('major', 'all') === 'all' ? 'selected' : '' }} class="bg-slate-900 text-white">Semua Jurusan</option>
+                            @foreach($availableMajors as $m)
+                                <option value="{{ $m }}" {{ request('major') === $m ? 'selected' : '' }} class="bg-slate-900 text-white">{{ $m }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Filter 3: Rombel (Diperluas Menjadi 2 Kolom Agar Tidak Bertabrakan dengan Arrow) -->
+                    <div class="lg:col-span-2">
+                        <select name="rombel" class="w-full rounded-xl border border-slate-700 bg-slate-900 pl-3 pr-8 py-2.5 text-xs font-bold text-white focus:border-indigo-500 focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                            <option value="all" {{ request('rombel', 'all') === 'all' ? 'selected' : '' }} class="bg-slate-900 text-white">Semua Rombel</option>
+                            @foreach($availableRombels as $r)
+                                <option value="{{ $r }}" {{ request('rombel') === (string)$r ? 'selected' : '' }} class="bg-slate-900 text-white">Rombel {{ $r }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Tombol Aksi Filter & Reset -->
+                    <div class="lg:col-span-2 flex items-center gap-1.5">
+                        <button type="submit" class="flex-1 rounded-xl scp-btn-gradient px-4 py-2.5 text-xs font-bold text-white transition shadow-sm cursor-pointer text-center">
+                            Filter
+                        </button>
+                        @if(request()->hasAny(['search', 'grade', 'major', 'rombel', 'class_id']))
+                            <a href="{{ route('waka.students.index') }}" class="px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold transition flex items-center justify-center" title="Reset Semua Filter">
+                                ✕
+                            </a>
+                        @endif
+                    </div>
                 </div>
             </form>
         </div>
@@ -264,11 +308,7 @@
                 </table>
             </div>
 
-            @if($students->hasPages())
-                <div class="p-4 border-t border-slate-800">
-                    {{ $students->links() }}
-                </div>
-            @endif
+            <x-table-pagination :paginator="$students" />
         </div>
 
         <!-- ============================================================= -->
@@ -600,6 +640,7 @@
                 <form method="POST" action="{{ route('waka.students.import') }}" enctype="multipart/form-data" 
                       x-data="{ 
                           selectedFiles: [],
+                          dupAction: 'replace',
                           handleFiles(e) {
                               const newFiles = Array.from(e.target.files);
                               this.selectedFiles = [...this.selectedFiles, ...newFiles];
@@ -661,24 +702,26 @@
                         </p>
                     </div>
 
-                    <!-- Opsi Penanganan Data Duplikat / Siswa yang Sudah Ada -->
-                    <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
-                        <label class="block text-[11px] font-bold text-slate-300">
+                    <!-- Opsi Penanganan Data Duplikat / Siswa yang Sudah Ada (Sesuai Foto ke-2) -->
+                    <div class="p-3.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2">
+                        <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300">
                             Jika Ditemukan Data Siswa yang Sudah Ada (Dobel):
                         </label>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                            <label class="flex items-start gap-2.5 p-2.5 rounded-lg border border-slate-800 bg-slate-950/60 hover:border-indigo-500/50 cursor-pointer transition">
-                                <input type="radio" name="duplicate_action" value="replace" checked class="mt-0.5 text-indigo-600 focus:ring-indigo-500 bg-slate-900 border-slate-700" />
+                            <label :class="dupAction === 'replace' ? 'border-indigo-600 bg-indigo-50/90 dark:bg-indigo-950/60 ring-2 ring-indigo-500/40 shadow-sm' : 'border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950/60 hover:border-indigo-400/60'"
+                                   class="flex items-start gap-2.5 p-2.5 rounded-lg border cursor-pointer transition">
+                                <input type="radio" name="duplicate_action" value="replace" x-model="dupAction" class="import-dup-radio" />
                                 <div>
-                                    <span class="font-bold text-white block text-[11px]">Ganti / Perbarui yang Baru</span>
-                                    <span class="text-[10px] text-slate-400 leading-tight block mt-0.5">Timpa data lama dengan data terbaru dari dokumen</span>
+                                    <span class="font-bold text-slate-900 dark:text-white block text-[11px]">Ganti / Perbarui yang Baru</span>
+                                    <span class="text-[10px] text-slate-600 dark:text-slate-400 leading-tight block mt-0.5">Timpa data lama dengan data terbaru dari dokumen</span>
                                 </div>
                             </label>
-                            <label class="flex items-start gap-2.5 p-2.5 rounded-lg border border-slate-800 bg-slate-950/60 hover:border-indigo-500/50 cursor-pointer transition">
-                                <input type="radio" name="duplicate_action" value="keep" class="mt-0.5 text-indigo-600 focus:ring-indigo-500 bg-slate-900 border-slate-700" />
+                            <label :class="dupAction === 'keep' ? 'border-indigo-600 bg-indigo-50/90 dark:bg-indigo-950/60 ring-2 ring-indigo-500/40 shadow-sm' : 'border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950/60 hover:border-indigo-400/60'"
+                                   class="flex items-start gap-2.5 p-2.5 rounded-lg border cursor-pointer transition">
+                                <input type="radio" name="duplicate_action" value="keep" x-model="dupAction" class="import-dup-radio" />
                                 <div>
-                                    <span class="font-bold text-white block text-[11px]">Pertahankan Data Awal</span>
-                                    <span class="text-[10px] text-slate-400 leading-tight block mt-0.5">Lewati jika NIS atau Nama siswa sudah terdaftar</span>
+                                    <span class="font-bold text-slate-900 dark:text-white block text-[11px]">Pertahankan Data Awal</span>
+                                    <span class="text-[10px] text-slate-600 dark:text-slate-400 leading-tight block mt-0.5">Lewati jika NIS atau Nama siswa sudah terdaftar</span>
                                 </div>
                             </label>
                         </div>

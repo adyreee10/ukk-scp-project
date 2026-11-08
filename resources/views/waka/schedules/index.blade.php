@@ -39,10 +39,10 @@
                         <span>Jadwal Terkunci</span>
                     </button>
                 @else
-                    <!-- Tombol Hapus Semua Jadwal -->
-                    <button @click="deleteAllModalOpen = true" type="button" class="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/40 text-xs sm:text-sm font-bold shadow-md cursor-pointer transition flex items-center gap-1.5 whitespace-nowrap">
-                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                        <span>Hapus Semua Jadwal</span>
+                    <!-- Tombol Hapus Semua Jadwal (Merah Solid & Kontras di Mode Terang Maupun Gelap) -->
+                    <button @click="deleteAllModalOpen = true" type="button" class="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold text-xs sm:text-sm shadow-md shadow-red-950/30 cursor-pointer transition flex items-center gap-1.5 whitespace-nowrap">
+                        <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        <span class="text-white">Hapus Semua Jadwal</span>
                     </button>
                     <button @click="importModalOpen = true" type="button" class="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs sm:text-sm font-bold text-white shadow-md shadow-emerald-950/40 cursor-pointer transition flex items-center gap-1.5">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
@@ -56,43 +56,88 @@
             
         </div>
 
-        <!-- Filter Bar (Gelap Keabuan) -->
-        <div class="bg-[#0f172a]/90 backdrop-blur-md p-4 border border-slate-800 shadow-xl" style="border-radius: 15px;">
-            <form method="GET" action="{{ route('waka.schedules.index') }}" class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+        <!-- Filter Bar (Dipecah Tingkat, Jurusan, Rombel Sesuai Permintaan) -->
+        <div class="bg-[#0f172a]/90 backdrop-blur-md p-4 sm:p-5 border border-slate-800 shadow-xl" style="border-radius: 15px;">
+            <form method="GET" action="{{ route('waka.schedules.index') }}" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-2.5 sm:gap-3 items-end">
+                @if(request('per_page'))
+                    <input type="hidden" name="per_page" value="{{ request('per_page') }}">
+                @endif
+                <!-- 1. Putaran Siklus -->
                 <div>
-                    <select name="cycle_type" class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2.5 text-xs font-bold text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                    <label class="block text-[11px] font-bold text-slate-400 mb-1">Siklus</label>
+                    <select name="cycle_type" class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-xs font-bold text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
                         <option value="Putaran 1" {{ request('cycle_type', $config->active_cycle) == 'Putaran 1' ? 'selected' : '' }}>Putaran 1</option>
                         <option value="Putaran 2" {{ request('cycle_type', $config->active_cycle) == 'Putaran 2' ? 'selected' : '' }}>Putaran 2</option>
                     </select>
                 </div>
+
+                <!-- 2. Hari -->
                 <div>
-                    <select name="day_of_week" class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2.5 text-xs text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                    <label class="block text-[11px] font-bold text-slate-400 mb-1">Hari</label>
+                    <select name="day_of_week" class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-xs text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
                         <option value="">Semua Hari</option>
                         @foreach(['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'] as $d)
                             <option value="{{ $d }}" {{ request('day_of_week') == $d ? 'selected' : '' }}>{{ $d }}</option>
                         @endforeach
                     </select>
                 </div>
+
+                <!-- 3. Tingkat Kelas -->
                 <div>
-                    <select name="class_id" class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2.5 text-xs text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
-                        <option value="">Semua Kelas</option>
-                        @foreach($classes as $c)
-                            <option value="{{ $c->id }}" {{ request('class_id') == $c->id ? 'selected' : '' }}>{{ $c->class_name }}</option>
+                    <label class="block text-[11px] font-bold text-slate-400 mb-1">Tingkat</label>
+                    <select name="grade" class="w-full rounded-xl border border-slate-700 bg-slate-900 pl-3 pr-7 py-2 text-xs font-bold text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                        <option value="all" {{ request('grade', 'all') === 'all' ? 'selected' : '' }}>Semua Tingkat</option>
+                        @foreach($availableGrades as $g)
+                            <option value="{{ $g }}" {{ request('grade') === $g ? 'selected' : '' }}>Kelas {{ $g }}</option>
                         @endforeach
                     </select>
                 </div>
-                <div class="flex gap-2">
-                    <select name="teacher_id" class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2.5 text-xs text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+
+                <!-- 4. Jurusan -->
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-400 mb-1">Jurusan</label>
+                    <select name="major" class="w-full rounded-xl border border-slate-700 bg-slate-900 pl-3 pr-7 py-2 text-xs font-bold text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                        <option value="all" {{ request('major', 'all') === 'all' ? 'selected' : '' }}>Semua Jurusan</option>
+                        @foreach($availableMajors as $m)
+                            <option value="{{ $m }}" {{ request('major') === $m ? 'selected' : '' }}>{{ $m }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- 5. Rombel -->
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-400 mb-1">Rombel</label>
+                    <select name="rombel" class="w-full rounded-xl border border-slate-700 bg-slate-900 pl-3 pr-7 py-2 text-xs font-bold text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                        <option value="all" {{ request('rombel', 'all') === 'all' ? 'selected' : '' }}>Semua Rombel</option>
+                        @foreach($availableRombels as $r)
+                            <option value="{{ $r }}" {{ request('rombel') === (string)$r ? 'selected' : '' }}>Rombel {{ $r }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- 6. Guru Pengajar -->
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-400 mb-1">Guru</label>
+                    <select name="teacher_id" class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-xs text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
                         <option value="">Semua Guru</option>
                         @foreach($teachers as $t)
                             <option value="{{ $t->id }}" {{ request('teacher_id') == $t->id ? 'selected' : '' }}>
-                                {{ $t->name }} {{ $t->role?->role_name === 'Guru BK' ? '(Guru BK)' : ($t->role?->role_name === 'Wali Kelas' ? '(Wali Kelas)' : '') }}
+                                {{ $t->name }} {{ $t->role?->role_name === 'Guru BK' ? '(BK)' : ($t->role?->role_name === 'Wali Kelas' ? '(Walas)' : '') }}
                             </option>
                         @endforeach
                     </select>
-                    <button type="submit" class="rounded-xl scp-btn-gradient px-5 py-2.5 text-xs font-bold text-white transition shadow-sm cursor-pointer">
+                </div>
+
+                <!-- 7. Tombol Filter & Reset -->
+                <div class="flex items-center gap-1.5">
+                    <button type="submit" class="flex-1 rounded-xl scp-btn-gradient px-4 py-2 text-xs font-bold text-white transition shadow-sm cursor-pointer text-center">
                         Filter
                     </button>
+                    @if(request()->hasAny(['day_of_week', 'grade', 'major', 'rombel', 'class_id', 'teacher_id']))
+                        <a href="{{ route('waka.schedules.index') }}" class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold transition flex items-center justify-center" title="Reset Semua Filter">
+                            ✕
+                        </a>
+                    @endif
                 </div>
             </form>
         </div>
@@ -195,7 +240,8 @@
                                                         end_time: '{{ substr($item->end_time, 0, 5) }}', 
                                                         cycle_type: '{{ $item->cycle_type }}' 
                                                     }; editModalOpen = true;"
-                                                    class="px-2.5 py-1 text-xs font-bold text-indigo-400 hover:text-white hover:bg-indigo-600 border border-indigo-500/30 rounded-lg transition cursor-pointer">
+                                                    class="px-2.5 py-1 text-xs font-bold rounded-lg transition cursor-pointer btn-action-edit shadow-sm"
+                                                    title="Edit Jadwal">
                                                 Edit
                                             </button>
                                         @endif
@@ -205,7 +251,7 @@
                                             <form method="POST" action="{{ route('waka.schedules.destroy', $item) }}" onsubmit="return confirm('Apakah Anda yakin ingin menghapus jadwal ini?')">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="px-2.5 py-1 text-xs font-bold text-red-400 hover:text-white hover:bg-red-600/80 border border-red-500/30 rounded-lg transition cursor-pointer">
+                                                <button type="submit" class="px-2.5 py-1 text-xs font-bold rounded-lg transition cursor-pointer btn-action-delete shadow-sm" title="Hapus Jadwal">
                                                     Hapus
                                                 </button>
                                             </form>
@@ -224,11 +270,7 @@
                 </table>
             </div>
 
-            @if($schedules->hasPages())
-                <div class="p-4 border-t border-slate-800">
-                    {{ $schedules->links() }}
-                </div>
-            @endif
+            <x-table-pagination :paginator="$schedules" />
         </div>
 
         <!-- Modal Tambah Jadwal Pelajaran -->
@@ -489,6 +531,7 @@
                 <form method="POST" action="{{ route('waka.schedules.import') }}" enctype="multipart/form-data" 
                       x-data="{ 
                           selectedFiles: [],
+                          dupAction: 'replace',
                           handleFiles(e) {
                               const newFiles = Array.from(e.target.files);
                               this.selectedFiles = [...this.selectedFiles, ...newFiles];
@@ -568,23 +611,25 @@
                     </div>
 
                     <!-- Opsi Penanganan Data Duplikat / Jadwal yang Sudah Ada (Sesuai Foto ke-2) -->
-                    <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
-                        <label class="block text-[11px] font-bold text-slate-300">
+                    <div class="p-3.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2">
+                        <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300">
                             Jika Ditemukan Data Jadwal yang Sudah Ada (Dobel):
                         </label>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                            <label class="flex items-start gap-2.5 p-2.5 rounded-lg border border-slate-800 bg-slate-950/60 hover:border-indigo-500/50 cursor-pointer transition">
-                                <input type="radio" name="duplicate_action" value="replace" checked class="mt-0.5 text-indigo-600 focus:ring-indigo-500 bg-slate-900 border-slate-700" />
+                            <label :class="dupAction === 'replace' ? 'border-indigo-600 bg-indigo-50/90 dark:bg-indigo-950/60 ring-2 ring-indigo-500/40 shadow-sm' : 'border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950/60 hover:border-indigo-400/60'"
+                                   class="flex items-start gap-2.5 p-2.5 rounded-lg border cursor-pointer transition">
+                                <input type="radio" name="duplicate_action" value="replace" x-model="dupAction" class="import-dup-radio" />
                                 <div>
-                                    <span class="font-bold text-white block text-[11px]">Ganti / Perbarui yang Baru</span>
-                                    <span class="text-[10px] text-slate-400 leading-tight block mt-0.5">Timpa data jadwal lama pada kelas & jam yang sama dengan data dari dokumen</span>
+                                    <span class="font-bold text-slate-900 dark:text-white block text-[11px]">Ganti / Perbarui yang Baru</span>
+                                    <span class="text-[10px] text-slate-600 dark:text-slate-400 leading-tight block mt-0.5">Timpa data jadwal lama pada kelas & jam yang sama dengan data dari dokumen</span>
                                 </div>
                             </label>
-                            <label class="flex items-start gap-2.5 p-2.5 rounded-lg border border-slate-800 bg-slate-950/60 hover:border-indigo-500/50 cursor-pointer transition">
-                                <input type="radio" name="duplicate_action" value="keep" class="mt-0.5 text-indigo-600 focus:ring-indigo-500 bg-slate-900 border-slate-700" />
+                            <label :class="dupAction === 'keep' ? 'border-indigo-600 bg-indigo-50/90 dark:bg-indigo-950/60 ring-2 ring-indigo-500/40 shadow-sm' : 'border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950/60 hover:border-indigo-400/60'"
+                                   class="flex items-start gap-2.5 p-2.5 rounded-lg border cursor-pointer transition">
+                                <input type="radio" name="duplicate_action" value="keep" x-model="dupAction" class="import-dup-radio" />
                                 <div>
-                                    <span class="font-bold text-white block text-[11px]">Pertahankan Data Awal</span>
-                                    <span class="text-[10px] text-slate-400 leading-tight block mt-0.5">Lewati jika kelas & jam tersebut sudah memiliki jadwal di sistem</span>
+                                    <span class="font-bold text-slate-900 dark:text-white block text-[11px]">Pertahankan Data Awal</span>
+                                    <span class="text-[10px] text-slate-600 dark:text-slate-400 leading-tight block mt-0.5">Lewati jika kelas & jam tersebut sudah memiliki jadwal di sistem</span>
                                 </div>
                             </label>
                         </div>

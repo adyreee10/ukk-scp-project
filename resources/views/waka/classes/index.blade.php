@@ -59,6 +59,9 @@
         <!-- Filter Bar Interaktif -->
         <div class="p-4 rounded-2xl bg-[#0f172a]/90 border border-slate-800 shadow-xl">
             <form method="GET" action="{{ route('waka.classes.index') }}" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                @if(request('per_page'))
+                    <input type="hidden" name="per_page" value="{{ request('per_page') }}">
+                @endif
                 <!-- Filter Tingkat -->
                 <div>
                     <label class="block font-bold text-slate-400 mb-1">Tingkat Kelas</label>
@@ -97,8 +100,8 @@
                 <div>
                     <label class="block font-bold text-slate-400 mb-1">Cari Kelas / Wali</label>
                     <div class="flex gap-2">
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama..." class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-white placeholder-slate-500 focus:border-indigo-500" />
-                        <button type="submit" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold transition">Cari</button>
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama kelas / wali..." class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-white placeholder-slate-500 focus:border-indigo-500" />
+                        <button type="submit" class="px-4 py-2 rounded-xl scp-btn-gradient text-white font-bold transition shadow-sm cursor-pointer">Cari</button>
                         @if(request()->hasAny(['grade', 'major', 'homeroom_status', 'search']))
                             <a href="{{ route('waka.classes.index') }}" class="px-2.5 py-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition flex items-center justify-center font-bold" title="Reset Filter">✕</a>
                         @endif
@@ -165,7 +168,8 @@
                                                     users: {{ json_encode($class->users) }}
                                                 }; viewModalOpen = true" 
                                                 type="button" 
-                                                class="px-2.5 py-1 text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg transition cursor-pointer">
+                                                class="px-2.5 py-1 text-xs font-bold rounded-lg transition cursor-pointer btn-action-view shadow-sm"
+                                                title="Lihat Detail Kelas">
                                             Detail
                                         </button>
 
@@ -176,7 +180,8 @@
                                                     homeroom_id: '{{ $homeroomTeacher?->id ?? '' }}' 
                                                 }; editModalOpen = true" 
                                                 type="button" 
-                                                class="px-2.5 py-1 text-xs font-bold bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-lg transition cursor-pointer">
+                                                class="px-2.5 py-1 text-xs font-bold rounded-lg transition cursor-pointer btn-action-edit shadow-sm"
+                                                title="Edit Kelas & Wali Kelas">
                                             Edit
                                         </button>
 
@@ -184,7 +189,7 @@
                                         <form method="POST" action="{{ route('waka.classes.destroy', $class) }}" onsubmit="return confirm('Apakah Anda yakin ingin menghapus kelas ini?')">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="px-2.5 py-1 text-xs font-bold text-red-400 hover:text-white hover:bg-red-600/80 border border-red-500/30 rounded-lg transition cursor-pointer">
+                                            <button type="submit" class="px-2.5 py-1 text-xs font-bold rounded-lg transition cursor-pointer btn-action-delete shadow-sm" title="Hapus Kelas">
                                                 Hapus
                                             </button>
                                         </form>
@@ -202,11 +207,7 @@
                 </table>
             </div>
 
-            @if($classes->hasPages())
-                <div class="p-4 border-t border-slate-800">
-                    {{ $classes->links() }}
-                </div>
-            @endif
+            <x-table-pagination :paginator="$classes" />
         </div>
 
         <!-- ================= MODAL DETAIL KELAS & DAFTAR SISWA ================= -->

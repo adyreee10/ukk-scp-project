@@ -91,6 +91,9 @@
         <!-- Filter Bar Dijabarkan: Tingkat, Jurusan, Rombel, Pencarian -->
         <div class="p-4 rounded-2xl bg-[#0f172a]/90 border border-slate-800 shadow-xl">
             <form method="GET" action="{{ route('waka.grades.index') }}" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                @if(request('per_page'))
+                    <input type="hidden" name="per_page" value="{{ request('per_page') }}">
+                @endif
                 <!-- 1. Filter Tingkat -->
                 <div>
                     <label class="block font-bold text-slate-400 mb-1">Tingkat Kelas</label>
@@ -130,8 +133,8 @@
                 <div>
                     <label class="block font-bold text-slate-400 mb-1">Cari Siswa</label>
                     <div class="flex gap-2">
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Ketik nama atau NIS..." class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-white placeholder-slate-500 focus:border-indigo-500" />
-                        <button type="submit" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold transition">Cari</button>
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Ketik nama, NIS, atau kelas..." class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-white placeholder-slate-500 focus:border-indigo-500" />
+                        <button type="submit" class="px-4 py-2 rounded-xl scp-btn-gradient text-white font-bold transition shadow-sm cursor-pointer">Cari</button>
                         @if(request()->hasAny(['major', 'rombel', 'search']))
                             <a href="{{ route('waka.grades.index', ['tab' => $activeTab]) }}" class="px-2.5 py-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition flex items-center justify-center font-bold" title="Reset Filter">✕</a>
                         @endif
@@ -223,7 +226,8 @@
                                                         student_status: '{{ $s->student_status }}'
                                                     }; viewModalOpen = true" 
                                                     type="button" 
-                                                    class="px-2.5 py-1 text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg transition cursor-pointer">
+                                                    class="px-2.5 py-1 text-xs font-bold rounded-lg transition cursor-pointer btn-action-view shadow-sm"
+                                                    title="Lihat Detail Siswa">
                                                 Detail
                                             </button>
 
@@ -236,13 +240,15 @@
                                                         student_status: '{{ $s->student_status }}'
                                                     }; editModalOpen = true" 
                                                     type="button" 
-                                                    class="px-2.5 py-1 text-xs font-bold bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-lg transition cursor-pointer">
+                                                    class="px-2.5 py-1 text-xs font-bold rounded-lg transition cursor-pointer btn-action-edit shadow-sm"
+                                                    title="Edit Status Siswa">
                                                 Edit
                                             </button>
 
                                             <!-- Tombol Hapus -->
                                             <button type="submit" form="deleteForm_{{ $s->id }}" 
-                                                    class="px-2.5 py-1 text-xs font-bold text-red-400 hover:text-white hover:bg-red-600/80 border border-red-500/30 rounded-lg transition cursor-pointer">
+                                                    class="px-2.5 py-1 text-xs font-bold rounded-lg transition cursor-pointer btn-action-delete shadow-sm"
+                                                    title="Hapus Siswa">
                                                 Hapus
                                             </button>
                                         </div>
@@ -259,11 +265,7 @@
                     </table>
                 </div>
 
-                @if($students->hasPages())
-                    <div class="p-4 border-t border-slate-800">
-                        {{ $students->links() }}
-                    </div>
-                @endif
+                <x-table-pagination :paginator="$students" />
             </div>
         </form>
 

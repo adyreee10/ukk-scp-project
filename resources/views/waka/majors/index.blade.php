@@ -104,14 +104,16 @@
                                         <!-- Detail Button -->
                                         <button @click="activeMajor = {{ json_encode($m) }}; viewModalOpen = true" 
                                                 type="button" 
-                                                class="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition cursor-pointer">
+                                                class="px-2.5 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer btn-action-view shadow-sm"
+                                                title="Lihat Detail Jurusan">
                                             Detail
                                         </button>
                                         
                                         <!-- Edit Button -->
                                         <button @click="activeMajor = {{ json_encode($m) }}; editModalOpen = true" 
                                                 type="button" 
-                                                class="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 transition cursor-pointer">
+                                                class="px-2.5 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer btn-action-edit shadow-sm"
+                                                title="Edit Jurusan">
                                             Edit
                                         </button>
 
@@ -119,7 +121,7 @@
                                         <form method="POST" action="{{ route('waka.majors.destroy', $m->id) }}" onsubmit="return confirm('Apakah Anda yakin ingin menghapus jurusan ini?')">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="px-2.5 py-1.5 rounded-lg text-xs font-bold text-red-400 hover:text-white hover:bg-red-600/80 border border-red-500/30 transition cursor-pointer">
+                                            <button type="submit" class="px-2.5 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer btn-action-delete shadow-sm" title="Hapus Jurusan">
                                                 Hapus
                                             </button>
                                         </form>
@@ -139,9 +141,9 @@
         </div>
 
         <!-- ================= MODAL DETAIL JURUSAN ================= -->
-        <div x-show="viewModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div x-show="viewModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
             <div @click="viewModalOpen = false" class="fixed inset-0 bg-black/70 backdrop-blur-sm"></div>
-            <div class="relative w-full max-w-lg bg-[#0f172a] p-6 shadow-2xl border border-slate-800 space-y-4 rounded-2xl">
+            <div class="relative w-full max-w-lg bg-[#0f172a] p-6 shadow-2xl border border-slate-800 space-y-4 rounded-2xl my-auto max-h-[90vh] overflow-y-auto">
                 <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                     <div>
                         <h3 class="text-base font-bold text-white flex items-center gap-2">
@@ -182,9 +184,9 @@
         </div>
 
         <!-- ================= MODAL TAMBAH JURUSAN ================= -->
-        <div x-show="addModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div x-show="addModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
             <div @click="addModalOpen = false" class="fixed inset-0 bg-black/70 backdrop-blur-sm"></div>
-            <div class="relative w-full max-w-md bg-[#0f172a] p-6 shadow-2xl border border-slate-800 space-y-4 rounded-2xl">
+            <div class="relative w-full max-w-md bg-[#0f172a] p-6 shadow-2xl border border-slate-800 space-y-4 rounded-2xl my-auto max-h-[90vh] overflow-y-auto">
                 <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                     <h3 class="text-base font-bold text-white">Tambah Jurusan Baru</h3>
                     <button @click="addModalOpen = false" class="text-xs font-bold text-slate-400 hover:text-white px-2 py-1">[Tutup]</button>
@@ -231,9 +233,9 @@
         </div>
 
         <!-- ================= MODAL EDIT JURUSAN ================= -->
-        <div x-show="editModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div x-show="editModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
             <div @click="editModalOpen = false" class="fixed inset-0 bg-black/70 backdrop-blur-sm"></div>
-            <div class="relative w-full max-w-md bg-[#0f172a] p-6 shadow-2xl border border-slate-800 space-y-4 rounded-2xl">
+            <div class="relative w-full max-w-md bg-[#0f172a] p-6 shadow-2xl border border-slate-800 space-y-4 rounded-2xl my-auto max-h-[90vh] overflow-y-auto">
                 <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                     <h3 class="text-base font-bold text-white">Edit Data Jurusan</h3>
                     <button @click="editModalOpen = false" class="text-xs font-bold text-slate-400 hover:text-white px-2 py-1">[Tutup]</button>
@@ -264,6 +266,7 @@
                         <div>
                             <label class="block font-bold text-slate-300 mb-1">Rombel Kelas 12</label>
                             <input type="number" name="rombel_xii" x-model="activeMajor.rombel_xii" min="1" max="10" required class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-white focus:border-indigo-500 text-center font-bold" />
+                        </div>
                     </div>
 
                     <div>
@@ -280,9 +283,9 @@
         </div>
 
         <!-- ================= MODAL TAHUN AJARAN & SEMESTER ================= -->
-        <div x-show="periodModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div x-show="periodModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
             <div @click="periodModalOpen = false" class="fixed inset-0 bg-black/70 backdrop-blur-sm"></div>
-            <div class="relative w-full max-w-sm bg-[#0f172a] p-6 shadow-2xl border border-slate-800 space-y-4 rounded-2xl">
+            <div class="relative w-full max-w-sm bg-[#0f172a] p-6 shadow-2xl border border-slate-800 space-y-4 rounded-2xl my-auto max-h-[90vh] overflow-y-auto">
                 <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                     <h3 class="text-base font-bold text-white">Atur Periode Realtime</h3>
                     <button @click="periodModalOpen = false" class="text-xs font-bold text-slate-400 hover:text-white px-2 py-1">[Tutup]</button>

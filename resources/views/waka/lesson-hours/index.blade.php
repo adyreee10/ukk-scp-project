@@ -33,8 +33,8 @@
                     <span class="text-[10px] font-extrabold uppercase text-slate-400 block">Agenda Pagi Khusus</span>
                     <p class="text-white font-bold">Senin: Upacara Bendera (07:00 - 08:00)</p>
                     <span class="text-[10px] text-amber-300 block">Dilaksanakan 2 minggu sekali atau kondisional</span>
-                    <p class="text-indigo-300 font-bold pt-1">Selasa: Literasi Membaca (07:00 - 07:30)</p>
-                    <span class="text-[10px] text-slate-500 block">Rabu, Kamis, Jumat: Mulai 07:15</span>
+                    <p class="text-white font-bold pt-1">Selasa: Literasi Membaca (07:00 - 07:30)</p>
+                    <span class="text-[10px] text-amber-300 block">Rabu, Kamis, Jumat: Mulai 07:15</span>
                 </div>
 
                 <!-- 2. Istirahat 1 (15 Menit) -->
@@ -57,7 +57,7 @@
                 <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 space-y-1">
                     <span class="text-[10px] font-extrabold uppercase text-slate-400 block">Istirahat 3 (Sholat Ashar dan Piket Kelas)</span>
                     <p class="text-slate-300">• Senin sampai dengan Kamis: <strong>15:10 - 15:30</strong></p>
-                    <span class="text-[10px] text-slate-400 block">Sholat Ashar berjamaah dan piket kelas</span>
+                    <span class="text-[10px] text-amber-300 block">Sholat Ashar berjamaah dan piket kelas</span>
                     <p class="text-slate-300">• Jumat: <strong>13:50 - 14:00</strong> (Piket Kelas)</p>
                 </div>
             </div>

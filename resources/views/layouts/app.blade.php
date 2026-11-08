@@ -5,14 +5,14 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'SCP - School Class Progress') }}</title>
+        <title>{{ config('app.name', 'School Class Progress') }}</title>
 
         <!-- Favicon / Logo Aplikasi SCP -->
         <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}?v=20261107">
         <link rel="shortcut icon" href="{{ asset('favicon.ico') }}?v=20261107">
         <link rel="apple-touch-icon" href="{{ asset('images/logo-sm.png') }}?v=20261107">
 
-        <!-- Script Deteksi Tema Cepat (Mencegah Layar Berkedip saat Refresh) -->
+        <!-- Script Deteksi Tema Cepat & Penghapus Header Cetak Browser Otomatis -->
         <script>
             if (localStorage.getItem('scp_theme') === 'light') {
                 document.documentElement.classList.add('theme-light');
@@ -21,6 +21,15 @@
                 document.documentElement.classList.remove('theme-light');
                 document.documentElement.classList.add('dark');
             }
+
+            // Hapus teks judul di header atas saat cetak A4 / PDF (Foto 3)
+            window.addEventListener('beforeprint', function () {
+                window.__scp_orig_title = document.title;
+                document.title = '';
+            });
+            window.addEventListener('afterprint', function () {
+                document.title = window.__scp_orig_title || 'School Class Progress';
+            });
         </script>
 
         <!-- Fonts -->
@@ -227,6 +236,24 @@
             html.theme-light a.bg-indigo-600,
             html.theme-light a.bg-indigo-600 * {
                 color: #ffffff !important;
+            }
+
+            /* Tombol Hapus Merah Solid (Kontras di Light & Dark Mode) */
+            button.bg-red-600,
+            html.theme-light button.bg-red-600 {
+                background-color: #dc2626 !important;
+                color: #ffffff !important;
+                border-color: #b91c1c !important;
+            }
+            button.bg-red-600:hover,
+            html.theme-light button.bg-red-600:hover {
+                background-color: #b91c1c !important;
+                color: #ffffff !important;
+            }
+            button.bg-red-600 svg,
+            html.theme-light button.bg-red-600 svg {
+                color: #ffffff !important;
+                stroke: #ffffff !important;
             }
 
             /* Notifikasi Banner Kontras Tinggi */
@@ -527,11 +554,11 @@
                 color: #64748b !important;
             }
 
-            /* Input Form & Dropdown Light Mode */
-            html.theme-light main input,
+            /* Input Form & Dropdown Light Mode (Kecuali Checkbox & Radio yang Memiliki Desain Khusus) */
+            html.theme-light main input:not([type="checkbox"]):not([type="radio"]),
             html.theme-light main select,
             html.theme-light main textarea,
-            html.theme-light [x-show="addModalOpen"] input,
+            html.theme-light [x-show="addModalOpen"] input:not([type="checkbox"]):not([type="radio"]),
             html.theme-light [x-show="addModalOpen"] select {
                 background-color: #ffffff !important; /* Putih Solid */
                 border: 1px solid #cbd5e1 !important; /* Border Halus Slate 300 */
@@ -539,7 +566,7 @@
                 border-radius: 10px !important;
                 transition: all 0.15s ease !important;
             }
-            html.theme-light main input:focus,
+            html.theme-light main input:not([type="checkbox"]):not([type="radio"]):focus,
             html.theme-light main select:focus,
             html.theme-light main textarea:focus {
                 border-color: #2563eb !important;     /* Aksen Royal Blue */
@@ -911,6 +938,386 @@
                 border-color: #4f46e5 !important;
             }
 
+            /* ===================================================
+               INDIKATOR RADIO PILIHAN DUPLIKAT IMPORT (FOTO 1 & FOTO 2)
+               (Berlaku di Data Siswa, Guru, Jadwal Mengajar, Ruangan)
+               =================================================== */
+            .import-dup-radio,
+            html.theme-light .import-dup-radio,
+            html.dark .import-dup-radio {
+                appearance: none !important;
+                -webkit-appearance: none !important;
+                width: 1.125rem !important; /* 18px */
+                height: 1.125rem !important; /* 18px */
+                border-radius: 9999px !important;
+                display: inline-grid !important;
+                place-content: center !important;
+                cursor: pointer !important;
+                margin-top: 0.125rem !important;
+                flex-shrink: 0 !important;
+                transition: all 0.15s ease !important;
+                box-sizing: border-box !important;
+            }
+
+            /* Unchecked di Dark Mode: Lingkaran putih bersih seperti Foto 2 kiri */
+            html.dark .import-dup-radio,
+            .import-dup-radio {
+                background-color: #ffffff !important;
+                border: 2px solid #ffffff !important;
+            }
+
+            /* Unchecked di Light Mode: Lingkaran putih dengan border slate seperti Foto 1 kiri */
+            html.theme-light .import-dup-radio {
+                background-color: #ffffff !important;
+                border: 2px solid #94a3b8 !important;
+            }
+
+            /* Checked di Mode Gelap & Mode Terang: Lingkaran Indigo 600 (#4f46e5) seperti Foto 2 kanan */
+            .import-dup-radio:checked,
+            html.theme-light .import-dup-radio:checked,
+            html.dark .import-dup-radio:checked {
+                background-color: #4f46e5 !important;
+                border: 2px solid #4f46e5 !important;
+                box-shadow: 0 0 0 1px #4f46e5 !important;
+            }
+
+            /* Titik Tengah Putih (Checked Dot) yang Presisi */
+            .import-dup-radio::before,
+            html.theme-light .import-dup-radio::before,
+            html.dark .import-dup-radio::before {
+                content: "" !important;
+                width: 0.45rem !important; /* 7-8px */
+                height: 0.45rem !important;
+                border-radius: 50% !important;
+                background-color: #ffffff !important;
+                transform: scale(0) !important;
+                transition: 0.12s transform ease-in-out !important;
+            }
+
+            .import-dup-radio:checked::before,
+            html.theme-light .import-dup-radio:checked::before,
+            html.dark .import-dup-radio:checked::before {
+                transform: scale(1) !important;
+            }
+
+            /* ===================================================
+               PILIHAN JUMLAH BARIS PER HALAMAN (50, 100, 500, 1000)
+               =================================================== */
+            .table-rows-btn {
+                transition: all 0.15s ease !important;
+            }
+            html.theme-light .table-rows-btn {
+                background-color: #ffffff !important;
+                border: 1px solid #cbd5e1 !important;
+                color: #0f172a !important;
+            }
+            html.theme-light .table-rows-btn:hover {
+                background-color: #f1f5f9 !important;
+                border-color: #94a3b8 !important;
+            }
+            html.theme-light .table-rows-popover {
+                background-color: #ffffff !important;
+                border: 1px solid #cbd5e1 !important;
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+            }
+            html.theme-light .table-rows-popover a,
+            html.theme-light .table-rows-popover button {
+                color: #334155 !important;
+            }
+            html.theme-light .table-rows-popover a:hover,
+            html.theme-light .table-rows-popover button:hover {
+                background-color: #4f46e5 !important;
+                color: #ffffff !important;
+            }
+            html.theme-light .table-rows-popover a.is-active,
+            html.theme-light .table-rows-popover button.is-active {
+                background-color: #ede9fe !important;
+                color: #4f46e5 !important;
+                font-weight: 700 !important;
+            }
+            html.theme-light .table-rows-popover .border-b {
+                border-color: #e2e8f0 !important;
+            }
+
+            /* ===================================================
+               TRANSFORMASI WARNA KUNING DI MODE TERANG (SEMUA ROLE)
+               (Kuning terang diubah menjadi Amber pekat kontras tinggi)
+               =================================================== */
+            html.theme-light .text-amber-300,
+            html.theme-light .text-amber-400,
+            html.theme-light .text-yellow-300,
+            html.theme-light .text-yellow-400,
+            html.theme-light main .text-amber-300,
+            html.theme-light main .text-amber-400,
+            html.theme-light main .text-yellow-300,
+            html.theme-light main .text-yellow-400 {
+                color: #b45309 !important; /* Deep Amber 700 - tajam & kontras tinggi */
+                font-weight: 700 !important;
+            }
+
+            html.theme-light .bg-amber-500\/20,
+            html.theme-light .bg-amber-500\/10,
+            html.theme-light .bg-yellow-500\/20,
+            html.theme-light .bg-yellow-500\/10 {
+                background-color: #fef3c7 !important; /* Amber 100 Lembut */
+                border-color: #fcd34d !important;     /* Amber 300 Tegas */
+                color: #92400e !important;            /* Amber 800 */
+            }
+
+            html.theme-light .bg-amber-500\/20 *,
+            html.theme-light .bg-yellow-500\/20 * {
+                color: #92400e !important;
+            }
+
+            /* ===================================================
+               BADGE KHUSUS MODAL DETAIL JADWAL RUANGAN
+               (Kontras Tinggi & Warna Berbeda Antar Kolom di Light/Dark)
+               =================================================== */
+            .room-count-badge,
+            html.theme-light .room-count-badge,
+            html.theme-light [x-show="viewModalOpen"] .room-count-badge,
+            html.theme-light [x-show="viewModalOpen"] span.room-count-badge {
+                background-color: #2563eb !important; /* Biru Solid */
+                color: #ffffff !important;            /* Teks Putih Pekat */
+                font-weight: 800 !important;
+                border: none !important;
+            }
+            .room-period-badge,
+            html.theme-light .room-period-badge {
+                background-color: #e0f2fe !important; /* Sky 100 */
+                color: #334155 !important;            /* Abu-abu Slate 700 Jelas & Elegan (Foto 3) */
+                border: 1px solid #7dd3fc !important; /* Sky 300 */
+                font-weight: 800 !important;
+            }
+            html.dark .room-period-badge {
+                background-color: rgba(3, 105, 161, 0.25) !important;
+                color: #7dd3fc !important;
+                border: 1px solid rgba(3, 105, 161, 0.5) !important;
+            }
+            .room-class-badge,
+            html.theme-light .room-class-badge {
+                background-color: #ede9fe !important; /* Indigo 100 */
+                color: #334155 !important;            /* Abu-abu Slate 700 Jelas & Elegan (Foto 3) */
+                border: 1px solid #a5b4fc !important; /* Indigo 300 */
+                font-weight: 800 !important;
+            }
+            html.dark .room-class-badge {
+                background-color: rgba(67, 56, 202, 0.3) !important;
+                color: #c7d2fe !important;
+                border: 1px solid rgba(67, 56, 202, 0.6) !important;
+            }
+            /* Siklus: Teks Abu-abu di Mode Terang, Emas di Mode Gelap */
+            .room-cycle-badge,
+            html.theme-light .room-cycle-badge {
+                background-color: #f1f5f9 !important; /* Slate 100 Bersih */
+                color: #334155 !important;            /* Abu-abu Slate 700 Jelas & Elegan (Foto 3) */
+                border: 1px solid #cbd5e1 !important; /* Slate 300 */
+                font-weight: 800 !important;
+            }
+            html.dark .room-cycle-badge {
+                background-color: rgba(217, 119, 6, 0.25) !important;
+                color: #fde68a !important;
+                border: 1px solid rgba(217, 119, 6, 0.4) !important;
+            }
+
+            /* Container Tabel Modal Detail Ruangan (Dark & Light Mode Konsisten) */
+            .room-table-container {
+                background-color: #ffffff !important;
+                border: 1px solid #e2e8f0 !important;
+            }
+            html.dark .room-table-container {
+                background-color: #0f172a !important;
+                border: 1px solid #1e293b !important;
+            }
+            html.dark .room-table-container table thead {
+                background-color: #1e293b !important;
+                border-bottom: 1px solid #334155 !important;
+            }
+            html.dark .room-table-container table th {
+                color: #e2e8f0 !important;
+            }
+            html.dark .room-table-container table tbody tr {
+                background-color: #0f172a !important;
+                color: #e2e8f0 !important;
+            }
+            html.dark .room-table-container table tbody tr:nth-child(even) {
+                background-color: #162032 !important;
+            }
+            html.dark .room-table-container table td {
+                border-color: #1e293b !important;
+            }
+            html.dark .room-table-container table td span.text-slate-900,
+            html.dark .room-table-container table td.text-slate-900 {
+                color: #ffffff !important;
+            }
+            html.dark .room-table-container table td.text-slate-700 {
+                color: #cbd5e1 !important;
+            }
+
+            html.theme-light .room-table-container table thead {
+                background-color: #f8fafc !important;
+                border-bottom: 1px solid #e2e8f0 !important;
+            }
+            html.theme-light .room-table-container table th {
+                color: #334155 !important;
+            }
+            html.theme-light .room-table-container table tbody tr {
+                background-color: #ffffff !important;
+                color: #0f172a !important;
+            }
+            html.theme-light .room-table-container table tbody tr:nth-child(even) {
+                background-color: #f8fafc !important;
+            }
+            html.theme-light .room-table-container table td {
+                border-color: #e2e8f0 !important;
+            }
+            html.theme-light .room-table-container table td span.text-slate-900,
+            html.theme-light .room-table-container table td.text-slate-900 {
+                color: #0f172a !important;
+            }
+
+            /* Tombol Sinkronisasi Orang Tua (Solid Royal Blue Seperti Tombol Hapus Semua) */
+            .sync-parent-btn,
+            html.theme-light .sync-parent-btn,
+            html.dark .sync-parent-btn {
+                background-color: #2563eb !important;
+                color: #ffffff !important;
+                border: none !important;
+            }
+            .sync-parent-btn:hover,
+            html.theme-light .sync-parent-btn:hover,
+            html.dark .sync-parent-btn:hover {
+                background-color: #1d4ed8 !important;
+                color: #ffffff !important;
+            }
+            .sync-parent-btn:active,
+            html.theme-light .sync-parent-btn:active,
+            html.dark .sync-parent-btn:active {
+                background-color: #1e40af !important;
+                color: #ffffff !important;
+            }
+            .sync-parent-btn svg,
+            .sync-parent-btn span,
+            html.theme-light .sync-parent-btn svg,
+            html.theme-light .sync-parent-btn span,
+            html.dark .sync-parent-btn svg,
+            html.dark .sync-parent-btn span {
+                color: #ffffff !important;
+            }
+
+            /* ===================================================
+               FORMAT CETAK REKAP A4 SIMETRIS & RAPI (SEMUA ROLE)
+               =================================================== */
+            @media print {
+                @page {
+                    size: A4 portrait;
+                    margin: 10mm 10mm 12mm 10mm;
+                }
+                *, *:before, *:after {
+                    box-shadow: none !important;
+                    text-shadow: none !important;
+                }
+                html, 
+                html.dark, 
+                html.theme-light, 
+                body {
+                    background-color: #ffffff !important;
+                    background: #ffffff !important;
+                    color: #000000 !important;
+                    font-size: 10pt !important;
+                    line-height: 1.3 !important;
+                    width: 100% !important;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                }
+                aside, 
+                header, 
+                nav, 
+                .theme-toggle-btn,
+                .print\:hidden {
+                    display: none !important;
+                }
+                main {
+                    padding: 0 !important;
+                    margin: 0 !important;
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    background-color: #ffffff !important;
+                    background: #ffffff !important;
+                }
+                /* Reset Semua Kontainer & Kartu Gelap saat Print (Foto 2) */
+                .bg-\[\#0f172a\],
+                .bg-\[\#0f172a\]\/90,
+                .bg-slate-900,
+                .bg-slate-950,
+                [class*="bg-slate-900"],
+                [class*="bg-\[\#0f172a\]"] {
+                    background-color: #ffffff !important;
+                    background: #ffffff !important;
+                    border: none !important;
+                    box-shadow: none !important;
+                }
+                .print-full-width,
+                table {
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    table-layout: fixed !important;
+                    border-collapse: collapse !important;
+                    background-color: #ffffff !important;
+                    background: #ffffff !important;
+                }
+                table thead,
+                table thead tr,
+                table thead th {
+                    background-color: #f3f4f6 !important;
+                    background: #f3f4f6 !important;
+                    color: #000000 !important;
+                    border: 1px solid #9ca3af !important;
+                }
+                table tbody,
+                table tbody tr,
+                table tbody td {
+                    background-color: #ffffff !important;
+                    background: #ffffff !important;
+                    color: #000000 !important;
+                    border: 1px solid #9ca3af !important;
+                }
+                table td div,
+                table td span {
+                    background-color: transparent !important;
+                    background: transparent !important;
+                }
+                th {
+                    word-break: keep-all !important;
+                    overflow-wrap: normal !important;
+                    word-wrap: normal !important;
+                    letter-spacing: normal !important;
+                    text-align: center !important;
+                    vertical-align: middle !important;
+                }
+                th.nowrap-col,
+                .nowrap-col {
+                    white-space: nowrap !important;
+                }
+                td {
+                    word-wrap: break-word !important;
+                    overflow-wrap: break-word !important;
+                    white-space: normal !important;
+                }
+                td.student-name-col,
+                td.student-name-col * {
+                    word-break: normal !important;
+                    word-wrap: normal !important;
+                    overflow-wrap: normal !important;
+                    white-space: normal !important;
+                    hyphens: none !important;
+                }
+                .page-break-inside-avoid {
+                    page-break-inside: avoid !important;
+                    break-inside: avoid !important;
+                }
+            }
+
         </style>
     </head>
     <body class="min-h-screen text-slate-100 antialiased font-sans transition-colors duration-200">
@@ -962,7 +1369,7 @@
                         <div class="flex items-center gap-3">
                             <img src="{{ asset('images/logo-sm.png') }}?v=20261107" alt="Logo SCP" class="h-10 w-10 object-contain shrink-0 drop-shadow-md" />
                             <div>
-                                <h2 class="text-base font-extrabold text-white leading-tight">SCP Sekolah</h2>
+                                <h2 class="text-base font-extrabold text-white leading-tight">School Class Progress</h2>
                                 <p class="text-[11px] font-bold text-indigo-400 tracking-wider uppercase">
                                     {{ auth()->user()->role?->role_name ?? 'PORTAL AKADEMIK' }}
                                 </p>
@@ -978,19 +1385,7 @@
                         </button>
                     </div>
 
-                    <!-- Search Input khusus Mobile Drawer -->
-                    <div class="lg:hidden mb-5">
-                        <form action="{{ route('search') }}" method="GET" class="relative w-full">
-                            <input type="text" 
-                                   name="q"
-                                   value="{{ request('q') }}"
-                                   placeholder="Cari guru, siswa, mapel..." 
-                                   class="w-full pl-9 pr-3.5 py-2 text-xs bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition" />
-                            <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                            </svg>
-                        </form>
-                    </div>
+
 
                                         <!-- Navigation Links Berdasarkan Role -->
                     <nav class="space-y-6 flex-1">
@@ -1080,7 +1475,7 @@
                                     <a href="{{ route('waka.dashboard') }}" 
                                        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs transition {{ request()->routeIs('waka.dashboard') ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-600/30' : 'text-slate-100 hover:bg-slate-800/80 hover:text-white font-semibold' }}">
                                         <svg class="w-4 h-4 {{ request()->routeIs('waka.dashboard') ? 'text-white' : 'text-slate-300' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                                        Dashboard Waka
+                                        Dashboard
                                     </a>
 
                                     <a href="{{ route('waka.cycle.index') }}" 
@@ -1252,33 +1647,23 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                             </svg>
                         </button>
-
-                        <!-- Search bar di Header: Hanya tampil di layar desktop / tablet (sm ke atas) -->
-                        <form action="{{ route('search') }}" method="GET" class="hidden sm:block w-44 md:w-64 lg:w-72 relative">
-                            <input type="text" 
-                                   name="q"
-                                   value="{{ request('q') }}"
-                                   placeholder="Cari guru, siswa, mapel..." 
-                                   class="w-full pl-8 pr-3.5 py-2 text-xs bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition" />
-                            <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2.5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                            </svg>
-                        </form>
                     </div>
 
-                    <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-                        <!-- INDIKATOR PERIODE REALTIME GLOBAL UNTUK SEMUA USER -->
-                        <div class="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700/80 text-[11px] sm:text-xs font-bold shadow-sm shrink-0">
-                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
-                            <span class="text-amber-400 font-extrabold">{{ \App\Models\SystemConfiguration::current()->academic_year }}</span>
+                    <div class="flex items-center gap-2 sm:gap-3.5 shrink-0">
+                        <!-- INDIKATOR PERIODE REALTIME GLOBAL & SEKOLAH UNTUK SEMUA USER (DIBESARKAN & JELAS DIBACA) -->
+                        <div class="flex items-center gap-2 sm:gap-2.5 px-3.5 sm:px-4 py-2 rounded-xl bg-slate-900 border border-slate-700/90 text-xs sm:text-sm font-bold shadow-md shrink-0">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+                            <span class="text-white font-extrabold tracking-wide hidden sm:inline">SMK Negeri 1 Bantul</span>
+                            <span class="text-slate-500 hidden sm:inline">•</span>
+                            <span class="text-amber-400 font-black tracking-wide">{{ \App\Models\SystemConfiguration::current()->academic_year }}</span>
                             <span class="text-slate-500">•</span>
-                            <span class="text-indigo-300 font-bold">{{ \App\Models\SystemConfiguration::current()->semester }}</span>
+                            <span class="text-indigo-300 font-extrabold">{{ \App\Models\SystemConfiguration::current()->semester }}</span>
                         </div>
 
                         <!-- TOMBOL GANTI TEMA (DARK / LIGHT MODE TOGGLE) -->
                         <button @click="toggleTheme()" 
                                 type="button" 
-                                class="theme-toggle-btn p-2 rounded-xl border border-slate-700 bg-slate-800/80 text-slate-300 hover:text-white hover:bg-slate-800 transition cursor-pointer flex items-center justify-center shadow-sm shrink-0"
+                                class="theme-toggle-btn p-2.5 rounded-xl border border-slate-700 bg-slate-800/80 text-slate-300 hover:text-white hover:bg-slate-800 transition cursor-pointer flex items-center justify-center shadow-sm shrink-0"
                                 :title="theme === 'dark' ? 'Ganti ke Mode Terang' : 'Ganti ke Mode Gelap'">
                             <!-- Ikon Matahari: Muncul saat Mode Gelap aktif -->
                             <svg x-show="theme === 'dark'" class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1289,11 +1674,6 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                             </svg>
                         </button>
-
-                        <span class="user-name-label text-xs font-bold text-white hidden md:inline truncate max-w-[120px]">{{ auth()->user()->name }}</span>
-                        <div class="h-8 w-8 rounded-full bg-indigo-600 text-white font-bold text-xs flex items-center justify-center shadow-md shrink-0">
-                            {{ substr(auth()->user()->name, 0, 1) }}
-                        </div>
                     </div>
                 </header>
 

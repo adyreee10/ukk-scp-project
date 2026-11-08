@@ -141,21 +141,21 @@
                     </button>
                 </div>
 
-                <!-- Info Ringkasan Ruangan -->
-                <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                <!-- Info Ringkasan Ruangan (Berwarna & Kontras di Mode Terang Maupun Gelap) -->
+                <div class="p-4 rounded-xl bg-gradient-to-r from-blue-50/90 via-indigo-50/80 to-purple-50/60 dark:from-slate-900 dark:via-indigo-950/40 dark:to-slate-900 border border-indigo-100 dark:border-indigo-900/50 shadow-sm flex items-center justify-between">
                     <div>
-                        <span class="text-xs text-slate-500 dark:text-slate-400 font-bold block">Ruangan:</span>
-                        <span class="text-base font-extrabold text-slate-900 dark:text-white" x-text="selectedRoom.room_name"></span>
+                        <span class="text-xs text-indigo-700 dark:text-indigo-400 font-bold block uppercase tracking-wider">Ruangan:</span>
+                        <span class="text-base sm:text-lg font-black text-slate-900 dark:text-white" x-text="selectedRoom.room_name"></span>
                     </div>
-                    <span class="px-3.5 py-1.5 rounded-full text-xs font-bold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 shadow-sm whitespace-nowrap" x-text="selectedRoom.schedules_count + ' Jadwal Menggunakan'"></span>
+                    <span class="room-count-badge px-3.5 py-1.5 rounded-full text-xs font-extrabold whitespace-nowrap shadow-sm text-white" style="color: #ffffff !important;" x-text="selectedRoom.schedules_count + ' Jadwal Menggunakan'"></span>
                 </div>
 
-                <!-- Tabel Daftar Jadwal Ruangan -->
-                <div class="rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden bg-white dark:bg-slate-950/60 shadow-sm">
+                <!-- Tabel Daftar Jadwal Ruangan (Berwarna & Beda Warna Antar Kolom) -->
+                <div class="room-table-container rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden bg-white dark:bg-slate-900 shadow-sm">
                     <div class="max-h-80 overflow-y-auto overflow-x-auto">
                         <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-800 text-xs">
-                            <thead class="bg-slate-50 dark:bg-slate-900/90 sticky top-0 border-b border-slate-200 dark:border-slate-800">
-                                <tr class="text-left font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                            <thead class="bg-slate-100/90 dark:bg-slate-800/80 sticky top-0 border-b border-slate-200 dark:border-slate-800">
+                                <tr class="text-left font-extrabold text-slate-700 dark:text-slate-200 uppercase tracking-wider text-[11px]">
                                     <th class="p-3.5 whitespace-nowrap min-w-[150px]">Hari & Jam</th>
                                     <th class="p-3.5 whitespace-nowrap min-w-[110px]">Kelas</th>
                                     <th class="p-3.5 min-w-[180px]">Mata Pelajaran</th>
@@ -163,25 +163,25 @@
                                     <th class="p-3.5 text-center whitespace-nowrap min-w-[110px]">Siklus</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-slate-200 dark:divide-slate-800/60 text-slate-700 dark:text-slate-300">
+                            <tbody class="divide-y divide-slate-200 dark:divide-slate-800/60 text-slate-800 dark:text-slate-200">
                                 <template x-for="sch in selectedRoom.schedules" :key="sch.id">
-                                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition">
-                                        <!-- Kolom Hari & Jam Pelajaran (Format Manusiawi: Jam Ke-X - Y) -->
+                                    <tr class="even:bg-slate-50/70 dark:even:bg-slate-800/40 hover:bg-blue-50/50 dark:hover:bg-slate-800/80 transition">
+                                        <!-- Kolom Hari & Jam Pelajaran (Badge Biru Langit / Sky Blue) -->
                                         <td class="p-3.5 whitespace-nowrap">
                                             <span class="font-bold text-slate-900 dark:text-white block text-xs" x-text="sch.day_of_week"></span>
-                                            <span class="inline-flex items-center gap-1 mt-1 px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-300 dark:bg-indigo-950/80 dark:text-indigo-300 dark:border-indigo-700/50 shadow-xs" x-text="sch.period_label"></span>
+                                            <span class="room-period-badge inline-flex items-center gap-1 mt-1 px-2.5 py-0.5 rounded-md text-[11px] font-bold shadow-xs" x-text="sch.period_label"></span>
                                         </td>
-                                        <!-- Kolom Kelas (Diproteksi whitespace-nowrap agar nomor rombel tidak melipat ke bawah) -->
+                                        <!-- Kolom Kelas (Badge Ungu Indigo) -->
                                         <td class="p-3.5 whitespace-nowrap">
-                                            <span class="inline-flex items-center whitespace-nowrap px-3 py-1 rounded-lg text-xs font-extrabold bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-950 dark:text-indigo-200 dark:border-indigo-700/60 shadow-xs tracking-wide" x-text="sch.class_name"></span>
+                                            <span class="room-class-badge inline-flex items-center whitespace-nowrap px-3 py-1 rounded-lg text-xs font-black shadow-xs tracking-wide" x-text="sch.class_name"></span>
                                         </td>
                                         <!-- Kolom Mata Pelajaran -->
                                         <td class="p-3.5 font-bold text-slate-900 dark:text-white text-xs" x-text="sch.subject"></td>
                                         <!-- Kolom Guru Pengajar -->
-                                        <td class="p-3.5 font-medium text-slate-700 dark:text-slate-300 text-xs" x-text="sch.teacher_name"></td>
-                                        <!-- Kolom Siklus (Diproteksi whitespace-nowrap agar nomor putaran tidak melipat ke bawah) -->
+                                        <td class="p-3.5 font-semibold text-slate-700 dark:text-slate-300 text-xs" x-text="sch.teacher_name"></td>
+                                        <!-- Kolom Siklus (Badge Bersih di Mode Terang, Emas di Mode Gelap) -->
                                         <td class="p-3.5 text-center whitespace-nowrap">
-                                            <span class="inline-flex items-center whitespace-nowrap px-3 py-1 rounded-md text-xs font-bold bg-slate-100 text-slate-700 border border-slate-300 dark:bg-slate-900 dark:text-amber-300 dark:border-amber-500/30 shadow-xs" x-text="sch.cycle_type || 'Putaran 1'"></span>
+                                            <span class="room-cycle-badge inline-flex items-center whitespace-nowrap px-3 py-1 rounded-md text-xs font-bold shadow-xs" x-text="sch.cycle_type || 'Putaran 1'"></span>
                                         </td>
                                     </tr>
                                 </template>
@@ -198,7 +198,7 @@
                 </div>
 
                 <div class="flex justify-end pt-2">
-                    <button @click="viewModalOpen = false" type="button" class="px-5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-white font-bold text-xs transition cursor-pointer">
+                    <button @click="viewModalOpen = false" type="button" class="px-5 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-white font-bold text-xs transition cursor-pointer">
                         Tutup Tampilan
                     </button>
                 </div>
@@ -274,6 +274,7 @@
                 <form method="POST" action="{{ route('waka.rooms.import') }}" enctype="multipart/form-data" 
                       x-data="{ 
                           selectedFiles: [],
+                          dupAction: 'replace',
                           handleFiles(e) {
                               const newFiles = Array.from(e.target.files);
                               this.selectedFiles = [...this.selectedFiles, ...newFiles];
@@ -332,23 +333,25 @@
                     </div>
 
                     <!-- Opsi Penanganan Data Duplikat / Ruangan yang Sudah Ada (Sesuai Foto ke-2) -->
-                    <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
-                        <label class="block text-[11px] font-bold text-slate-300">
+                    <div class="p-3.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2">
+                        <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300">
                             Jika Ditemukan Data Ruangan yang Sudah Ada (Dobel):
                         </label>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                            <label class="flex items-start gap-2.5 p-2.5 rounded-lg border border-slate-800 bg-slate-950/60 hover:border-indigo-500/50 cursor-pointer transition">
-                                <input type="radio" name="duplicate_action" value="replace" checked class="mt-0.5 text-indigo-600 focus:ring-indigo-500 bg-slate-900 border-slate-700" />
+                            <label :class="dupAction === 'replace' ? 'border-indigo-600 bg-indigo-50/90 dark:bg-indigo-950/60 ring-2 ring-indigo-500/40 shadow-sm' : 'border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950/60 hover:border-indigo-400/60'"
+                                   class="flex items-start gap-2.5 p-2.5 rounded-lg border cursor-pointer transition">
+                                <input type="radio" name="duplicate_action" value="replace" x-model="dupAction" class="import-dup-radio" />
                                 <div>
-                                    <span class="font-bold text-white block text-[11px]">Ganti / Perbarui yang Baru</span>
-                                    <span class="text-[10px] text-slate-400 leading-tight block mt-0.5">Pertahankan konsistensi nama ruangan terbaru</span>
+                                    <span class="font-bold text-slate-900 dark:text-white block text-[11px]">Ganti / Perbarui yang Baru</span>
+                                    <span class="text-[10px] text-slate-600 dark:text-slate-400 leading-tight block mt-0.5">Pertahankan konsistensi nama ruangan terbaru</span>
                                 </div>
                             </label>
-                            <label class="flex items-start gap-2.5 p-2.5 rounded-lg border border-slate-800 bg-slate-950/60 hover:border-indigo-500/50 cursor-pointer transition">
-                                <input type="radio" name="duplicate_action" value="keep" class="mt-0.5 text-indigo-600 focus:ring-indigo-500 bg-slate-900 border-slate-700" />
+                            <label :class="dupAction === 'keep' ? 'border-indigo-600 bg-indigo-50/90 dark:bg-indigo-950/60 ring-2 ring-indigo-500/40 shadow-sm' : 'border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950/60 hover:border-indigo-400/60'"
+                                   class="flex items-start gap-2.5 p-2.5 rounded-lg border cursor-pointer transition">
+                                <input type="radio" name="duplicate_action" value="keep" x-model="dupAction" class="import-dup-radio" />
                                 <div>
-                                    <span class="font-bold text-white block text-[11px]">Pertahankan Data Awal</span>
-                                    <span class="text-[10px] text-slate-400 leading-tight block mt-0.5">Lewati jika nama ruangan sudah terdaftar di sistem</span>
+                                    <span class="font-bold text-slate-900 dark:text-white block text-[11px]">Pertahankan Data Awal</span>
+                                    <span class="text-[10px] text-slate-600 dark:text-slate-400 leading-tight block mt-0.5">Lewati jika nama ruangan sudah terdaftar di sistem</span>
                                 </div>
                             </label>
                         </div>

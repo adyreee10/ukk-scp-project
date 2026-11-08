@@ -24,7 +24,7 @@
 
                 <!-- TOMBOL CETAK REKAP A4 (POIN 5) -->
                 <button type="button" 
-                        onclick="window.print()" 
+                        onclick="const oldT = document.title; document.title = ''; window.print(); setTimeout(() => { document.title = oldT; }, 1000);" 
                         class="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-bold shadow-lg shadow-indigo-600/30 transition cursor-pointer">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
                     <span>Cetak Rekap (A4)</span>
@@ -32,13 +32,15 @@
             </div>
         </div>
 
-        <!-- HEADER KOP LAPORAN (HANYA MUNCUL SAAT DI-PRINT) -->
-        <div class="hidden print:block mb-6 border-b-2 border-black pb-4 text-center">
-            <h2 class="text-xl font-bold uppercase tracking-wider text-black">LAPORAN REKAPITULASI PRESENSI SISWA</h2>
-            <p class="text-xs text-gray-700 mt-1">
-                Kelas: <strong>{{ $activeClass?->class_name ?? 'Semua Kelas' }}</strong> • 
-                Dicetak pada: {{ now()->translatedFormat('d F Y, H:i') }} WIB • 
-                Oleh: {{ auth()->user()->name }} ({{ auth()->user()->role?->role_name }})
+        <!-- HEADER KOP LAPORAN (HANYA MUNCUL SAAT DI-PRINT A4) -->
+        <div class="hidden print:block mb-5 border-b-2 border-black pb-3 text-center">
+            <h1 class="text-base font-black tracking-wider text-black uppercase">SMK NEGERI 1 BANTUL</h1>
+            <h2 class="text-sm font-bold uppercase tracking-wider text-black mt-0.5">LAPORAN REKAPITULASI PRESENSI SISWA</h2>
+            <p class="text-[11px] text-gray-700 mt-1">
+                Kelas: <strong>{{ $activeClass?->class_name ?? 'Semua Kelas' }}</strong> &nbsp;•&nbsp; 
+                Semester: <strong>{{ \App\Models\SystemConfiguration::current()->semester }} (TA {{ \App\Models\SystemConfiguration::current()->academic_year }})</strong> &nbsp;•&nbsp; 
+                Dicetak: {{ now()->translatedFormat('d F Y, H:i') }} WIB &nbsp;•&nbsp; 
+                Oleh: {{ auth()->user()->name }}
             </p>
         </div>
 
@@ -186,68 +188,72 @@
 
                 <!-- Desktop Table View (Cocok juga untuk Format Cetak) -->
                 <div class="hidden overflow-x-auto md:block print:block">
-                    <table class="min-w-full divide-y divide-slate-800 text-sm print:divide-gray-300 print:text-black">
+                    <table class="min-w-full divide-y divide-slate-800 text-sm print:divide-gray-400 print:text-black print:w-full print:table-fixed">
                         <thead class="bg-slate-900/70 print:bg-gray-100">
-                            <tr class="text-left text-xs font-bold text-slate-400 uppercase tracking-wider print:text-black">
-                                <th class="p-3.5 print:border print:border-gray-300">No</th>
-                                <th class="p-3.5 print:border print:border-gray-300">Siswa (NIS)</th>
-                                <th class="p-3.5 text-center print:border print:border-gray-300">Hadir</th>
-                                <th class="p-3.5 text-center print:border print:border-gray-300">Sakit</th>
-                                <th class="p-3.5 text-center print:border print:border-gray-300">Izin</th>
-                                <th class="p-3.5 text-center print:border print:border-gray-300">Alpa</th>
-                                <th class="p-3.5 text-center print:border print:border-gray-300">Tingkat Kehadiran</th>
-                                <th class="p-3.5 text-center print:border print:border-gray-300">Status Disiplin</th>
+                            <tr class="text-left text-xs font-bold text-slate-400 uppercase tracking-wider print:text-black print:text-[10px] print:tracking-normal">
+                                <th class="p-3.5 text-center print:border print:border-gray-400 print:py-1.5 print:px-0.5 print:w-[4%] print:whitespace-nowrap nowrap-col">No</th>
+                                <th class="p-3.5 print:border print:border-gray-400 print:py-1.5 print:px-2 print:w-[37%]">Siswa (NIS)</th>
+                                <th class="p-3.5 text-center print:border print:border-gray-400 print:py-1.5 print:px-0.5 print:w-[7%] print:whitespace-nowrap nowrap-col">Hadir</th>
+                                <th class="p-3.5 text-center print:border print:border-gray-400 print:py-1.5 print:px-0.5 print:w-[7%] print:whitespace-nowrap nowrap-col">Sakit</th>
+                                <th class="p-3.5 text-center print:border print:border-gray-400 print:py-1.5 print:px-0.5 print:w-[7%] print:whitespace-nowrap nowrap-col">Izin</th>
+                                <th class="p-3.5 text-center print:border print:border-gray-400 print:py-1.5 print:px-0.5 print:w-[7%] print:whitespace-nowrap nowrap-col">Alpa</th>
+                                <th class="p-3.5 text-center print:border print:border-gray-400 print:py-1 print:px-0.5 print:w-[15.5%] leading-tight">
+                                    <span class="block">Tingkat<br class="hidden print:inline"> Kehadiran</span>
+                                </th>
+                                <th class="p-3.5 text-center print:border print:border-gray-400 print:py-1 print:px-0.5 print:w-[15.5%] leading-tight">
+                                    <span class="block">Status<br class="hidden print:inline"> Disiplin</span>
+                                </th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-800/60 print:divide-gray-300">
+                        <tbody class="divide-y divide-slate-800/60 print:divide-gray-400">
                             @foreach ($studentsAttendance as $index => $st)
                                 <tr x-show="!searchStudent || '{{ strtolower(addslashes($st->name)) }} {{ strtolower(addslashes($st->nis)) }}'.includes(searchStudent.toLowerCase())"
                                     class="hover:bg-slate-800/30 transition print:hover:bg-transparent">
-                                    <td class="p-3.5 text-slate-400 font-mono text-xs print:border print:border-gray-300 print:text-black">
+                                    <td class="p-3.5 text-center text-slate-400 font-mono text-xs print:border print:border-gray-400 print:text-black print:py-1.5 print:px-0.5 print:text-[11px] print:whitespace-nowrap">
                                         {{ $index + 1 }}
                                     </td>
 
-                                    <td class="p-3.5 whitespace-nowrap print:border print:border-gray-300">
-                                        <div class="font-bold text-white print:text-black">{{ $st->name }}</div>
-                                        <span class="text-xs font-mono text-slate-400 print:text-gray-600">NIS: {{ $st->nis }}</span>
+                                    <td class="p-3.5 whitespace-nowrap print:whitespace-normal print:border print:border-gray-400 print:py-1.5 print:px-2 student-name-col">
+                                        <div class="font-bold text-white print:text-black print:text-xs tracking-tight print:break-normal" style="word-break: keep-all; overflow-wrap: normal;">{{ $st->name }}</div>
+                                        <span class="text-xs font-mono text-slate-400 print:text-gray-700 print:text-[10px]">NIS: {{ $st->nis }}</span>
                                     </td>
 
-                                    <td class="p-3.5 text-center font-bold text-emerald-400 font-mono print:border print:border-gray-300 print:text-black">
+                                    <td class="p-3.5 text-center font-bold text-emerald-400 font-mono print:border print:border-gray-400 print:text-black print:py-1.5 print:px-0.5 print:text-xs print:whitespace-nowrap">
                                         {{ $st->hadir }}
                                     </td>
 
-                                    <td class="p-3.5 text-center font-mono text-amber-300 print:border print:border-gray-300 print:text-black">
+                                    <td class="p-3.5 text-center font-mono text-amber-300 print:border print:border-gray-400 print:text-black print:py-1.5 print:px-0.5 print:text-xs print:whitespace-nowrap">
                                         {{ $st->sakit }}
                                     </td>
 
-                                    <td class="p-3.5 text-center font-mono text-blue-300 print:border print:border-gray-300 print:text-black">
+                                    <td class="p-3.5 text-center font-mono text-blue-300 print:border print:border-gray-400 print:text-black print:py-1.5 print:px-0.5 print:text-xs print:whitespace-nowrap">
                                         {{ $st->izin }}
                                     </td>
 
-                                    <td class="p-3.5 text-center font-mono font-bold {{ $st->alpa > 0 ? 'text-red-400 bg-red-950/20' : 'text-slate-400' }} print:border print:border-gray-300 print:text-black print:bg-transparent">
+                                    <td class="p-3.5 text-center font-mono font-bold {{ $st->alpa > 0 ? 'text-red-400 bg-red-950/20' : 'text-slate-400' }} print:border print:border-gray-400 print:text-black print:bg-transparent print:py-1.5 print:px-0.5 print:text-xs print:whitespace-nowrap">
                                         {{ $st->alpa }}
                                     </td>
 
-                                    <td class="p-3.5 text-center whitespace-nowrap print:border print:border-gray-300">
-                                        <div class="font-bold text-xs {{ $st->rate >= 85 ? 'text-emerald-400' : ($st->rate >= 75 ? 'text-amber-400' : 'text-red-400') }} print:text-black">
+                                    <td class="p-3.5 text-center whitespace-nowrap print:whitespace-normal print:border print:border-gray-400 print:p-1.5">
+                                        <div class="font-bold text-xs {{ $st->rate >= 85 ? 'text-emerald-400' : ($st->rate >= 75 ? 'text-amber-400' : 'text-red-400') }} print:text-black print:text-xs">
                                             {{ $st->rate }}%
                                         </div>
-                                        <div class="text-[11px] text-slate-500 font-mono print:text-gray-500">{{ $st->total_sessions }} Sesi Total</div>
+                                        <div class="text-[11px] text-slate-500 font-mono print:text-gray-600 print:text-[10px]">{{ $st->total_sessions }} Sesi Total</div>
                                     </td>
 
-                                    <td class="p-3.5 text-center whitespace-nowrap print:border print:border-gray-300">
+                                    <td class="p-3.5 text-center whitespace-nowrap print:whitespace-normal print:border print:border-gray-400 print:p-1.5">
                                         @if($st->status === 'Kritis')
-                                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-red-950/70 border border-red-700/60 text-red-300 text-xs font-bold shadow-sm print:bg-transparent print:border-none print:text-black">
+                                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-red-950/70 border border-red-700/60 text-red-300 text-xs font-bold shadow-sm print:bg-transparent print:border-none print:text-red-700 print:font-bold print:p-0 print:text-[11px]">
                                                 <svg class="w-3.5 h-3.5 text-red-400 print:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                                                 Panggilan BK
                                             </span>
                                         @elseif($st->status === 'Perhatian')
-                                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-950/70 border border-amber-700/60 text-amber-300 text-xs font-bold shadow-sm print:bg-transparent print:border-none print:text-black">
+                                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-950/70 border border-amber-700/60 text-amber-300 text-xs font-bold shadow-sm print:bg-transparent print:border-none print:text-amber-800 print:font-bold print:p-0 print:text-[11px]">
                                                 <span class="h-1.5 w-1.5 rounded-full bg-amber-400 print:hidden"></span>
                                                 Perhatian
                                             </span>
                                         @else
-                                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-950/70 border border-emerald-700/60 text-emerald-300 text-xs font-bold shadow-sm print:bg-transparent print:border-none print:text-black">
+                                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-950/70 border border-emerald-700/60 text-emerald-300 text-xs font-bold shadow-sm print:bg-transparent print:border-none print:text-emerald-700 print:font-bold print:p-0 print:text-[11px]">
                                                 <svg class="w-3.5 h-3.5 text-emerald-400 print:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
                                                 Tertib
                                             </span>
@@ -262,20 +268,20 @@
         </div>
 
         <!-- TANDA TANGAN (HANYA MUNCUL DI CETAK A4) -->
-        <div class="hidden print:grid grid-cols-2 gap-8 mt-12 pt-6 text-xs text-black">
+        <div class="hidden print:grid grid-cols-2 gap-8 mt-8 pt-4 text-xs text-black page-break-inside-avoid">
             <div class="text-center">
                 <p>Mengetahui,</p>
                 <p class="font-bold">Kepala Sekolah / Waka Kesiswaan</p>
-                <div class="h-20"></div>
+                <div class="h-16"></div>
                 <p class="font-bold underline">_________________________</p>
-                <p>NIP. ........................................</p>
+                <p class="text-[11px]">NIP. ........................................</p>
             </div>
             <div class="text-center">
-                <p>{{ now()->translatedFormat('d F Y') }}</p>
+                <p>Bantul, {{ now()->translatedFormat('d F Y') }}</p>
                 <p class="font-bold">{{ auth()->user()->role?->role_name }}</p>
-                <div class="h-20"></div>
+                <div class="h-16"></div>
                 <p class="font-bold underline">{{ auth()->user()->name }}</p>
-                <p>NIP/NUPTK. ........................................</p>
+                <p class="text-[11px]">NIP/NUPTK: {{ auth()->user()->nip ?? '........................................' }}</p>
             </div>
         </div>
 

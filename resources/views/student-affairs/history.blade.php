@@ -2,7 +2,7 @@
     <div x-data="{ 
         filterStatus: 'all',
         filterType: 'all',
-        searchStudent: '',
+        searchStudent: '{{ addslashes(request('search', '')) }}',
         previewDocOpen: false,
         previewDocUrl: '',
         previewDocTitle: '',
@@ -156,15 +156,22 @@
                     @endif
                 </div>
 
-                <!-- Input Pencarian -->
-                <div class="relative w-full md:w-72">
-                    <input type="text" x-model="searchStudent" 
-                           placeholder="Cari siswa atau kelas..." 
-                           class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 pl-9 text-xs text-white placeholder-slate-500 focus:border-indigo-500 focus:bg-slate-900 focus:outline-none focus:ring-1 focus:ring-indigo-500">
-                    <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <!-- Input Pencarian (Universal: Nama Siswa, NIS, Kelas, Jenis Izin, Alasan) -->
+                <form method="GET" action="{{ route('student-affairs.leaves.history') }}" class="relative w-full md:w-72 flex items-center">
+                    @if(request('grade')) <input type="hidden" name="grade" value="{{ request('grade') }}"> @endif
+                    @if(request('major')) <input type="hidden" name="major" value="{{ request('major') }}"> @endif
+                    @if(request('rombel')) <input type="hidden" name="rombel" value="{{ request('rombel') }}"> @endif
+                    @if(request('class_id')) <input type="hidden" name="class_id" value="{{ request('class_id') }}"> @endif
+                    <input type="text" name="search" x-model="searchStudent" 
+                           placeholder="Cari siswa, NIS, kelas, alasan..." 
+                           class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 pl-9 pr-8 text-xs text-white placeholder-slate-500 focus:border-indigo-500 focus:bg-slate-900 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                    <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                     </svg>
-                </div>
+                    <template x-if="searchStudent">
+                        <button type="button" @click="searchStudent = ''; $nextTick(() => $el.closest('form').submit())" class="absolute right-2.5 text-slate-400 hover:text-white cursor-pointer text-xs p-1" title="Hapus Pencarian">✕</button>
+                    </template>
+                </form>
             </div>
 
             <!-- TABEL / CARD VIEW RIWAYAT -->
@@ -180,7 +187,7 @@
                 <!-- Mobile Card View -->
                 <div class="p-4 space-y-3.5 md:hidden">
                     @foreach ($processedLeaves as $leave)
-                        <div x-show="(filterStatus === 'all' || '{{ $leave->status }}' === filterStatus) && (filterType === 'all' || '{{ $leave->leave_type }}' === filterType) && (!searchStudent || '{{ strtolower(addslashes($leave->student_name)) }} {{ strtolower(addslashes($leave->class_name)) }}'.includes(searchStudent.toLowerCase()))"
+                        <div x-show="(filterStatus === 'all' || '{{ $leave->status }}' === filterStatus) && (filterType === 'all' || '{{ $leave->leave_type }}' === filterType) && (!searchStudent || '{{ strtolower(addslashes($leave->student_name . ' ' . ($leave->student_nis ?? '') . ' ' . $leave->class_name . ' ' . $leave->leave_type . ' ' . $leave->reason)) }}'.includes(searchStudent.toLowerCase().trim()))"
                              class="p-4 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800/40 transition">
                             <div class="flex items-start justify-between gap-2">
                                 <div>
@@ -246,7 +253,7 @@
                         </thead>
                         <tbody class="divide-y divide-slate-800/60">
                             @foreach ($processedLeaves as $leave)
-                                <tr x-show="(filterStatus === 'all' || '{{ $leave->status }}' === filterStatus) && (filterType === 'all' || '{{ $leave->leave_type }}' === filterType) && (!searchStudent || '{{ strtolower(addslashes($leave->student_name)) }} {{ strtolower(addslashes($leave->class_name)) }}'.includes(searchStudent.toLowerCase()))"
+                                <tr x-show="(filterStatus === 'all' || '{{ $leave->status }}' === filterStatus) && (filterType === 'all' || '{{ $leave->leave_type }}' === filterType) && (!searchStudent || '{{ strtolower(addslashes($leave->student_name . ' ' . ($leave->student_nis ?? '') . ' ' . $leave->class_name . ' ' . $leave->leave_type . ' ' . $leave->reason)) }}'.includes(searchStudent.toLowerCase().trim()))"
                                     class="hover:bg-slate-800/30 transition">
                                     <td class="p-4">
                                         <div class="font-bold text-white">{{ $leave->student_name }}</div>

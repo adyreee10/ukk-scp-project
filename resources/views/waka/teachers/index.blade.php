@@ -161,10 +161,10 @@
                 <p class="text-xs font-semibold text-slate-400 mt-0.5">Kelola data tenaga pendidik, penugasan Wali Kelas & Guru BK (multi-kelas), serta akun login guru</p>
             </div>
             <div class="flex items-center gap-2 shrink-0 flex-wrap">
-                <!-- Tombol Hapus Semua Guru -->
-                <button @click="deleteAllModalOpen = true" type="button" class="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/40 text-xs sm:text-sm font-bold shadow-md cursor-pointer transition flex items-center gap-1.5 whitespace-nowrap">
-                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                    <span>Hapus Semua Guru</span>
+                <!-- Tombol Hapus Semua Guru (Merah Solid & Kontras di Mode Terang Maupun Gelap) -->
+                <button @click="deleteAllModalOpen = true" type="button" class="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold text-xs sm:text-sm shadow-md shadow-red-950/30 cursor-pointer transition flex items-center gap-1.5 whitespace-nowrap">
+                    <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    <span class="text-white">Hapus Semua Guru</span>
                 </button>
                 <button @click="importModalOpen = true" type="button" class="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs sm:text-sm font-bold text-white shadow-md shadow-emerald-950/40 cursor-pointer transition flex items-center gap-1.5">
                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
@@ -225,6 +225,9 @@
             <form method="GET" action="{{ route('waka.teachers.index') }}" class="flex flex-col sm:flex-row gap-2">
                 @if(request('role'))
                     <input type="hidden" name="role" value="{{ request('role') }}">
+                @endif
+                @if(request('per_page'))
+                    <input type="hidden" name="per_page" value="{{ request('per_page') }}">
                 @endif
                 <div class="relative w-full">
                     <input type="text" 
@@ -436,11 +439,7 @@
                 </table>
             </div>
 
-            @if($teachers->hasPages())
-                <div class="p-4 border-t border-slate-800">
-                    {{ $teachers->links() }}
-                </div>
-            @endif
+            <x-table-pagination :paginator="$teachers" />
         </div>
 
         <!-- ============================================================= -->
@@ -930,6 +929,7 @@
                 <form method="POST" action="{{ route('waka.teachers.import') }}" enctype="multipart/form-data" 
                       x-data="{ 
                           selectedFiles: [],
+                          dupAction: 'replace',
                           handleFiles(e) {
                               const newFiles = Array.from(e.target.files);
                               this.selectedFiles = [...this.selectedFiles, ...newFiles];
@@ -991,23 +991,25 @@
                     </div>
 
                     <!-- Opsi Penanganan Data Duplikat / Guru yang Sudah Ada (Sesuai Foto ke-2) -->
-                    <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
-                        <label class="block text-[11px] font-bold text-slate-300">
+                    <div class="p-3.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2">
+                        <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300">
                             Jika Ditemukan Data Guru yang Sudah Ada (Dobel):
                         </label>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                            <label class="flex items-start gap-2.5 p-2.5 rounded-lg border border-slate-800 bg-slate-950/60 hover:border-indigo-500/50 cursor-pointer transition">
-                                <input type="radio" name="duplicate_action" value="replace" checked class="mt-0.5 text-indigo-600 focus:ring-indigo-500 bg-slate-900 border-slate-700" />
+                            <label :class="dupAction === 'replace' ? 'border-indigo-600 bg-indigo-50/90 dark:bg-indigo-950/60 ring-2 ring-indigo-500/40 shadow-sm' : 'border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950/60 hover:border-indigo-400/60'"
+                                   class="flex items-start gap-2.5 p-2.5 rounded-lg border cursor-pointer transition">
+                                <input type="radio" name="duplicate_action" value="replace" x-model="dupAction" class="import-dup-radio" />
                                 <div>
-                                    <span class="font-bold text-white block text-[11px]">Ganti / Perbarui yang Baru</span>
-                                    <span class="text-[10px] text-slate-400 leading-tight block mt-0.5">Timpa data lama dengan data terbaru dari dokumen</span>
+                                    <span class="font-bold text-slate-900 dark:text-white block text-[11px]">Ganti / Perbarui yang Baru</span>
+                                    <span class="text-[10px] text-slate-600 dark:text-slate-400 leading-tight block mt-0.5">Timpa data lama dengan data terbaru dari dokumen</span>
                                 </div>
                             </label>
-                            <label class="flex items-start gap-2.5 p-2.5 rounded-lg border border-slate-800 bg-slate-950/60 hover:border-indigo-500/50 cursor-pointer transition">
-                                <input type="radio" name="duplicate_action" value="keep" class="mt-0.5 text-indigo-600 focus:ring-indigo-500 bg-slate-900 border-slate-700" />
+                            <label :class="dupAction === 'keep' ? 'border-indigo-600 bg-indigo-50/90 dark:bg-indigo-950/60 ring-2 ring-indigo-500/40 shadow-sm' : 'border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-950/60 hover:border-indigo-400/60'"
+                                   class="flex items-start gap-2.5 p-2.5 rounded-lg border cursor-pointer transition">
+                                <input type="radio" name="duplicate_action" value="keep" x-model="dupAction" class="import-dup-radio" />
                                 <div>
-                                    <span class="font-bold text-white block text-[11px]">Pertahankan Data Awal</span>
-                                    <span class="text-[10px] text-slate-400 leading-tight block mt-0.5">Lewati jika NIP atau Nama guru sudah terdaftar</span>
+                                    <span class="font-bold text-slate-900 dark:text-white block text-[11px]">Pertahankan Data Awal</span>
+                                    <span class="text-[10px] text-slate-600 dark:text-slate-400 leading-tight block mt-0.5">Lewati jika NIP atau Nama guru sudah terdaftar</span>
                                 </div>
                             </label>
                         </div>

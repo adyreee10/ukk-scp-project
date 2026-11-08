@@ -112,21 +112,6 @@
                 </form>
             </div>
         </div>
-
-        <!-- KARTU 3: Panduan Sistem Siklus Blok -->
-        <div class="bg-[#0f172a]/90 backdrop-blur-md p-6 border border-slate-800 shadow-xl" style="border-radius: 15px;">
-            <h2 class="text-sm font-bold uppercase tracking-wider text-slate-300 mb-2">Panduan Sistem Siklus Blok</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-400 leading-relaxed">
-                <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800">
-                    <p class="font-bold text-white mb-1">Mekanisme Putaran 1 & Putaran 2</p>
-                    <p>Sistem pembelajaran sistem blok membagi kalender ke dalam dua rotasi putaran. Jadwal pelajaran yang diinput di menu Jadwal Mengajar terikat pada siklus putaran masing-masing.</p>
-                </div>
-                <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800">
-                    <p class="font-bold text-white mb-1">Dampak Kuncian Jadwal</p>
-                    <p>Waka Kurikulum disarankan mengunci jadwal ketika seluruh jadwal pelajaran pada semester berjalan telah final, guna mencegah perubahan tidak disengaja.</p>
-                </div>
-            </div>
-        </div>
     </div>
         <style>
         /* Mode Gelap (Default) */
