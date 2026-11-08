@@ -802,7 +802,7 @@
                     <div>
                         <label class="block font-bold text-slate-300 mb-1.5">Cakupan Penghapusan:</label>
                         <select name="class_id" class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2.5 text-xs font-semibold text-white focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500">
-                            <option value="all">⚠️ Hapus SELURUH Siswa di SEMUA Kelas</option>
+                            <option value="all">Hapus SELURUH Siswa di SEMUA Kelas</option>
                             @foreach($classes as $c)
                                 <option value="{{ $c->id }}" {{ request('class_id') == $c->id ? 'selected' : '' }}>
                                     Hanya Siswa di Kelas: {{ $c->class_name }}

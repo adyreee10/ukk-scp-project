@@ -1090,7 +1090,7 @@
                     <div>
                         <label class="block font-bold text-slate-300 mb-1.5">Cakupan Penghapusan Peran:</label>
                         <select name="role" class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2.5 text-xs font-semibold text-white focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500">
-                            <option value="all">⚠️ Hapus SELURUH Guru (Guru, Wali Kelas, Guru BK)</option>
+                            <option value="all">Hapus SELURUH Guru (Guru, Wali Kelas, Guru BK)</option>
                             <option value="Guru">Hanya Guru Pengajar (Bukan Wali/BK)</option>
                             <option value="Wali Kelas">Hanya Guru yang Memiliki Peran Wali Kelas</option>
                             <option value="Guru BK">Hanya Guru BK (Bimbingan Konseling)</option>
