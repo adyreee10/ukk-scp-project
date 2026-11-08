@@ -1438,8 +1438,10 @@ public function classesDestroy(SchoolClass $schoolClass)
     /**
      * Master Data: Ruang
      */
-    public function roomsIndex()
+    public function roomsIndex(Request $request)
     {
+        $perPage = in_array((int)$request->input('per_page'), [50, 100, 500, 1000]) ? (int)$request->input('per_page') : 50;
+
         $rooms = Room::withCount('schedules')
             ->with(['schedules' => function ($q) {
                 $q->with(['schoolClass', 'teacher'])
@@ -1447,7 +1449,8 @@ public function classesDestroy(SchoolClass $schoolClass)
                   ->orderBy('start_time');
             }])
             ->orderBy('room_name')
-            ->paginate(15);
+            ->paginate($perPage)
+            ->withQueryString();
 
         return view('waka.rooms.index', compact('rooms'));
     }

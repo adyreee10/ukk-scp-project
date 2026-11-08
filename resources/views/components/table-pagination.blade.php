@@ -85,7 +85,7 @@
                         &hellip;
                     </span>
                 @elseif ($p == $currentPage)
-                    <span class="table-page-active w-8 h-8 rounded-lg flex items-center justify-center bg-indigo-600 text-white font-extrabold border border-indigo-500 shadow-md text-xs cursor-default">
+                    <span class="table-page-active w-8 h-8 rounded-lg flex items-center justify-center bg-blue-600 text-white font-extrabold border border-blue-500 shadow-md text-xs cursor-default" style="color: #ffffff !important;">
                         {{ $p }}
                     </span>
                 @else

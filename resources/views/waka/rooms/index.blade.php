@@ -115,11 +115,7 @@
                 </table>
             </div>
 
-            @if($rooms->hasPages())
-                <div class="p-4 border-t border-slate-800">
-                    {{ $rooms->links() }}
-                </div>
-            @endif
+            <x-table-pagination :paginator="$rooms" />
         </div>
 
         <!-- ============================================================= -->

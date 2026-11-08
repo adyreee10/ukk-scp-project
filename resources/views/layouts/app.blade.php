@@ -206,7 +206,7 @@
             html.theme-light main h1,
             html.theme-light main h2,
             html.theme-light main h3,
-            html.theme-light main .text-white:not(.scp-btn-gradient):not(.scp-btn-gradient *):not(button):not(button *) {
+            html.theme-light main .text-white:not(.scp-btn-gradient):not(.scp-btn-gradient *):not(button):not(button *):not(.table-page-active):not(.table-page-active *):not(.room-count-badge):not(.room-count-badge *) {
                 color: #0f172a !important;
             }
             html.theme-light main .text-slate-200,
@@ -1053,9 +1053,18 @@
                 border-color: #94a3b8 !important;
                 color: #0f172a !important;
             }
-            html.theme-light .table-page-active {
-                background-color: #4f46e5 !important;
-                border: 1px solid #4338ca !important;
+            .table-page-active,
+            html.theme-light main .table-page-active,
+            html.theme-light .table-page-active,
+            html.theme-light span.table-page-active {
+                background-color: #2563eb !important;
+                border: 1px solid #1d4ed8 !important;
+                color: #ffffff !important;
+                font-weight: 800 !important;
+            }
+            .table-page-active *,
+            html.theme-light main .table-page-active *,
+            html.theme-light .table-page-active * {
                 color: #ffffff !important;
             }
             html.theme-light .table-page-disabled {
