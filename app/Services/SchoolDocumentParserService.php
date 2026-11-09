@@ -1667,7 +1667,8 @@ class SchoolDocumentParserService
                     $uniqueParentUser = substr($baseParentUser, 0, 38) . "_{$pCounter}";
                     $pCounter++;
                 }
-                $parentPassHash = $cache['passwordHash'] ?? Hash::make('password123');
+                $parentPassPlain = $nis ? "p{$nis}" : "portu123";
+                $parentPassHash = Hash::make($parentPassPlain);
                 $parentUser = User::create([
                     'name'           => 'Orang tua ' . $cleanName,
                     'username'       => $uniqueParentUser,
@@ -1724,7 +1725,8 @@ class SchoolDocumentParserService
                 }
             }
 
-            $parentPassHash = $cache['passwordHash'] ?? Hash::make('password123');
+            $parentPassPlain = $nis ? "p{$nis}" : "portu123";
+            $parentPassHash = Hash::make($parentPassPlain);
 
             $parentUser = User::create([
                 'name'           => 'Orang tua ' . $cleanName,

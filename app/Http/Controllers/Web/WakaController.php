@@ -1135,6 +1135,7 @@ class WakaController extends Controller
 
     /**
      * Sinkronisasi massal seluruh akun Orang Tua untuk siswa yang belum memiliki akun orang tua
+     * serta memperbarui kata sandi dan hak akses akun orang tua yang telah ada agar sesuai dengan format p[NIS].
      */
     public function studentsSyncParents(Request $request)
     {
@@ -1142,13 +1143,12 @@ class WakaController extends Controller
         ini_set('memory_limit', '512M');
 
         $parentRole = Role::where('role_name', 'Orang Tua')->firstOrFail();
-        $unlinkedStudents = User::whereHas('role', fn($q) => $q->where('role_name', 'Siswa'))
-            ->whereNull('parent_id')
-            ->select('id', 'name', 'username', 'nis', 'phone', 'address')
+        $students = User::whereHas('role', fn($q) => $q->where('role_name', 'Siswa'))
+            ->select('id', 'name', 'username', 'nis', 'phone', 'address', 'parent_id')
             ->get();
 
-        if ($unlinkedStudents->isEmpty()) {
-            return redirect()->route('waka.students.index')->with('success', 'Seluruh data siswa sudah memiliki akun orang tua yang terhubung.');
+        if ($students->isEmpty()) {
+            return redirect()->route('waka.students.index')->with('info', 'Tidak ada data siswa untuk disinkronkan.');
         }
 
         // Cache username yang sudah ada ke array memori agar pencarian username sangat cepat tanpa query berulang
@@ -1158,25 +1158,61 @@ class WakaController extends Controller
         }
 
         $createdCount = 0;
+        $syncedCount = 0;
         $nisHashes = [];
 
         // Proses per chunk 100 siswa dalam transaksi database untuk performa maksimal
-        foreach ($unlinkedStudents->chunk(100) as $chunk) {
-            DB::transaction(function () use ($chunk, $parentRole, &$existingUsernames, &$nisHashes, &$createdCount) {
+        foreach ($students->chunk(100) as $chunk) {
+            DB::transaction(function () use ($chunk, $parentRole, &$existingUsernames, &$nisHashes, &$createdCount, &$syncedCount) {
                 $now = now();
                 foreach ($chunk as $student) {
                     $nis = preg_replace('/[^0-9A-Za-z]/', '', (string)($student->nis ?? ''));
                     $baseParentUser = $nis ? "ortu_{$nis}" : "ortu_" . preg_replace('/[^0-9A-Za-z_]/', '', (string)$student->username);
                     $parentPasswordPlain = $nis ? "p{$nis}" : "portu123";
 
+                    if (!isset($nisHashes[$parentPasswordPlain])) {
+                        $nisHashes[$parentPasswordPlain] = password_hash($parentPasswordPlain, PASSWORD_BCRYPT, ['cost' => 10]);
+                    }
+                    $hash = $nisHashes[$parentPasswordPlain];
+
+                    // KASUS A: Siswa sudah memiliki akun orang tua yang terhubung
+                    if ($student->parent_id) {
+                        $parent = DB::table('users')->where('id', $student->parent_id)->first();
+                        if ($parent) {
+                            $targetUsername = $parent->username;
+                            // Normalisasi username jika sebelumnya mendapat suffix _1 dan baseParentUser belum dipakai
+                            if ($targetUsername !== $baseParentUser) {
+                                $orphanCheck = DB::table('users')->where('username', $baseParentUser)->first();
+                                if (!$orphanCheck) {
+                                    $targetUsername = $baseParentUser;
+                                } elseif ($orphanCheck->id === $parent->id) {
+                                    $targetUsername = $baseParentUser;
+                                } elseif (!DB::table('users')->where('parent_id', $orphanCheck->id)->exists()) {
+                                    // Akun lama tidak tertaut ke siswa mana pun, ganti username-nya agar baseParentUser bisa dipakai
+                                    DB::table('users')->where('id', $orphanCheck->id)->update(['username' => $baseParentUser . '_old_' . $orphanCheck->id]);
+                                    $targetUsername = $baseParentUser;
+                                }
+                            }
+
+                            DB::table('users')->where('id', $parent->id)->update([
+                                'username'   => $targetUsername,
+                                'password'   => $hash,
+                                'role_id'    => $parentRole->id,
+                                'name'       => 'Orang tua ' . trim($student->name),
+                                'updated_at' => $now,
+                            ]);
+                            $existingUsernames[strtolower($targetUsername)] = true;
+                            $syncedCount++;
+                            continue;
+                        }
+                    }
+
+                    // KASUS B: Siswa belum memiliki akun orang tua
                     // 1. Cek jika akun orang tua dengan username ini sudah pernah dibuat sebelumnya (misal diinput manual)
                     $existingParent = DB::table('users')->where('username', $baseParentUser)->first();
                     if ($existingParent) {
-                        if (!isset($nisHashes[$parentPasswordPlain])) {
-                            $nisHashes[$parentPasswordPlain] = password_hash($parentPasswordPlain, PASSWORD_BCRYPT, ['cost' => 10]);
-                        }
                         DB::table('users')->where('id', $existingParent->id)->update([
-                            'password'   => $nisHashes[$parentPasswordPlain],
+                            'password'   => $hash,
                             'role_id'    => $parentRole->id,
                             'name'       => 'Orang tua ' . trim($student->name),
                             'updated_at' => $now,
@@ -1196,11 +1232,6 @@ class WakaController extends Controller
                     }
                     $existingUsernames[strtolower($uniqueParentUser)] = true;
 
-                    if (!isset($nisHashes[$parentPasswordPlain])) {
-                        $nisHashes[$parentPasswordPlain] = password_hash($parentPasswordPlain, PASSWORD_BCRYPT, ['cost' => 10]);
-                    }
-                    $hash = $nisHashes[$parentPasswordPlain];
-
                     try {
                         $parentId = DB::table('users')->insertGetId([
                             'name'           => 'Orang tua ' . trim($student->name),
@@ -1239,7 +1270,7 @@ class WakaController extends Controller
             });
         }
 
-        return redirect()->route('waka.students.index')->with('success', "Sukses! Berhasil membuat {$createdCount} akun orang tua baru dan menautkannya ke masing-masing siswa.");
+        return redirect()->route('waka.students.index')->with('success', "Sukses! Berhasil menyinkronkan seluruh akun Orang Tua: {$createdCount} akun baru dibuat, {$syncedCount} akun diperbarui password dan hak aksesnya ke format p[NIS].");
     }
 
     /**
@@ -1255,9 +1286,8 @@ class WakaController extends Controller
         ini_set('memory_limit', '512M');
 
         $parentRole = Role::where('role_name', 'Orang Tua')->firstOrFail();
-        $unlinkedStudents = User::whereHas('role', fn($q) => $q->where('role_name', 'Siswa'))
-            ->whereNull('parent_id')
-            ->select('id', 'name', 'username', 'nis', 'phone', 'address')
+        $students = User::whereHas('role', fn($q) => $q->where('role_name', 'Siswa'))
+            ->select('id', 'name', 'username', 'nis', 'phone', 'address', 'parent_id')
             ->get();
 
         $existingUsernames = [];
@@ -1266,24 +1296,57 @@ class WakaController extends Controller
         }
 
         $createdCount = 0;
+        $syncedCount = 0;
         $nisHashes = [];
 
-        foreach ($unlinkedStudents->chunk(100) as $chunk) {
-            DB::transaction(function () use ($chunk, $parentRole, &$existingUsernames, &$nisHashes, &$createdCount) {
+        foreach ($students->chunk(100) as $chunk) {
+            DB::transaction(function () use ($chunk, $parentRole, &$existingUsernames, &$nisHashes, &$createdCount, &$syncedCount) {
                 $now = now();
                 foreach ($chunk as $student) {
                     $nis = preg_replace('/[^0-9A-Za-z]/', '', (string)($student->nis ?? ''));
                     $baseParentUser = $nis ? "ortu_{$nis}" : "ortu_" . preg_replace('/[^0-9A-Za-z_]/', '', (string)$student->username);
                     $parentPasswordPlain = $nis ? "p{$nis}" : "portu123";
 
-                    // 1. Cek jika akun orang tua sudah ada
+                    if (!isset($nisHashes[$parentPasswordPlain])) {
+                        $nisHashes[$parentPasswordPlain] = password_hash($parentPasswordPlain, PASSWORD_BCRYPT, ['cost' => 10]);
+                    }
+                    $hash = $nisHashes[$parentPasswordPlain];
+
+                    // KASUS A: Siswa sudah memiliki akun orang tua
+                    if ($student->parent_id) {
+                        $parent = DB::table('users')->where('id', $student->parent_id)->first();
+                        if ($parent) {
+                            $targetUsername = $parent->username;
+                            if ($targetUsername !== $baseParentUser) {
+                                $orphanCheck = DB::table('users')->where('username', $baseParentUser)->first();
+                                if (!$orphanCheck) {
+                                    $targetUsername = $baseParentUser;
+                                } elseif ($orphanCheck->id === $parent->id) {
+                                    $targetUsername = $baseParentUser;
+                                } elseif (!DB::table('users')->where('parent_id', $orphanCheck->id)->exists()) {
+                                    DB::table('users')->where('id', $orphanCheck->id)->update(['username' => $baseParentUser . '_old_' . $orphanCheck->id]);
+                                    $targetUsername = $baseParentUser;
+                                }
+                            }
+
+                            DB::table('users')->where('id', $parent->id)->update([
+                                'username'   => $targetUsername,
+                                'password'   => $hash,
+                                'role_id'    => $parentRole->id,
+                                'name'       => 'Orang tua ' . trim($student->name),
+                                'updated_at' => $now,
+                            ]);
+                            $existingUsernames[strtolower($targetUsername)] = true;
+                            $syncedCount++;
+                            continue;
+                        }
+                    }
+
+                    // KASUS B: Siswa belum memiliki akun orang tua
                     $existingParent = DB::table('users')->where('username', $baseParentUser)->first();
                     if ($existingParent) {
-                        if (!isset($nisHashes[$parentPasswordPlain])) {
-                            $nisHashes[$parentPasswordPlain] = password_hash($parentPasswordPlain, PASSWORD_BCRYPT, ['cost' => 10]);
-                        }
                         DB::table('users')->where('id', $existingParent->id)->update([
-                            'password'   => $nisHashes[$parentPasswordPlain],
+                            'password'   => $hash,
                             'role_id'    => $parentRole->id,
                             'name'       => 'Orang tua ' . trim($student->name),
                             'updated_at' => $now,
@@ -1294,7 +1357,7 @@ class WakaController extends Controller
                         continue;
                     }
 
-                    // 2. Jika belum ada, buat baru
+                    // Buat baru
                     $uniqueParentUser = substr($baseParentUser, 0, 45);
                     $pCounter = 1;
                     while (isset($existingUsernames[strtolower($uniqueParentUser)])) {
@@ -1302,11 +1365,6 @@ class WakaController extends Controller
                         $pCounter++;
                     }
                     $existingUsernames[strtolower($uniqueParentUser)] = true;
-
-                    if (!isset($nisHashes[$parentPasswordPlain])) {
-                        $nisHashes[$parentPasswordPlain] = password_hash($parentPasswordPlain, PASSWORD_BCRYPT, ['cost' => 10]);
-                    }
-                    $hash = $nisHashes[$parentPasswordPlain];
 
                     try {
                         $parentId = DB::table('users')->insertGetId([
@@ -1346,15 +1404,28 @@ class WakaController extends Controller
             });
         }
 
-        return response("<div style='font-family:system-ui,-apple-system,sans-serif;padding:30px;background:#0f172a;color:#38bdf8;border-radius:15px;max-width:550px;margin:50px auto;border:1px solid #1e293b;box-shadow:0 20px 25px -5px rgba(0,0,0,0.5);line-height:1.6;'>
-            <h2 style='color:#4ade80;margin-top:0;'>✔ Sinkronisasi Akun Orang Tua Berhasil!</h2>
-            <p style='color:#f8fafc;'>Berhasil memproses dan membuatkan <strong style='color:#38bdf8;'>{$createdCount}</strong> akun Orang Tua baru untuk semua siswa yang belum terhubung.</p>
-            <div style='background:#1e293b;padding:15px;border-radius:10px;margin:20px 0;font-size:13px;color:#cbd5e1;'>
-                <p style='margin:0 0 8px 0;font-weight:bold;color:#fff;'>Format Akun Orang Tua:</p>
-                <p style='margin:3px 0;'>• <strong>Username:</strong> <code style='color:#a5b4fc;'>ortu_[NIS]</code> (contoh: <code>ortu_17821</code>)</p>
-                <p style='margin:3px 0;'>• <strong>Password:</strong> <code style='color:#4ade80;'>p[NIS]</code> (contoh: <code>p17821</code>)</p>
+        return response("<div style='font-family:system-ui,-apple-system,sans-serif;padding:32px;background:#0f172a;color:#38bdf8;border-radius:18px;max-width:600px;margin:50px auto;border:1px solid #1e293b;box-shadow:0 25px 30px -5px rgba(0,0,0,0.6);line-height:1.6;'>
+            <h2 style='color:#4ade80;margin-top:0;display:flex;align-items:center;gap:10px;'>✔ Sinkronisasi Akun Orang Tua Sukses!</h2>
+            <p style='color:#f8fafc;font-size:15px;margin-bottom:20px;'>Seluruh akun Orang Tua telah berhasil diverifikasi, dibuat, dan diselaraskan kata sandinya:</p>
+            <div style='display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;'>
+                <div style='background:#1e293b;padding:14px;border-radius:12px;border:1px solid #334155;'>
+                    <span style='color:#94a3b8;font-size:12px;display:block;'>Akun Baru Dibuat:</span>
+                    <strong style='color:#38bdf8;font-size:20px;'>{$createdCount}</strong>
+                </div>
+                <div style='background:#1e293b;padding:14px;border-radius:12px;border:1px solid #334155;'>
+                    <span style='color:#94a3b8;font-size:12px;display:block;'>Sandi Diselaraskan (p[NIS]):</span>
+                    <strong style='color:#4ade80;font-size:20px;'>{$syncedCount}</strong>
+                </div>
             </div>
-            <a href='/login' style='display:inline-block;padding:12px 24px;background:#6366f1;color:#fff;text-decoration:none;border-radius:10px;font-weight:bold;box-shadow:0 4px 6px -1px rgba(99,102,241,0.4);'>Masuk ke Halaman Login &rarr;</a>
+            <div style='background:#1e293b;padding:16px;border-radius:12px;margin:20px 0;font-size:13px;color:#cbd5e1;border:1px solid #334155;'>
+                <p style='margin:0 0 10px 0;font-weight:bold;color:#fff;'>Format Baku Login Orang Tua:</p>
+                <p style='margin:4px 0;'>• <strong>Username:</strong> <code style='color:#a5b4fc;background:#0f172a;padding:2px 6px;border-radius:6px;'>ortu_[NIS]</code> (contoh: <code>ortu_18694</code>)</p>
+                <p style='margin:4px 0;'>• <strong>Password:</strong> <code style='color:#4ade80;background:#0f172a;padding:2px 6px;border-radius:6px;'>p[NIS]</code> (contoh: <code>p18694</code>)</p>
+            </div>
+            <div style='display:flex;gap:12px;margin-top:24px;'>
+                <a href='/login' style='flex:1;text-align:center;padding:12px 20px;background:#6366f1;color:#fff;text-decoration:none;border-radius:10px;font-weight:bold;box-shadow:0 4px 6px -1px rgba(99,102,241,0.4);'>Masuk ke Halaman Login &rarr;</a>
+                <a href='/waka/students' style='padding:12px 20px;background:#334155;color:#e2e8f0;text-decoration:none;border-radius:10px;font-weight:bold;'>Data Siswa</a>
+            </div>
         </div>");
     }
 
