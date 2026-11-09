@@ -24,6 +24,21 @@ class RoleMiddleware
         // Ambil user yang sedang login
         $user = $request->user();
 
+        // Cek apakah akun adalah siswa yang telah lulus / alumni (akun dinonaktifkan)
+        if ($user->student_status === 'Lulus') {
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json([
+                    'message' => 'Akun Anda telah dinonaktifkan karena telah lulus / menjadi alumni SMK Negeri 1 Bantul.'
+                ], 403);
+            }
+            auth()->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            return redirect()->route('login')->withErrors([
+                'login' => 'Akun Anda telah dinonaktifkan karena telah lulus / menjadi alumni SMK Negeri 1 Bantul.'
+            ]);
+        }
+
         // Ambil nama role user
         $roleName = $user->role?->role_name;
 

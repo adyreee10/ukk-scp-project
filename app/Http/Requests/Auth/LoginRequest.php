@@ -105,6 +105,13 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        // Cek apakah akun adalah siswa yang telah lulus / alumni
+        if ($user->student_status === 'Lulus') {
+            throw ValidationException::withMessages([
+                'login' => 'Akun Anda telah dinonaktifkan karena telah dinyatakan Lulus / menjadi Alumni SMK Negeri 1 Bantul.',
+            ]);
+        }
+
         // Login berhasil: bersihkan counter percobaan dan status penangguhan
         RateLimiter::clear($this->attemptsKey());
         RateLimiter::clear($this->lockoutKey());

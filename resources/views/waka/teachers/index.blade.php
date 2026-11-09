@@ -142,12 +142,23 @@
                 role_name: '',
                 homeroom_class_name: '',
                 counselor_classes: [],
-                schedules_count: 0
+                schedules_count: 0,
+                schedules: []
             },
-            openView(teacherData, counselorClassesJson) {
+            scheduleCycleFilter: 'all',
+            get filteredTeacherSchedules() {
+                if (!this.selectedTeacher || !this.selectedTeacher.schedules) return [];
+                if (this.scheduleCycleFilter === 'all') {
+                    return this.selectedTeacher.schedules;
+                }
+                return this.selectedTeacher.schedules.filter(s => s.cycle_type === this.scheduleCycleFilter);
+            },
+            openView(teacherData, counselorClassesJson, schedulesJson) {
+                this.scheduleCycleFilter = 'all';
                 this.selectedTeacher = {
                     ...teacherData,
-                    counselor_classes: counselorClassesJson ? JSON.parse(counselorClassesJson) : []
+                    counselor_classes: counselorClassesJson ? JSON.parse(counselorClassesJson) : [],
+                    schedules: schedulesJson ? JSON.parse(schedulesJson) : []
                 };
                 this.viewModalOpen = true;
             }
@@ -376,7 +387,19 @@
                                 <!-- Aksi (Lihat, Edit, Hapus) -->
                                 <td class="p-4 text-center whitespace-nowrap">
                                     <div class="inline-flex items-center gap-1.5">
-                                        <!-- Tombol Lihat -->
+                                        @php
+                                            $teacherSchedulesJson = $teacher->schedules->map(fn($s) => [
+                                                'id' => $s->id,
+                                                'day_of_week' => $s->day_of_week,
+                                                'period_label' => $s->period_label,
+                                                'time_range' => ($s->start_time ? substr($s->start_time, 0, 5) : '') . ' - ' . ($s->end_time ? substr($s->end_time, 0, 5) : ''),
+                                                'subject' => $s->subject,
+                                                'class_name' => $s->schoolClass?->class_name ?? '-',
+                                                'room_name' => $s->room?->room_name ?? '-',
+                                                'cycle_type' => $s->cycle_type,
+                                            ]);
+                                        @endphp
+                                        <!-- Tombol Lihat Jadwal Mengajar Guru -->
                                         <button type="button" 
                                                 @click="openView({
                                                     id: '{{ $teacher->id }}',
@@ -389,9 +412,9 @@
                                                     role_name: '{{ addslashes($teacher->role?->role_name ?? 'Guru') }}',
                                                     homeroom_class_name: '{{ addslashes($teacher->homeroomClass?->class_name ?? '-') }}',
                                                     schedules_count: '{{ $teacher->schedules_count }}'
-                                                }, '{{ addslashes(json_encode($teacher->counselorClasses->map(fn($c) => ['id' => $c->id, 'class_name' => $c->class_name]))) }}')"
+                                                }, '{{ addslashes(json_encode($teacher->counselorClasses->map(fn($c) => ['id' => $c->id, 'class_name' => $c->class_name]))) }}', '{{ addslashes(json_encode($teacherSchedulesJson)) }}')"
                                                 class="px-2.5 py-1 text-xs font-bold rounded-lg transition cursor-pointer btn-action-view shadow-sm"
-                                                title="Lihat Detail Profil">
+                                                title="Lihat Jadwal Mengajar Guru">
                                             Lihat
                                         </button>
 
@@ -443,83 +466,133 @@
         </div>
 
         <!-- ============================================================= -->
-        <!-- MODAL 1: LIHAT DETAIL PROFIL GURU                            -->
+        <!-- MODAL 1: LIHAT JADWAL MENGAJAR YANG DIAMPU GURU               -->
         <!-- ============================================================= -->
         <div x-show="viewModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
             <div @click="viewModalOpen = false" class="fixed inset-0 bg-black/75 backdrop-blur-sm"></div>
             
-            <div class="relative w-full max-w-lg bg-[#0f172a] p-6 sm:p-7 shadow-2xl border border-slate-800 space-y-5 my-auto max-h-[90vh] overflow-y-auto" style="border-radius: 20px;">
+            <div class="relative w-full max-w-4xl bg-[#0f172a] p-6 sm:p-7 shadow-2xl border border-slate-800 space-y-5 my-auto max-h-[90vh] overflow-y-auto" style="border-radius: 20px;">
+                <!-- Header Modal -->
                 <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                    <h3 class="text-base font-bold text-white flex items-center gap-2">
-                        <span>Detail Profil Guru</span>
-                    </h3>
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-white">Jadwal Mengajar Guru</h3>
+                            <p class="text-xs text-slate-400">Daftar kelas dan mata pelajaran yang diampu oleh guru</p>
+                        </div>
+                    </div>
                     <button @click="viewModalOpen = false" class="text-xs font-bold text-slate-400 hover:text-white px-2 py-1 cursor-pointer">
-                        [Tutup]
+                        ✕ Tutup
                     </button>
                 </div>
 
-                <!-- Kartu Identitas Atas -->
-                <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800">
-                    <h4 class="text-base font-extrabold text-white truncate" x-text="selectedTeacher.name"></h4>
-                    <p class="text-xs text-indigo-400 font-mono mt-0.5" x-text="'@' + selectedTeacher.username"></p>
-                    <div class="flex items-center gap-2 mt-2">
-                        <span class="inline-block px-2.5 py-0.5 rounded-md text-[10px] font-bold badge-role" x-text="selectedTeacher.role_name"></span>
-                        <span class="inline-block px-2.5 py-0.5 rounded-md text-[10px] font-bold badge-schedule-count" x-text="selectedTeacher.schedules_count + ' Jadwal Aktif'"></span>
+                <!-- Kartu Identitas Guru & Filter Siklus -->
+                <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div>
+                        <h4 class="text-base font-extrabold text-white" x-text="selectedTeacher.name"></h4>
+                        <div class="flex flex-wrap items-center gap-2 mt-1.5 text-xs text-slate-400">
+                            <span class="font-mono text-indigo-400" x-text="'NIP: ' + (selectedTeacher.nip || '-')"></span>
+                            <span>•</span>
+                            <span class="px-2 py-0.5 rounded-md text-[10px] font-bold badge-role" x-text="selectedTeacher.role_name"></span>
+                            <template x-if="selectedTeacher.role_name === 'Wali Kelas' && selectedTeacher.homeroom_class_name">
+                                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-950 text-indigo-300 border border-indigo-700/60" x-text="'Walas: ' + selectedTeacher.homeroom_class_name"></span>
+                            </template>
+                            <span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold badge-schedule-count" x-text="(selectedTeacher.schedules ? selectedTeacher.schedules.length : selectedTeacher.schedules_count) + ' Total Jadwal'"></span>
+                        </div>
+                    </div>
+
+                    <!-- Filter Siklus (Semua / Putaran 1 / Putaran 2) -->
+                    <div class="flex items-center gap-1.5 bg-slate-950/70 p-1 rounded-xl border border-slate-800 shrink-0">
+                        <button type="button" 
+                                @click="scheduleCycleFilter = 'all'"
+                                :class="scheduleCycleFilter === 'all' ? 'bg-indigo-600 text-white font-bold shadow-sm' : 'text-slate-400 hover:text-white'"
+                                class="px-3 py-1.5 rounded-lg text-xs transition cursor-pointer">
+                            Semua
+                        </button>
+                        <button type="button" 
+                                @click="scheduleCycleFilter = 'Putaran 1'"
+                                :class="scheduleCycleFilter === 'Putaran 1' ? 'bg-indigo-600 text-white font-bold shadow-sm' : 'text-slate-400 hover:text-white'"
+                                class="px-3 py-1.5 rounded-lg text-xs transition cursor-pointer">
+                            Putaran 1
+                        </button>
+                        <button type="button" 
+                                @click="scheduleCycleFilter = 'Putaran 2'"
+                                :class="scheduleCycleFilter === 'Putaran 2' ? 'bg-indigo-600 text-white font-bold shadow-sm' : 'text-slate-400 hover:text-white'"
+                                class="px-3 py-1.5 rounded-lg text-xs transition cursor-pointer">
+                            Putaran 2
+                        </button>
                     </div>
                 </div>
 
-                <!-- Rincian Data Lengkap -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                    <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800/80">
-                        <span class="text-slate-400 font-bold block mb-1">NIP (Nomor Induk Pegawai)</span>
-                        <span class="text-white font-mono font-bold" x-text="selectedTeacher.nip || '-'"></span>
-                    </div>
-
-                    <!-- Jika Wali Kelas -->
-                    <template x-if="selectedTeacher.role_name === 'Wali Kelas'">
-                        <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800/80">
-                            <span class="text-slate-400 font-bold block mb-1">Wali Kelas</span>
-                            <span class="text-white font-bold" x-text="selectedTeacher.homeroom_class_name || 'Bukan Wali Kelas'"></span>
-                        </div>
-                    </template>
-
-                    <!-- Jika Guru BK: Tampilkan Semua Kelas Perwalian -->
-                    <template x-if="selectedTeacher.role_name === 'Guru BK'">
-                        <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800/80 sm:col-span-2">
-                            <span class="text-slate-400 font-bold block mb-1.5">Kelas Perwalian / Binaan BK:</span>
-                            <div class="flex flex-wrap gap-1.5">
-                                <template x-for="cCls in selectedTeacher.counselor_classes" :key="cCls.id">
-                                    <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-indigo-950 text-indigo-300 border border-indigo-700/60" x-text="cCls.class_name"></span>
-                                </template>
-                                <template x-if="!selectedTeacher.counselor_classes || selectedTeacher.counselor_classes.length === 0">
-                                    <span class="text-slate-500 italic">Belum ada kelas perwalian yang ditugaskan.</span>
-                                </template>
-                            </div>
-                        </div>
-                    </template>
-
-                    <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800/80">
-                        <span class="text-slate-400 font-bold block mb-1">Email Resmi</span>
-                        <span class="text-white font-mono break-all" x-text="selectedTeacher.email || '-'"></span>
-                    </div>
-
-                    <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800/80">
-                        <span class="text-slate-400 font-bold block mb-1">Nomor HP / WhatsApp</span>
-                        <span class="text-emerald-400 font-mono font-bold" x-text="selectedTeacher.phone || '-'"></span>
-                    </div>
-
-                    <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800/80 sm:col-span-2">
-                        <span class="text-slate-400 font-bold block mb-1">Alamat Tempat Tinggal</span>
-                        <p class="text-slate-200 leading-relaxed" x-text="selectedTeacher.address || 'Belum diisi'"></p>
-                    </div>
+                <!-- Tabel Jadwal Mengajar Guru -->
+                <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900/40">
+                    <table class="min-w-full divide-y divide-slate-800 text-xs">
+                        <thead class="bg-slate-900/90 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                            <tr>
+                                <th class="p-3 text-left whitespace-nowrap">Hari & Jam</th>
+                                <th class="p-3 text-center whitespace-nowrap">Siklus</th>
+                                <th class="p-3 text-left">Mata Pelajaran</th>
+                                <th class="p-3 text-left whitespace-nowrap">Kelas</th>
+                                <th class="p-3 text-left whitespace-nowrap">Ruangan</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800/60">
+                            <template x-for="sch in filteredTeacherSchedules" :key="sch.id">
+                                <tr class="hover:bg-slate-800/40 transition">
+                                    <td class="p-3 whitespace-nowrap">
+                                        <div class="font-bold text-white flex items-center gap-1.5">
+                                            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-300" x-text="sch.day_of_week"></span>
+                                            <span x-text="sch.period_label"></span>
+                                        </div>
+                                        <div class="text-[11px] font-mono text-slate-400 mt-0.5" x-text="sch.time_range"></div>
+                                    </td>
+                                    <td class="p-3 text-center whitespace-nowrap">
+                                        <span class="px-2 py-0.5 rounded-md text-[10px] font-bold"
+                                              :class="sch.cycle_type === 'Putaran 1' ? 'bg-blue-950/80 text-blue-300 border border-blue-700/60' : 'bg-emerald-950/80 text-emerald-300 border border-emerald-700/60'"
+                                              x-text="sch.cycle_type">
+                                        </span>
+                                    </td>
+                                    <td class="p-3">
+                                        <p class="font-bold text-white" x-text="sch.subject"></p>
+                                    </td>
+                                    <td class="p-3 whitespace-nowrap">
+                                        <span class="font-bold text-indigo-400" x-text="sch.class_name"></span>
+                                    </td>
+                                    <td class="p-3 whitespace-nowrap text-slate-300">
+                                        <span x-text="sch.room_name || '-'"></span>
+                                    </td>
+                                </tr>
+                            </template>
+                            <template x-if="filteredTeacherSchedules.length === 0">
+                                <tr>
+                                    <td colspan="5" class="p-8 text-center text-slate-400">
+                                        <div class="flex flex-col items-center justify-center gap-1">
+                                            <svg class="w-8 h-8 text-slate-600 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                            <p class="font-bold text-white text-xs">Belum Ada Jadwal Mengajar</p>
+                                            <p class="text-[11px] text-slate-500">Guru ini belum memiliki jadwal KBM yang terdaftar pada siklus yang dipilih.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
                 </div>
 
-                <div class="flex justify-end pt-2">
-                    <button @click="viewModalOpen = false" type="button" class="px-5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition cursor-pointer">
+                <!-- Footer Modal -->
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 border-t border-slate-800">
+                    <a :href="'{{ route('waka.schedules.index') }}?teacher_id=' + selectedTeacher.id" 
+                       class="text-xs font-bold text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition">
+                        <span>Buka & Kelola di Menu Jadwal Mengajar</span>
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    </a>
+                    <button @click="viewModalOpen = false" type="button" class="w-full sm:w-auto px-5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition cursor-pointer">
                         Tutup Tampilan
                     </button>
                 </div>
             </div>
+        </div>
         </div>
 
         <!-- ============================================================= -->

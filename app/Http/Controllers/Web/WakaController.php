@@ -526,7 +526,22 @@ class WakaController extends Controller
         $countBK   = (clone $baseQuery)->whereHas('role', fn($q) => $q->where('role_name', 'Guru BK'))->count();
 
         $query = (clone $baseQuery)
-            ->with(['role', 'homeroomClass', 'counselorClasses'])
+            ->with([
+                'role', 
+                'homeroomClass', 
+                'counselorClasses',
+                'schedules' => function ($q) {
+                    $q->with(['schoolClass', 'room'])
+                      ->orderByRaw("CASE 
+                          WHEN day_of_week = 'Senin' THEN 1 
+                          WHEN day_of_week = 'Selasa' THEN 2 
+                          WHEN day_of_week = 'Rabu' THEN 3 
+                          WHEN day_of_week = 'Kamis' THEN 4 
+                          WHEN day_of_week = 'Jumat' THEN 5 
+                          ELSE 6 END")
+                      ->orderBy('start_time');
+                }
+            ])
             ->withCount('schedules');
 
         // Filter berdasarkan peran (Guru, Wali Kelas, atau Guru BK)
@@ -1668,46 +1683,171 @@ public function classesDestroy(SchoolClass $schoolClass)
         // 1. Guru Terlambat / Belum Mengisi Jurnal Hari Ini
         $lateTeachers = $service->overdueFor();
 
-                // 2. Filter Riwayat Jurnal KBM
-        $range     = $request->get('range');
-        $date      = $request->get('date');
-        $month     = $request->get('month');
-        $teacherId = $request->get('teacher_id');
-        $classId   = $request->get('class_id');
+        // 2. Filter Riwayat & Monitoring Jurnal KBM
+        $config = SystemConfiguration::current();
+        $activeCycle = $config->active_cycle ?? 'Putaran 1';
 
-        $query = \App\Models\Journal::with(['schedule.teacher', 'schedule.schoolClass', 'schedule.room', 'attendances']);
-
-        // Filter Tanggal Spesifik (jika diisi)
-        if ($request->filled('date')) {
-            $query->whereDate('date', $date);
-        }
-        // Filter Rekapan 1 Bulan (jika diisi, format YYYY-MM)
-        elseif ($request->filled('month')) {
-            $parsedMonth = \Carbon\Carbon::parse($month);
-            $query->whereYear('date', $parsedMonth->year)->whereMonth('date', $parsedMonth->month);
-        }
-        // Filter Preset Rentang (jika tanggal & bulan tidak dipilih)
-        elseif ($range === 'hari_ini') {
-            $query->whereDate('date', now()->toDateString());
-        } elseif ($range === '1_minggu') {
-            $query->whereDate('date', '>=', now()->subDays(7)->toDateString());
-        } elseif ($range === '1_bulan') {
-            $query->whereDate('date', '>=', now()->subDays(30)->toDateString());
+        // Tanggal target: default ke input tanggal yang dikirim, atau hari ini (Senin-Jumat)
+        $date = $request->get('date');
+        if (empty($date)) {
+            $now = now();
+            if ($now->isSaturday()) {
+                $date = $now->subDay()->toDateString();
+            } elseif ($now->isSunday()) {
+                $date = $now->subDays(2)->toDateString();
+            } else {
+                $date = $now->toDateString();
+            }
         }
 
-        if ($teacherId) {
-            $query->whereHas('schedule', fn($q) => $q->where('teacher_id', $teacherId));
+        $carbonDate = \Carbon\Carbon::parse($date);
+        $dayOfWeek = \App\Support\IndonesianDay::from($carbonDate);
+        $isWeekend = in_array($dayOfWeek, ['Sabtu', 'Minggu']);
+
+        $statusFilter = $request->get('status', 'all'); // 'all', 'sudah', 'belum'
+        $teacherId    = $request->get('teacher_id');
+        $grade        = $request->get('grade', 'all');
+        $major        = $request->get('major', 'all');
+        $rombel       = $request->get('rombel', 'all');
+        $classId      = $request->get('class_id', 'all');
+
+        $entries = [];
+        $totalScheduled = 0;
+        $totalFilled = 0;
+        $totalUnfilled = 0;
+
+        if (!$isWeekend) {
+            // A. Query Jadwal Pelajaran (Schedule) untuk Hari & Siklus tersebut
+            $scheduleQuery = Schedule::query()
+                ->with([
+                    'teacher:id,name',
+                    'schoolClass:id,class_name',
+                    'room:id,room_name'
+                ])
+                ->where('cycle_type', $activeCycle)
+                ->where('day_of_week', $dayOfWeek);
+
+            // Filter Guru
+            if ($teacherId) {
+                $scheduleQuery->where('teacher_id', $teacherId);
+            }
+
+            // Filter 1: Tingkat (X, XI, XII)
+            if ($grade && $grade !== 'all') {
+                $gradeMap = ['10' => 'X', '11' => 'XI', '12' => 'XII', 'X' => 'X', 'XI' => 'XI', 'XII' => 'XII'];
+                $gVal = $gradeMap[$grade] ?? $grade;
+                $scheduleQuery->whereHas('schoolClass', fn($q) => $q->where('class_name', 'like', "{$gVal} %"));
+            }
+
+            // Filter 2: Jurusan
+            if ($major && $major !== 'all') {
+                $majorTrim = trim($major);
+                $scheduleQuery->whereHas('schoolClass', fn($q) => $q->where('class_name', 'like', "% {$majorTrim} %")->orWhere('class_name', 'like', "% {$majorTrim}"));
+            }
+
+            // Filter 3: Rombel
+            if ($rombel && $rombel !== 'all') {
+                $rombelTrim = trim($rombel);
+                $scheduleQuery->whereHas('schoolClass', fn($q) => $q->where('class_name', 'like', "% {$rombelTrim}"));
+            }
+
+            // Filter Class ID langsung (jika ada)
+            if ($classId && $classId !== 'all') {
+                $scheduleQuery->where('class_id', $classId);
+            }
+
+            $schedules = $scheduleQuery
+                ->orderBy('start_time')
+                ->get();
+
+            // B. Ambil Jurnal yang sudah terisi pada tanggal tersebut
+            $scheduleIds = $schedules->pluck('id');
+            $existingJournals = \App\Models\Journal::with(['attendances'])
+                ->whereDate('date', $date)
+                ->whereIn('schedule_id', $scheduleIds)
+                ->get()
+                ->keyBy('schedule_id');
+
+            $totalScheduled = $schedules->count();
+            $totalFilled = $existingJournals->count();
+            $totalUnfilled = max(0, $totalScheduled - $totalFilled);
+
+            // C. Petakan Setiap Jadwal Menjadi Entri Terpadu (Status: Sudah / Belum)
+            foreach ($schedules as $s) {
+                $journal = $existingJournals->get($s->id);
+                $isFilled = $journal !== null;
+
+                // Terapkan Filter Status
+                if ($statusFilter === 'sudah' && !$isFilled) {
+                    continue;
+                }
+                if ($statusFilter === 'belum' && $isFilled) {
+                    continue;
+                }
+
+                $entries[] = (object) [
+                    'id'                => $journal?->id,
+                    'schedule_id'       => $s->id,
+                    'date'              => $date,
+                    'day_of_week'       => $dayOfWeek,
+                    'schedule'          => $s,
+                    'teacher'           => $s->teacher,
+                    'schoolClass'       => $s->schoolClass,
+                    'room'              => $s->room,
+                    'subject'           => $s->subject,
+                    'period_label'      => $s->period_label,
+                    'status'            => $isFilled ? 'sudah' : 'belum',
+                    'is_filled'         => $isFilled,
+                    'topic_description' => $journal?->topic_description,
+                    'photo_path'        => $journal?->photo_path,
+                    'photo_url'         => $journal?->photo_url,
+                    'attendances'       => $journal?->attendances ?? collect(),
+                ];
+            }
         }
 
-        if ($classId) {
-            $query->whereHas('schedule', fn($q) => $q->where('class_id', $classId));
-        }
+        // Paginasi Manual yang Kompatibel dengan Blade (Dukung Tampilkan Baris: 50, 100, 500, 1000)
+        $perPage = in_array((int)$request->input('per_page'), [50, 100, 500, 1000]) ? (int)$request->input('per_page') : 50;
+        $page = \Illuminate\Pagination\LengthAwarePaginator::resolveCurrentPage();
+        $offset = ($page - 1) * $perPage;
+        $itemsForCurrentPage = array_slice($entries, $offset, $perPage);
+        $paginatedEntries = new \Illuminate\Pagination\LengthAwarePaginator(
+            $itemsForCurrentPage,
+            count($entries),
+            $perPage,
+            $page,
+            ['path' => \Illuminate\Pagination\LengthAwarePaginator::resolveCurrentPath(), 'query' => $request->query()]
+        );
 
-        $journals = $query->latest('date')->paginate(15)->withQueryString();
         $teachers = User::with('role')->whereHas('role', fn($q) => $q->whereIn('role_name', ['Guru', 'Wali Kelas', 'Guru BK']))->orderBy('name')->get();
         $classes  = SchoolClass::orderBy('class_name')->get();
+        $availableGrades = ['X', 'XI', 'XII'];
+        $availableMajors = Major::orderBy('code')->pluck('code')->toArray();
+        if (empty($availableMajors)) {
+            $availableMajors = ['RPL', 'TKJ', 'AKL', 'BD', 'MP'];
+        }
+        $availableRombels = ['1', '2', '3', '4'];
 
-        return view('waka.journals.index', compact('lateTeachers', 'journals', 'teachers', 'classes', 'range', 'date', 'month'));
+        return view('waka.journals.index', [
+            'lateTeachers'     => $lateTeachers,
+            'journals'         => $paginatedEntries,
+            'teachers'         => $teachers,
+            'classes'          => $classes,
+            'availableGrades'  => $availableGrades,
+            'availableMajors'  => $availableMajors,
+            'availableRombels' => $availableRombels,
+            'date'             => $date,
+            'dayOfWeek'        => $dayOfWeek,
+            'isWeekend'        => $isWeekend,
+            'statusFilter'     => $statusFilter,
+            'teacherId'        => $teacherId,
+            'grade'            => $grade,
+            'major'            => $major,
+            'rombel'           => $rombel,
+            'totalScheduled'   => $totalScheduled,
+            'totalFilled'      => $totalFilled,
+            'totalUnfilled'    => $totalUnfilled,
+        ]);
     }
 
     /**
@@ -2341,6 +2481,9 @@ public function classesDestroy(SchoolClass $schoolClass)
         ]);
 
         $student->update($validated);
+        if ($student->student_status === 'Lulus') {
+            $student->tokens()->delete();
+        }
 
         return redirect()->back()->with('success', "Data siswa {$student->name} berhasil diperbarui.");
     }
@@ -2352,9 +2495,12 @@ public function classesDestroy(SchoolClass $schoolClass)
     {
         $newStatus = ($student->student_status === 'Lulus') ? 'Aktif' : 'Lulus';
         $student->update(['student_status' => $newStatus]);
+        if ($newStatus === 'Lulus') {
+            $student->tokens()->delete();
+        }
 
         $pesan = ($newStatus === 'Lulus')
-            ? "Siswa {$student->name} berhasil ditandai sebagai LULUS."
+            ? "Siswa {$student->name} berhasil ditandai sebagai LULUS (Alumni) dan akun login SCP telah dinonaktifkan."
             : "Siswa {$student->name} berhasil diaktifkan kembali ke data siswa aktif.";
 
         return redirect()->back()->with('success', $pesan);
@@ -2391,7 +2537,8 @@ public function classesDestroy(SchoolClass $schoolClass)
         // Jika Kelas 12 (XII) -> Lulus menjadi Alumni
         if (str_starts_with($className, 'XII ')) {
             $student->update(['student_status' => 'Lulus']);
-            return redirect()->back()->with('success', "Siswa {$student->name} berhasil diluluskan menjadi Alumni!");
+            $student->tokens()->delete();
+            return redirect()->back()->with('success', "Siswa {$student->name} berhasil diluluskan menjadi Alumni! Akun login SCP telah otomatis dinonaktifkan.");
         }
 
         return redirect()->back()->with('error', 'Format nama kelas siswa tidak dikenali.');
@@ -2470,9 +2617,10 @@ public function classesDestroy(SchoolClass $schoolClass)
         $count = $students->count();
         foreach ($students as $s) {
             $s->update(['student_status' => 'Lulus']);
+            $s->tokens()->delete();
         }
 
-        return redirect()->back()->with('success', "Sukses! Sebanyak {$count} siswa kelas 12 berhasil diluluskan menjadi Alumni.");
+        return redirect()->back()->with('success', "Sukses! Sebanyak {$count} siswa kelas 12 berhasil diluluskan menjadi Alumni. Akun login SCP seluruh alumni otomatis dinonaktifkan.");
     }
 
         /**
@@ -2501,6 +2649,7 @@ public function classesDestroy(SchoolClass $schoolClass)
             if (in_array($studentId, $selectedIds)) {
                 if ($fromGrade === 'XII') {
                     $student->update(['student_status' => 'Lulus']);
+                    $student->tokens()->delete();
                     $promotedCount++;
                 } else {
                     if ($student->schoolClass) {
@@ -2517,7 +2666,7 @@ public function classesDestroy(SchoolClass $schoolClass)
             }
         }
 
-        $actionText   = ($fromGrade === 'XII') ? "diluluskan menjadi Alumni" : "dinaikkan ke tingkat {$toGrade}";
+        $actionText   = ($fromGrade === 'XII') ? "diluluskan menjadi Alumni (Akun SCP dinonaktifkan)" : "dinaikkan ke tingkat {$toGrade}";
         $retainedText = ($fromGrade === 'XII') ? "tetap aktif di Kelas 12" : "tinggal di tingkat {$fromGrade}";
 
         $message = "Proses Berhasil! Sebanyak {$promotedCount} siswa {$actionText}, dan {$retainedCount} siswa {$retainedText}.";

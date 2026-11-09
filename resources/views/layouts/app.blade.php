@@ -337,7 +337,8 @@
 
             /* Badge Keterlambatan Jurnal & Anti-Patah (Anti-Wrap) */
             .whitespace-nowrap,
-            .badge-late-status {
+            .badge-late-status,
+            .badge-filled-status {
                 white-space: nowrap !important;
             }
             .badge-late-status {
@@ -360,6 +361,28 @@
                 background-color: #fff1f2 !important;
                 border: 1px solid #fecdd3 !important;
                 color: #be123c !important;
+            }
+
+            .badge-filled-status {
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                white-space: nowrap !important;
+                gap: 6px !important;
+                padding: 4px 12px !important;
+                border-radius: 9999px !important;
+                font-size: 11px !important;
+                font-weight: 700 !important;
+                line-height: 1.2 !important;
+                background-color: rgba(6, 78, 59, 0.75) !important;
+                border: 1px solid rgba(16, 185, 129, 0.6) !important;
+                color: #6ee7b7 !important;
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+            }
+            html.theme-light .badge-filled-status {
+                background-color: #ecfdf5 !important;
+                border: 1px solid #a7f3d0 !important;
+                color: #047857 !important;
             }
 
             /* Badge Akademik & Statistik */

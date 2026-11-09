@@ -68,6 +68,13 @@ class AuthController extends Controller
             ], 401);
         }
 
+        // Cek apakah akun adalah siswa yang telah lulus / alumni
+        if ($user->student_status === 'Lulus') {
+            return response()->json([
+                'message' => 'Akun Anda telah dinonaktifkan karena telah dinyatakan Lulus / menjadi Alumni SMK Negeri 1 Bantul.',
+            ], 403);
+        }
+
         RateLimiter::clear($attemptsKey);
         RateLimiter::clear($lockoutKey);
 

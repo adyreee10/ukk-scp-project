@@ -22,13 +22,15 @@
                     @endif
                 </span>
 
-                <!-- TOMBOL CETAK REKAP A4 (POIN 5) -->
+                <!-- TOMBOL CETAK REKAP A4 (KHUSUS WALI KELAS & GURU BK, WAKA HANYA MEMANTAU) -->
+                @if(in_array(auth()->user()->role?->role_name, ['Wali Kelas', 'Guru BK']))
                 <button type="button" 
                         onclick="const oldT = document.title; document.title = ''; window.print(); setTimeout(() => { document.title = oldT; }, 1000);" 
                         class="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-bold shadow-lg shadow-indigo-600/30 transition cursor-pointer">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
                     <span>Cetak Rekap (A4)</span>
                 </button>
+                @endif
             </div>
         </div>
 

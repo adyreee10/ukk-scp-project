@@ -15,13 +15,13 @@
          class="space-y-6">
         
         <!-- Header -->
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 w-full">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 w-full print:hidden">
             <div>
                 <h1 class="text-xl sm:text-2xl font-black text-white tracking-tight">Master Tingkat Kelas & Kelulusan</h1>
                 <p class="text-xs font-semibold text-slate-400 mt-0.5">Kelola kenaikan jenjang kelas 10, 11, 12 serta penetapan kelulusan siswa menjadi alumni</p>
             </div>
 
-                        <!-- Tombol Kenaikan / Kelulusan Berdasarkan Checklist -->
+            <!-- Tombol Kenaikan / Kelulusan Berdasarkan Checklist / Cetak Dokumen Lulus -->
             <div>
                 @if($activeTab === 'X')
                     <button type="submit" form="promoteChecklistForm" 
@@ -37,16 +37,35 @@
                     </button>
                 @elseif($activeTab === 'XII')
                     <button type="submit" form="promoteChecklistForm" 
-                            onclick="return confirm('Proses siswa yang dicentang lulus menjadi Alumni, dan siswa yang TIDAK dicentang tinggal di Kelas 12?')" 
+                            onclick="return confirm('Proses siswa yang dicentang lulus menjadi Alumni, dan siswa yang TIDAK dicentang tinggal di Kelas 12? (Akun siswa yang lulus akan otomatis dinonaktifkan)')" 
                             class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-extrabold text-white shadow-lg flex items-center gap-2 cursor-pointer transition">
                         <span>Proses Kelulusan Siswa (Siswa Tercentang)</span>
+                    </button>
+                @elseif($activeTab === 'lulus')
+                    <!-- Tombol Cetak Dokumen Siswa Lulus (A4) -->
+                    <button type="button" 
+                            onclick="window.print()" 
+                            class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-extrabold text-white shadow-lg flex items-center gap-2 cursor-pointer transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                        <span>Cetak Dokumen Siswa Lulus (A4)</span>
                     </button>
                 @endif
             </div>
         </div>
 
+        <!-- HEADER KOP LAPORAN KELULUSAN (HANYA MUNCUL DI PRINT A4) -->
+        <div class="hidden print:block mb-5 border-b-2 border-black pb-3 text-center">
+            <h1 class="text-base font-black tracking-wider text-black uppercase">SMK NEGERI 1 BANTUL</h1>
+            <h2 class="text-sm font-bold uppercase tracking-wider text-black mt-0.5">DAFTAR SISWA KELULUSAN & ALUMNI</h2>
+            <p class="text-[11px] text-gray-700 mt-1">
+                Tahun Ajaran: <strong>{{ \App\Models\SystemConfiguration::current()->academic_year ?? '2026/2027' }}</strong> &nbsp;•&nbsp; 
+                Dicetak pada: {{ now()->translatedFormat('d F Y, H:i') }} WIB &nbsp;•&nbsp; 
+                Oleh: {{ auth()->user()->name }} (Waka Kurikulum)
+            </p>
+        </div>
+
         <!-- 4 Kartu Tab Tingkat (Bersih Tanpa Tulisan Fase) -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 print:hidden">
             <!-- Tab Kelas 10 -->
             <a href="{{ route('waka.grades.index', ['tab' => 'X']) }}" 
                class="p-4 rounded-2xl border transition {{ $activeTab === 'X' ? 'bg-indigo-950/70 border-indigo-500 shadow-lg shadow-indigo-600/20' : 'bg-[#0f172a]/90 border-slate-800 hover:bg-slate-800/50' }}">
@@ -89,7 +108,7 @@
         </div>
 
         <!-- Filter Bar Dijabarkan: Tingkat, Jurusan, Rombel, Pencarian -->
-        <div class="p-4 rounded-2xl bg-[#0f172a]/90 border border-slate-800 shadow-xl">
+        <div class="p-4 rounded-2xl bg-[#0f172a]/90 border border-slate-800 shadow-xl print:hidden">
             <form method="GET" action="{{ route('waka.grades.index') }}" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
                 @if(request('per_page'))
                     <input type="hidden" name="per_page" value="{{ request('per_page') }}">
@@ -164,14 +183,14 @@
                                 <th class="p-4">Nama Siswa</th>
                                 <th class="p-4">Kelas</th>
                                 <th class="p-4">Status Rencana</th>
-                                <th class="p-4 text-center">Aksi</th>
+                                <th class="p-4 text-center print:hidden">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-800/60">
                             @forelse ($students as $s)
                                 <tr class="hover:bg-slate-800/30 transition">
                                     @if($activeTab !== 'lulus')
-                                        <td class="p-4 text-center">
+                                        <td class="p-4 text-center print:hidden">
                                             <!-- Hidden input untuk tracking semua siswa yang dievaluasi -->
                                             <input type="hidden" name="evaluated_students[]" value="{{ $s->id }}" />
                                             <!-- Checkbox keputusan -->
@@ -194,9 +213,15 @@
                                     </td>
                                     <td class="p-4">
                                         @if($activeTab === 'lulus')
-                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-                                                ✓ Lulus (Alumni)
-                                            </span>
+                                            <div class="flex flex-col gap-1 items-start">
+                                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                                                    ✓ Lulus (Alumni)
+                                                </span>
+                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                                                    Akun SCP Dinonaktifkan
+                                                </span>
+                                            </div>
                                         @else
                                             <!-- Indikator Dinamis Real-Time sesuai Checklist -->
                                             <template x-if="selectedIds.includes({{ $s->id }})">
@@ -211,7 +236,7 @@
                                             </template>
                                         @endif
                                     </td>
-                                    <td class="p-4 text-center">
+                                    <td class="p-4 text-center print:hidden">
                                         <div class="flex items-center justify-center gap-1.5">
                                             <!-- Tombol Detail -->
                                             <button @click="activeStudent = {
@@ -265,9 +290,29 @@
                     </table>
                 </div>
 
-                <x-table-pagination :paginator="$students" />
+                <div class="print:hidden">
+                    <x-table-pagination :paginator="$students" />
+                </div>
             </div>
         </form>
+
+        <!-- TANDA TANGAN PENGESAHAN KELULUSAN (HANYA MUNCUL DI PRINT A4) -->
+        <div class="hidden print:flex justify-between items-end mt-12 pt-4 text-xs text-black">
+            <div class="text-center">
+                <p>Mengetahui,</p>
+                <p class="font-bold">Kepala Sekolah</p>
+                <div class="h-20"></div>
+                <p class="font-bold underline">Tri Rahayu, M.Pd.</p>
+                <p>NIP. 19700101 199512 2 001</p>
+            </div>
+            <div class="text-center">
+                <p>Bantul, {{ now()->translatedFormat('d F Y') }}</p>
+                <p class="font-bold">Waka Kurikulum</p>
+                <div class="h-20"></div>
+                <p class="font-bold underline">{{ auth()->user()->name }}</p>
+                <p>NIP. {{ auth()->user()->nip ?? '-' }}</p>
+            </div>
+        </div>
 
         <!-- Hidden Delete Forms untuk setiap siswa (agar tidak merusak form tabel checklist) -->
         @foreach ($students as $s)
@@ -278,7 +323,7 @@
         @endforeach
 
         <!-- ================= MODAL DETAIL SISWA ================= -->
-        <div x-show="viewModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div x-show="viewModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 print:hidden">
             <div @click="viewModalOpen = false" class="fixed inset-0 bg-black/70 backdrop-blur-sm"></div>
             <div class="relative w-full max-w-md bg-[#0f172a] p-6 shadow-2xl border border-slate-800 space-y-4 rounded-2xl">
                 <div class="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -329,7 +374,7 @@
         </div>
 
         <!-- ================= MODAL EDIT SISWA & STATUS ================= -->
-        <div x-show="editModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div x-show="editModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 print:hidden">
             <div @click="editModalOpen = false" class="fixed inset-0 bg-black/70 backdrop-blur-sm"></div>
             <div class="relative w-full max-w-md bg-[#0f172a] p-6 shadow-2xl border border-slate-800 space-y-4 rounded-2xl">
                 <div class="flex items-center justify-between border-b border-slate-800 pb-3">
