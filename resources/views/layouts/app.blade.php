@@ -106,12 +106,14 @@
             /* 3. Kotak Kartu Konten: Solid Flat Surface (Tinggalkan Glassmorphism Buram) */
             .bg-\[\#0f172a\],
             .bg-\[\#0f172a\]\/90,
+            .bg-\[\#0f172a\]\/95,
             .bg-slate-900 {
                 background-color: #111827 !important; /* Dark Surface */
                 border: 1px solid #1f2937 !important; /* Crisp 1px Border */
             }
             html.theme-light .bg-\[\#0f172a\],
             html.theme-light .bg-\[\#0f172a\]\/90,
+            html.theme-light .bg-\[\#0f172a\]\/95,
             html.theme-light .bg-slate-900 {
                 background-color: #ffffff !important; /* Crisp White Surface */
                 border: 1px solid #e5e7eb !important; /* 1px Border Slate 200 */
@@ -192,11 +194,23 @@
             }
 
             /* Kotak Kartu Konten Light Mode */
+            html.theme-light .bg-\[\#0f172a\]\/95,
             html.theme-light .bg-\[\#0f172a\]\/90,
             html.theme-light .bg-\[\#0f172a\] {
                 background-color: #ffffff !important;
                 border-color: #e2e8f0 !important;
                 box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.06), 0 2px 4px -1px rgba(0, 0, 0, 0.04) !important;
+            }
+
+            /* Border Halus di Light Mode */
+            html.theme-light .border-slate-800,
+            html.theme-light .border-slate-800\/80,
+            html.theme-light .border-slate-700,
+            html.theme-light .border-slate-700\/80 {
+                border-color: #e2e8f0 !important;
+            }
+            html.theme-light .hover\:bg-slate-800\/40:hover {
+                background-color: #f1f5f9 !important;
             }
 
             /* ===================================================
@@ -206,7 +220,7 @@
             html.theme-light main h1,
             html.theme-light main h2,
             html.theme-light main h3,
-            html.theme-light main .text-white:not(.scp-btn-gradient):not(.scp-btn-gradient *):not(button):not(button *):not(.table-page-active):not(.table-page-active *):not(.room-count-badge):not(.room-count-badge *) {
+            html.theme-light main .text-white:not(.scp-btn-gradient):not(.scp-btn-gradient *):not(button):not(button *):not(.table-page-active):not(.table-page-active *):not(.room-count-badge):not(.room-count-badge *):not(input[type="radio"]:checked + span) {
                 color: #0f172a !important;
             }
             html.theme-light main .text-slate-200,
@@ -656,9 +670,22 @@
                 border-color: #a7f3d0 !important;
                 color: #065f46 !important;
             }
+            html.theme-light [class*="bg-emerald-950"] span,
             html.theme-light [class*="bg-emerald-950"] strong,
             html.theme-light [class*="bg-emerald-950"] .text-emerald-200,
             html.theme-light [class*="bg-emerald-950"] .text-emerald-300 {
+                color: #047857 !important;
+            }
+
+            /* Tombol Set Semua Hadir di Light Mode */
+            html.theme-light button.bg-emerald-950\/60,
+            html.theme-light [class*="bg-emerald-950\/60"] {
+                background-color: #d1fae5 !important;
+                border-color: #6ee7b7 !important;
+                color: #065f46 !important;
+            }
+            html.theme-light button.bg-emerald-950\/60:hover {
+                background-color: #a7f3d0 !important;
                 color: #047857 !important;
             }
 
@@ -669,6 +696,7 @@
                 border-color: #fde68a !important;
                 color: #92400e !important;
             }
+            html.theme-light [class*="bg-amber-950"] span,
             html.theme-light [class*="bg-amber-950"] .text-amber-300 {
                 color: #b45309 !important;
             }
@@ -680,6 +708,7 @@
                 border-color: #bfdbfe !important;
                 color: #1e40af !important;
             }
+            html.theme-light [class*="bg-blue-950"] span,
             html.theme-light [class*="bg-blue-950"] .text-blue-300 {
                 color: #1d4ed8 !important;
             }
@@ -692,6 +721,7 @@
                 border-color: #fecdd3 !important;
                 color: #9f1239 !important;
             }
+            html.theme-light [class*="bg-red-950"] span,
             html.theme-light [class*="bg-red-950"] strong,
             html.theme-light [class*="bg-red-950"] p,
             html.theme-light [class*="bg-red-950"] .text-red-300 {
