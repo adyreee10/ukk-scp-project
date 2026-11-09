@@ -84,31 +84,38 @@
                 <table class="min-w-full divide-y divide-slate-800 text-sm">
                     <thead class="bg-slate-900/70">
                         <tr class="text-left text-xs font-bold text-slate-400 uppercase tracking-wider">
-                            <th class="p-4">Mata Pelajaran</th>
-                            <th class="p-4">Kelas</th>
-                            <th class="p-4">Waktu</th>
-                            <th class="p-4">Ruangan</th>
-                            <th class="p-4 text-center">Aksi Jurnal</th>
+                            <th class="p-4 min-w-[200px] whitespace-nowrap">Mata Pelajaran</th>
+                            <th class="p-4 min-w-[130px] whitespace-nowrap">Kelas</th>
+                            <th class="p-4 min-w-[220px] whitespace-nowrap">Waktu</th>
+                            <th class="p-4 min-w-[160px] whitespace-nowrap">Ruangan</th>
+                            <th class="p-4 text-center min-w-[190px] whitespace-nowrap">Aksi Jurnal</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-800/60">
                         @forelse ($todaySchedules as $schedule)
                             <tr class="hover:bg-slate-800/30 transition">
-                                <td class="p-4">
+                                <td class="p-4 min-w-[200px]">
                                     <span class="font-bold text-white">{{ $schedule->subject }}</span>
                                 </td>
-                                <td class="p-4">
-                                    <span class="inline-block rounded-md bg-indigo-950/60 px-2.5 py-1 text-xs font-bold text-indigo-300 border border-indigo-800/60">
+                                <td class="p-4 whitespace-nowrap min-w-[130px]">
+                                    <span class="inline-block rounded-md bg-indigo-950/60 px-3 py-1.5 text-xs font-bold text-indigo-300 border border-indigo-800/60 whitespace-nowrap">
                                         {{ $schedule->schoolClass?->class_name ?? '-' }}
                                     </span>
                                 </td>
-                                <td class="p-4 text-xs font-mono text-slate-300">
-                                    {{ $schedule->period_label }}
+                                <td class="p-4 text-xs font-mono text-slate-300 whitespace-nowrap min-w-[220px]">
+                                    <div class="font-bold text-slate-100">
+                                        {{ \Illuminate\Support\Str::before($schedule->period_label, '(') }}
+                                    </div>
+                                    @if(\Illuminate\Support\Str::contains($schedule->period_label, '('))
+                                        <div class="text-[11px] text-slate-400 font-sans mt-0.5 font-normal">
+                                            ({{ \Illuminate\Support\Str::between($schedule->period_label, '(', ')') }})
+                                        </div>
+                                    @endif
                                 </td>
-                                <td class="p-4 text-xs text-slate-300">
+                                <td class="p-4 text-xs text-slate-300 whitespace-nowrap min-w-[160px]">
                                     {{ $schedule->room?->room_name ?? '-' }}
                                 </td>
-                                <td class="p-4 text-center">
+                                <td class="p-4 text-center whitespace-nowrap min-w-[190px]">
                                     @if(in_array($schedule->id, $filledScheduleIdsToday ?? []))
                                         <!-- BADGE HIJAU: JIKA SUDAH DIISI HARI INI (Bisa Klik untuk Edit Presensi hingga 23:59) -->
                                         <a href="{{ route('teacher.journals.create', ['schedule_id' => $schedule->id]) }}" 

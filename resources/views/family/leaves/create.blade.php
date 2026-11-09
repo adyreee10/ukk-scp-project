@@ -108,19 +108,19 @@
                                     <!-- Opsi 3: Potong Jam Pelajaran -->
                                     <label @click="leaveType = 'Potong Jam Pelajaran'"
                                            :class="leaveType === 'Potong Jam Pelajaran' 
-                                                ? 'border-purple-500 bg-purple-950/30 ring-2 ring-purple-500/50' 
+                                                ? 'leave-active-potong ring-2 ring-teal-500/50' 
                                                 : 'leave-inactive hover:border-slate-400'"
                                            class="relative flex items-center justify-between p-3.5 rounded-xl border cursor-pointer transition-all duration-150">
                                         <input type="radio" name="leave_type" value="Potong Jam Pelajaran" x-model="leaveType" class="sr-only">
                                         
                                         <div class="flex items-center gap-3">
-                                            <div :class="leaveType === 'Potong Jam Pelajaran' ? 'border-purple-500 bg-purple-500' : 'border-slate-400 bg-transparent'"
+                                            <div :class="leaveType === 'Potong Jam Pelajaran' ? 'border-teal-500 bg-teal-500' : 'border-slate-400 bg-transparent'"
                                                  class="w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition">
                                                 <div x-show="leaveType === 'Potong Jam Pelajaran'" class="w-1.5 h-1.5 rounded-full bg-white"></div>
                                             </div>
 
                                             <div>
-                                                <span :class="leaveType === 'Potong Jam Pelajaran' ? '!text-purple-400 font-black' : 'font-bold'"
+                                                <span :class="leaveType === 'Potong Jam Pelajaran' ? '!text-teal-700 dark:!text-teal-300 font-black' : 'font-bold'"
                                                       class="block text-xs">
                                                     Potong Jam Pelajaran
                                                 </span>
@@ -153,25 +153,26 @@
                                 </div>
                             </div>
 
-                                                        <!-- FORM JAM KHUSUS (JIKA POTONG JAM PELAJARAN) -->
-                            <div x-show="leaveType === 'Potong Jam Pelajaran'" style="display: none;" class="p-4 rounded-xl bg-purple-950/20 border border-purple-500/30 space-y-3">
+                            <!-- FORM JAM KHUSUS (JIKA POTONG JAM PELAJARAN) -->
+                            <div x-show="leaveType === 'Potong Jam Pelajaran'" style="display: none;" 
+                                 class="p-4 rounded-xl bg-teal-50/70 dark:bg-teal-950/20 border border-teal-200 dark:border-teal-500/30 space-y-3">
                                 <div>
-                                    <label class="block text-xs font-bold uppercase tracking-wider text-purple-300 mb-1.5">
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-teal-800 dark:text-teal-300 mb-1.5">
                                         Tanggal Izin <span class="text-red-400">*</span>
                                     </label>
                                     <input type="date" name="single_date" value="{{ old('single_date', date('Y-m-d')) }}"
                                            :required="leaveType === 'Potong Jam Pelajaran'"
-                                           class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-purple-500 transition">
+                                           class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-teal-500 transition">
                                 </div>
 
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
-                                        <label class="block text-xs font-bold uppercase tracking-wider text-purple-300 mb-1.5">
+                                        <label class="block text-xs font-bold uppercase tracking-wider text-teal-800 dark:text-teal-300 mb-1.5">
                                             Dari Jam Pelajaran <span class="text-red-400">*</span>
                                         </label>
                                         <select name="start_time" 
                                                 :required="leaveType === 'Potong Jam Pelajaran'"
-                                                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-purple-500 transition cursor-pointer">
+                                                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-teal-500 transition cursor-pointer">
                                             @for($i = 1; $i <= 10; $i++)
                                                 @php $val = sprintf('%02d:00', $i); @endphp
                                                 <option value="{{ $val }}" {{ old('start_time', '01:00') === $val ? 'selected' : '' }}>
@@ -181,12 +182,12 @@
                                         </select>
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-bold uppercase tracking-wider text-purple-300 mb-1.5">
+                                        <label class="block text-xs font-bold uppercase tracking-wider text-teal-800 dark:text-teal-300 mb-1.5">
                                             Sampai Jam Pelajaran <span class="text-red-400">*</span>
                                         </label>
                                         <select name="end_time" 
                                                 :required="leaveType === 'Potong Jam Pelajaran'"
-                                                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-purple-500 transition cursor-pointer">
+                                                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-teal-500 transition cursor-pointer">
                                             @for($i = 1; $i <= 10; $i++)
                                                 @php $val = sprintf('%02d:00', $i); @endphp
                                                 <option value="{{ $val }}" {{ old('end_time', '02:00') === $val ? 'selected' : '' }}>
@@ -197,7 +198,10 @@
                                     </div>
                                 </div>
 
-                                <p class="text-[11px] text-purple-300/80">
+                                <p class="text-[11px] text-teal-800 dark:text-teal-300/90 font-medium">
+                                    Siswa hanya izin pada rentang jam tersebut dan tetap mengikuti pembelajaran sebelum atau sesudahnya.
+                                </p>
+                            </div>
                                     Siswa hanya izin pada rentang jam tersebut dan tetap mengikuti pembelajaran sebelum atau sesudahnya.
                                 </p>
                             </div>
@@ -392,6 +396,10 @@
             background-color: rgba(37, 99, 235, 0.15) !important;
             border-color: #2563eb !important;
         }
+        .leave-active-potong {
+            background-color: rgba(13, 148, 136, 0.15) !important;
+            border-color: #0d9488 !important;
+        }
 
         /* Tampilan Mode Cerah (Light Mode) */
         html.theme-light .leave-inactive {
@@ -407,6 +415,11 @@
             background-color: #dbeafe !important;
             border-color: #2563eb !important;
             box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25) !important;
+        }
+        html.theme-light .leave-active-potong {
+            background-color: #ccfbf1 !important;
+            border-color: #0d9488 !important;
+            box-shadow: 0 2px 8px rgba(13, 148, 136, 0.25) !important;
         }
     </style>
 

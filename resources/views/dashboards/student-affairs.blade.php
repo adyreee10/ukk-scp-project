@@ -118,7 +118,7 @@
                              class="p-4 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800/40 transition">
                             <div class="flex items-start justify-between gap-2">
                                 <div>
-                                    <span class="inline-block px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase border {{ $leave->leave_type === 'Sakit' ? 'bg-amber-950/60 text-amber-300 border-amber-800/60' : (in_array($leave->leave_type, ['Potong Jam Pelajaran', 'Dispensasi']) ? 'bg-purple-950/60 text-purple-300 border-purple-800/60' : 'bg-blue-950/60 text-blue-300 border-blue-800/60') }}">
+                                    <span class="inline-block px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase border {{ $leave->leave_type === 'Sakit' ? 'bg-amber-950/60 text-amber-300 border-amber-800/60' : (in_array($leave->leave_type, ['Potong Jam Pelajaran', 'Dispensasi']) ? 'bg-teal-950/60 text-teal-300 border-teal-800/60' : 'bg-blue-950/60 text-blue-300 border-blue-800/60') }}">
                                         {{ $leave->leave_type }}
                                     </span>
                                     <h3 class="font-bold text-white text-sm mt-1.5">{{ $leave->student_name }}</h3>
@@ -219,7 +219,7 @@
 
 
                                     <td class="p-4 max-w-xs">
-                                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase border mb-1 {{ $leave->leave_type === 'Sakit' ? 'bg-amber-950/60 text-amber-300 border-amber-800/60' : (in_array($leave->leave_type, ['Potong Jam Pelajaran', 'Dispensasi']) ? 'bg-purple-950/60 text-purple-300 border-purple-800/60' : 'bg-blue-950/60 text-blue-300 border-blue-800/60') }}">
+                                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase border mb-1 {{ $leave->leave_type === 'Sakit' ? 'bg-amber-950/60 text-amber-300 border-amber-800/60' : (in_array($leave->leave_type, ['Potong Jam Pelajaran', 'Dispensasi']) ? 'bg-teal-950/60 text-teal-300 border-teal-800/60' : 'bg-blue-950/60 text-blue-300 border-blue-800/60') }}">
                                             {{ $leave->leave_type }}
                                         </span>
                                         <p class="text-xs text-slate-300 line-clamp-2">{{ $leave->reason }}</p>

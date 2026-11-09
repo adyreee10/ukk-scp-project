@@ -80,7 +80,7 @@
                                 <div class="flex items-start justify-between gap-2">
                                     <div>
                                         <div class="flex items-center gap-1.5 mb-1.5">
-                                            <span class="inline-block px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase border {{ $req->leave_type === 'Sakit' ? 'bg-amber-950/60 text-amber-300 border-amber-800/60' : 'bg-blue-950/60 text-blue-300 border-blue-800/60' }}">
+                                            <span class="inline-block px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase border {{ $req->leave_type === 'Sakit' ? 'bg-amber-950/60 text-amber-300 border-amber-800/60' : ($req->leave_type === 'Potong Jam Pelajaran' ? 'bg-teal-950/60 text-teal-300 border-teal-800/60' : 'bg-blue-950/60 text-blue-300 border-blue-800/60') }}">
                                                 {{ $req->leave_type }}
                                             </span>
                                             @if($req->status_approval === 'Pending')
@@ -142,7 +142,7 @@
                                     <tr class="hover:bg-slate-800/30 transition">
                                         <!-- Jenis & Tanggal -->
                                         <td class="p-4">
-                                            <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase border mb-1 {{ $req->leave_type === 'Sakit' ? 'bg-amber-950/60 text-amber-300 border-amber-800/60' : 'bg-blue-950/60 text-blue-300 border-blue-800/60' }}">
+                                            <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase border mb-1 {{ $req->leave_type === 'Sakit' ? 'bg-amber-950/60 text-amber-300 border-amber-800/60' : ($req->leave_type === 'Potong Jam Pelajaran' ? 'bg-teal-950/60 text-teal-300 border-teal-800/60' : 'bg-blue-950/60 text-blue-300 border-blue-800/60') }}">
                                                 {{ $req->leave_type }}
                                             </span>
                                             <div class="text-xs font-mono text-slate-300">

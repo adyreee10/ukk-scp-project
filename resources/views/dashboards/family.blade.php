@@ -156,9 +156,10 @@
                     <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto">Siswa belum pernah mengajukan permohonan izin sakit atau keperluan.</p>
                     <div class="mt-4">
                         <a href="{{ route('family.leaves.create') }}" 
-                           class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-md transition cursor-pointer">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                            <span>Buat Pengajuan Izin Baru</span>
+                           style="color: #ffffff !important;"
+                           class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold scp-btn-gradient shadow-md hover:shadow-lg transition cursor-pointer">
+                            <svg class="w-3.5 h-3.5 text-white" style="color: #ffffff !important;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            <span style="color: #ffffff !important;">+ Buat Pengajuan Izin Baru</span>
                         </a>
                     </div>
                 </div>
@@ -167,7 +168,7 @@
                     @foreach($recentLeaves as $req)
                         <div class="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-800/30 transition">
                             <div class="flex items-start gap-3">
-                                <span class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase border shrink-0 {{ $req->leave_type === 'Sakit' ? 'bg-amber-950/60 text-amber-300 border-amber-800/60' : 'bg-blue-950/60 text-blue-300 border-blue-800/60' }}">
+                                <span class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase border shrink-0 {{ $req->leave_type === 'Sakit' ? 'bg-amber-950/60 text-amber-300 border-amber-800/60' : ($req->leave_type === 'Potong Jam Pelajaran' ? 'bg-teal-950/60 text-teal-300 border-teal-800/60' : 'bg-blue-950/60 text-blue-300 border-blue-800/60') }}">
                                     {{ $req->leave_type }}
                                 </span>
                                 <div>

@@ -101,7 +101,7 @@
                                 :class="filterType === 'Izin' ? 'bg-blue-600 text-white font-bold shadow' : 'text-slate-400 hover:text-white'"
                                 class="px-2.5 py-1 rounded-lg transition cursor-pointer text-xs">Izin</button>
                         <button type="button" @click="filterType = 'Potong Jam Pelajaran'" 
-                                :class="filterType === 'Potong Jam Pelajaran' ? 'bg-purple-600 text-white font-bold shadow' : 'text-slate-400 hover:text-white'"
+                                :class="filterType === 'Potong Jam Pelajaran' ? 'bg-teal-600 text-white font-bold shadow' : 'text-slate-400 hover:text-white'"
                                 class="px-2.5 py-1 rounded-lg transition cursor-pointer text-xs">Potong Jam</button>
 
                     </div>
@@ -195,7 +195,7 @@
                                         <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase border {{ $leave->status === 'Approved' ? 'bg-emerald-950/60 text-emerald-300 border-emerald-800/60' : 'bg-red-950/60 text-red-300 border-red-800/60' }}">
                                             {{ $leave->status === 'Approved' ? 'Disetujui' : 'Ditolak' }}
                                         </span>
-                                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase border {{ $leave->leave_type === 'Sakit' ? 'bg-amber-950/60 text-amber-300 border-amber-800/60' : (in_array($leave->leave_type, ['Potong Jam Pelajaran', 'Dispensasi']) ? 'bg-purple-950/60 text-purple-300 border-purple-800/60' : 'bg-blue-950/60 text-blue-300 border-blue-800/60') }}">
+                                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase border {{ $leave->leave_type === 'Sakit' ? 'bg-amber-950/60 text-amber-300 border-amber-800/60' : (in_array($leave->leave_type, ['Potong Jam Pelajaran', 'Dispensasi']) ? 'bg-teal-950/60 text-teal-300 border-teal-800/60' : 'bg-blue-950/60 text-blue-300 border-blue-800/60') }}">
                                             {{ $leave->leave_type }}
                                         </span>
 
@@ -270,7 +270,7 @@
                                     </td>
 
                                     <td class="p-4 max-w-xs">
-                                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase border {{ $leave->leave_type === 'Sakit' ? 'bg-amber-950/60 text-amber-300 border-amber-800/60' : (in_array($leave->leave_type, ['Potong Jam Pelajaran', 'Dispensasi']) ? 'bg-purple-950/60 text-purple-300 border-purple-800/60' : 'bg-blue-950/60 text-blue-300 border-blue-800/60') }}">
+                                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase border {{ $leave->leave_type === 'Sakit' ? 'bg-amber-950/60 text-amber-300 border-amber-800/60' : (in_array($leave->leave_type, ['Potong Jam Pelajaran', 'Dispensasi']) ? 'bg-teal-950/60 text-teal-300 border-teal-800/60' : 'bg-blue-950/60 text-blue-300 border-blue-800/60') }}">
                                             {{ $leave->leave_type }}
                                         </span>
                                         <p class="text-xs text-slate-300 line-clamp-2">{{ $leave->reason }}</p>

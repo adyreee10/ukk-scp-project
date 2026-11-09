@@ -81,18 +81,29 @@
                 <!-- Tampilan Mobile (Card View) -->
                 <div class="p-4 space-y-3.5 md:hidden">
                     @foreach ($schedules as $schedule)
-                        <div class="p-4 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800/50 transition">
-                            <div class="flex items-start justify-between gap-2">
-                                <div>
-                                    <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-indigo-950/60 text-indigo-300 border border-indigo-800/60">
-                                        {{ $schedule->day_of_week }}
-                                    </span>
-                                    <h3 class="font-bold text-white text-sm mt-1.5">{{ $schedule->subject }}</h3>
-                                    <p class="text-xs text-slate-400">{{ $schedule->schoolClass->class_name }} • {{ $schedule->room->room_name }}</p>
-                                </div>
-                                <span class="text-xs font-mono font-bold text-blue-600 dark:text-indigo-400 shrink-0">
-                                    {{ $schedule->period_label }}
+                        <div class="p-4 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800/50 transition space-y-2.5">
+                            <div class="flex items-center justify-between gap-2 pb-2 border-b border-slate-800/70">
+                                <span class="text-[10px] font-black uppercase px-2.5 py-1 rounded-md bg-indigo-950/80 text-indigo-300 border border-indigo-800/60 shrink-0">
+                                    {{ $schedule->day_of_week }}
                                 </span>
+                                <div class="text-right">
+                                    <div class="text-xs font-mono font-bold text-indigo-400">
+                                        {{ \Illuminate\Support\Str::before($schedule->period_label, '(') }}
+                                    </div>
+                                    @if(\Illuminate\Support\Str::contains($schedule->period_label, '('))
+                                        <div class="text-[11px] font-mono text-slate-400 mt-0.5">
+                                            ({{ \Illuminate\Support\Str::between($schedule->period_label, '(', ')') }})
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-white text-sm leading-snug">{{ $schedule->subject }}</h3>
+                                <div class="mt-1.5 flex items-center gap-2 text-xs text-slate-400">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-semibold">{{ $schedule->schoolClass->class_name }}</span>
+                                    <span>•</span>
+                                    <span>{{ $schedule->room->room_name }}</span>
+                                </div>
                             </div>
                         </div>
                     @endforeach

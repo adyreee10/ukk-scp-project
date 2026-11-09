@@ -24,11 +24,20 @@
                 $days = ['Semua', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
             @endphp
             @foreach($days as $d)
+                @php
+                    $isActive = ($selectedDay === $d);
+                    $isToday = ($d === $todayName);
+                @endphp
                 <a href="{{ route('family.schedules.index', ['day' => $d]) }}" 
-                   class="px-3.5 py-2 rounded-xl text-xs font-bold transition {{ ($selectedDay === $d) ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'bg-[#0f172a]/90 border border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800' }}">
-                    {{ $d === 'Semua' ? 'Semua Hari' : $d }}
-                    @if($d === $todayName)
-                        <span class="ml-1 text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold">Hari Ini</span>
+                   @if($isActive) style="color: #ffffff !important;" @endif
+                   class="inline-flex items-center px-3.5 py-2 rounded-xl text-xs font-bold transition {{ $isActive ? 'scp-btn-gradient text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-[#0f172a]/90 border border-slate-300 dark:border-slate-800 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800' }}">
+                    <span @if($isActive) style="color: #ffffff !important;" @endif>{{ $d === 'Semua' ? 'Semua Hari' : $d }}</span>
+                    @if($isToday)
+                        @if($isActive)
+                            <span class="ml-1.5 text-[10px] px-2 py-0.5 rounded-full bg-white/25 text-white border border-white/40 font-black" style="color: #ffffff !important;">Hari Ini</span>
+                        @else
+                            <span class="ml-1.5 text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 dark:bg-emerald-950/80 dark:text-emerald-300 dark:border-emerald-700/80 font-black">Hari Ini</span>
+                        @endif
                     @endif
                 </a>
             @endforeach
@@ -47,12 +56,19 @@
                     <div class="bg-[#0f172a]/90 backdrop-blur-md border border-slate-800 hover:border-slate-700 shadow-xl rounded-2xl p-5 flex flex-col justify-between transition">
                         <div>
                             <div class="flex items-center justify-between gap-2 mb-2">
-                                <span class="px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider {{ $sc->day_of_week === $todayName ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-slate-800 text-slate-300' }}">
+                                <span class="px-2.5 py-1 rounded-md text-[10px] uppercase tracking-wider shrink-0 {{ $sc->day_of_week === $todayName ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-700/80 font-black' : 'bg-slate-800 text-slate-300 font-bold' }}">
                                     {{ $sc->day_of_week }}
                                 </span>
-                                <span class="text-xs font-mono font-bold text-indigo-400">
-                                    {{ $sc->period_label ?? ($sc->start_time . ' - ' . $sc->end_time) }}
-                                </span>
+                                <div class="text-right">
+                                    <div class="text-xs font-mono font-bold text-indigo-400">
+                                        {{ \Illuminate\Support\Str::before($sc->period_label, '(') }}
+                                    </div>
+                                    @if(\Illuminate\Support\Str::contains($sc->period_label, '('))
+                                        <div class="text-[11px] font-mono text-slate-400 mt-0.5">
+                                            ({{ \Illuminate\Support\Str::between($sc->period_label, '(', ')') }})
+                                        </div>
+                                    @endif
+                                </div>
                             </div>
 
                             <h3 class="text-base font-extrabold text-white mt-1">{{ $sc->subject }}</h3>
