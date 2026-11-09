@@ -563,12 +563,24 @@ class WakaController extends Controller
         ]);
 
         if (empty($validated['username'])) {
-            $baseName = !empty($validated['nip']) ? 'guru_' . $validated['nip'] : 'guru_' . Str::slug($validated['name'], '_');
-            $validated['username'] = substr($baseName . '_' . rand(10, 99), 0, 35);
+            $docService = app(\App\Services\SchoolDocumentParserService::class);
+            $norm = $docService->stripAcademicTitles($validated['name']);
+            $words = preg_split('/\s+/', trim($norm));
+            $firstWord = preg_replace('/[^a-z0-9]/', '', strtolower($words[0] ?? ''));
+            $baseUser = !empty($firstWord) ? "guru_{$firstWord}" : 'guru_user';
+            $baseUser = substr($baseUser, 0, 30);
+
+            $uniqueUser = $baseUser;
+            $counter = 1;
+            while (User::where('username', $uniqueUser)->exists()) {
+                $uniqueUser = "{$baseUser}{$counter}";
+                $counter++;
+            }
+            $validated['username'] = $uniqueUser;
         }
 
         if (empty($validated['email'])) {
-            $validated['email'] = null;
+            $validated['email'] = "{$validated['username']}@guru.smk.sch.id";
         }
 
         $role = Role::find($validated['role_id']);
@@ -674,14 +686,20 @@ class WakaController extends Controller
             return redirect()->back()->with('error', 'Tidak ada data guru valid yang ditemukan.');
         }
 
-        \Illuminate\Support\Facades\DB::transaction(function () use ($validIds) {
+        \Illuminate\Support\Facades\DB::transaction(function () use ($validIds, $currentUserId) {
             // 1. Lepaskan relasi perwalian Guru BK
             \Illuminate\Support\Facades\DB::table('counselor_classes')->whereIn('user_id', $validIds)->delete();
 
-            // 2. Hapus jadwal mengajar yang terikat pada guru-guru ini
+            // 2. Lepaskan updated_by pada SystemConfiguration jika mengarah ke guru yang dihapus
+            \App\Models\SystemConfiguration::whereIn('updated_by', $validIds)->update(['updated_by' => $currentUserId]);
+
+            // 3. Lepaskan perwalian homeroom_class_id
+            User::whereIn('id', $validIds)->update(['homeroom_class_id' => null]);
+
+            // 4. Hapus jadwal mengajar yang terikat pada guru-guru ini (cascade ke jurnal dan presensi)
             \App\Models\Schedule::whereIn('teacher_id', $validIds)->delete();
 
-            // 3. Hapus data akun guru
+            // 5. Hapus data akun guru
             User::whereIn('id', $validIds)->delete();
         });
 
@@ -712,14 +730,20 @@ class WakaController extends Controller
             return redirect()->back()->with('error', 'Tidak ada data guru yang dapat dihapus.');
         }
 
-        \Illuminate\Support\Facades\DB::transaction(function () use ($validIds) {
+        \Illuminate\Support\Facades\DB::transaction(function () use ($validIds, $currentUserId) {
             // 1. Lepaskan relasi perwalian Guru BK
             \Illuminate\Support\Facades\DB::table('counselor_classes')->whereIn('user_id', $validIds)->delete();
 
-            // 2. Hapus jadwal mengajar yang terikat pada guru-guru ini
+            // 2. Lepaskan updated_by pada SystemConfiguration jika mengarah ke guru yang dihapus
+            \App\Models\SystemConfiguration::whereIn('updated_by', $validIds)->update(['updated_by' => $currentUserId]);
+
+            // 3. Lepaskan perwalian homeroom_class_id
+            User::whereIn('id', $validIds)->update(['homeroom_class_id' => null]);
+
+            // 4. Hapus jadwal mengajar yang terikat pada guru-guru ini (cascade ke jurnal dan presensi)
             \App\Models\Schedule::whereIn('teacher_id', $validIds)->delete();
 
-            // 3. Hapus data akun guru
+            // 5. Hapus data akun guru
             User::whereIn('id', $validIds)->delete();
         });
 

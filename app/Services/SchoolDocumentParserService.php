@@ -358,6 +358,7 @@ class SchoolDocumentParserService
                         existingUsernames: $existingUsernames,
                         existingEmails: $existingEmails
                     );
+                    $newWali->setRelation('role', $waliRole);
                     $allTeachers->push($newWali);
                     $created++;
                     $processedUserIds[] = $newWali->id;
@@ -414,6 +415,7 @@ class SchoolDocumentParserService
                         existingUsernames: $existingUsernames,
                         existingEmails: $existingEmails
                     );
+                    $newBk->setRelation('role', $bkRole);
                     $newBk->counselorClasses()->syncWithoutDetaching([$schoolClass->id]);
                     $allTeachers->push($newBk);
                     $created++;
@@ -648,14 +650,29 @@ class SchoolDocumentParserService
 
         // Cari guru yang sudah ada berdasarkan NIP atau Pencarian Nama Cerdas Fleksibel di Memori
         $teacher = null;
-        if ($nip && $allTeachers) {
-            $teacher = $allTeachers->first(fn($t) => $t->nip === $nip);
-        } elseif ($nip) {
-            $teacher = User::where('nip', $nip)->first();
+        if ($nip) {
+            $cleanNipDigits = preg_replace('/[^0-9]/', '', (string)$nip);
+            if ($allTeachers) {
+                $teacher = $allTeachers->first(function ($t) use ($cleanNipDigits, $nip) {
+                    if (empty($t->nip)) return false;
+                    $tDigits = preg_replace('/[^0-9]/', '', (string)$t->nip);
+                    return $tDigits === $cleanNipDigits || (string)$t->nip === (string)$nip;
+                });
+            }
+            if (!$teacher) {
+                $teacher = User::where('nip', $nip)
+                    ->orWhere('nip', $cleanNipDigits)
+                    ->orWhere('username', "guru_{$cleanNipDigits}")
+                    ->first();
+            }
         }
 
         if (!$teacher) {
             $teacher = $this->findTeacherByNameFlexible($cleanName, $allTeachers);
+        }
+
+        if (!$teacher) {
+            $teacher = $this->findTeacherByNameFlexible($cleanName, null);
         }
 
         if ($teacher) {
@@ -681,16 +698,35 @@ class SchoolDocumentParserService
                 'homeroom_class_id' => $homeroomClassId ?? $teacher->homeroom_class_id,
             ];
 
-            // Jika sebelumnya akun dibuat tanpa NIP (misal dari matriks wali kelas), perbarui username & email dengan NIP resmi
-            if ($nip && empty($teacher->nip)) {
-                $nipUser = "guru_{$nip}";
-                if (!User::where('username', $nipUser)->where('id', '!=', $teacher->id)->exists()) {
-                    $updateData['username'] = $nipUser;
-                    $updateData['email'] = "{$nipUser}@guru.smk.sch.id";
+            // Jika sebelumnya akun belum memiliki username berformat guru_{namaDepan}, perbarui ke format simpel
+            if (empty($teacher->username) || !str_starts_with($teacher->username, 'guru_') || preg_match('/^guru_\d{6,}/', $teacher->username)) {
+                $norm = $this->stripAcademicTitles($cleanName);
+                $words = preg_split('/\s+/', trim($norm));
+                $firstWord = preg_replace('/[^a-z0-9]/', '', strtolower($words[0] ?? ''));
+                $baseUser = !empty($firstWord) ? "guru_{$firstWord}" : 'guru_user';
+                $baseUser = substr($baseUser, 0, 30);
+
+                $uniqueUser = $baseUser;
+                $counter = 1;
+                while (
+                    isset($existingUsernames[$uniqueUser]) ||
+                    User::where('username', $uniqueUser)->where('id', '!=', $teacher->id)->exists()
+                ) {
+                    $uniqueUser = "{$baseUser}{$counter}";
+                    $counter++;
                 }
+
+                $updateData['username'] = $uniqueUser;
+                $updateData['email'] = "{$uniqueUser}@guru.smk.sch.id";
+                $existingUsernames[$uniqueUser] = true;
+                $existingEmails["{$uniqueUser}@guru.smk.sch.id"] = true;
             }
 
             $teacher->update($updateData);
+            if ($targetRoleId !== $teacher->role_id) {
+                $teacher->role_id = $targetRoleId;
+                $teacher->setRelation('role', Role::find($targetRoleId));
+            }
             $updated++;
         } else {
             $newTeacher = $this->createNewTeacherAccount(
@@ -703,6 +739,7 @@ class SchoolDocumentParserService
                 existingUsernames: $existingUsernames,
                 existingEmails: $existingEmails
             );
+            $newTeacher->setRelation('role', Role::find($roleId));
             if ($allTeachers) {
                 $allTeachers->push($newTeacher);
             }
@@ -725,13 +762,16 @@ class SchoolDocumentParserService
     ): User {
         $cleanName = trim(preg_replace('/^\d+[\.\)]\s*/', '', $name), " \t\n\r\0\x0B\"'");
 
-        $baseUser = $nip ? "guru_{$nip}" : Str::slug($cleanName, '.');
-        if (empty($baseUser)) $baseUser = 'guru_' . Str::random(5);
-        $baseUser = substr($baseUser, 0, 35);
+        // Format username simpel: guru_(namaDepan)
+        $norm = $this->stripAcademicTitles($cleanName);
+        $words = preg_split('/\s+/', trim($norm));
+        $firstWord = preg_replace('/[^a-z0-9]/', '', strtolower($words[0] ?? ''));
+        $baseUser = !empty($firstWord) ? "guru_{$firstWord}" : 'guru_user';
+        $baseUser = substr($baseUser, 0, 30);
 
         $uniqueUser = $baseUser;
         $counter = 1;
-        while (isset($existingUsernames[$uniqueUser]) || (empty($existingUsernames) && User::where('username', $uniqueUser)->exists())) {
+        while (isset($existingUsernames[$uniqueUser]) || User::where('username', $uniqueUser)->exists()) {
             $uniqueUser = "{$baseUser}{$counter}";
             $counter++;
         }
@@ -739,7 +779,7 @@ class SchoolDocumentParserService
 
         $email = "{$uniqueUser}@guru.smk.sch.id";
         $c = 1;
-        while (isset($existingEmails[$email]) || (empty($existingEmails) && User::where('email', $email)->exists())) {
+        while (isset($existingEmails[$email]) || User::where('email', $email)->exists()) {
             $email = "{$uniqueUser}{$c}@guru.smk.sch.id";
             $c++;
         }
@@ -792,29 +832,22 @@ class SchoolDocumentParserService
             }
         }
 
-        // 4. Pencocokan substring jika nama cukup panjang (>= 6 huruf)
-        foreach ($allTeachers as $t) {
-            $tNorm = $this->stripAcademicTitles($t->name);
-            if (strlen($normSearch) >= 6 && strlen($tNorm) >= 6) {
-                if (str_contains($tNorm, $normSearch) || str_contains($normSearch, $tNorm)) {
+        // 4. Jika belum ditemukan dalam koleksi memori, coba cari langsung ke database
+        if ($cachedTeachers !== null) {
+            $dbTeacher = User::whereRaw('LOWER(name) = ?', [$lowerClean])
+                ->whereHas('role', fn($q) => $q->whereIn('role_name', ['Guru', 'Wali Kelas', 'Guru BK', 'Waka Kurikulum', 'Admin']))
+                ->first();
+            if ($dbTeacher) return $dbTeacher;
+
+            $allDb = User::whereHas('role', fn($q) => $q->whereIn('role_name', ['Guru', 'Wali Kelas', 'Guru BK', 'Waka Kurikulum', 'Admin']))->get();
+            foreach ($allDb as $t) {
+                if ($this->stripAcademicTitles($t->name) === $normSearch) {
                     return $t;
                 }
             }
         }
 
-        // 5. Fuzzy match menggunakan similar_text jika terdapat perbedaan typo kecil
-        $bestMatch = null;
-        $highestPercent = 0;
-        foreach ($allTeachers as $t) {
-            $tNorm = $this->stripAcademicTitles($t->name);
-            similar_text($normSearch, $tNorm, $percent);
-            if ($percent > 85 && $percent > $highestPercent) {
-                $highestPercent = $percent;
-                $bestMatch = $t;
-            }
-        }
-
-        return $bestMatch;
+        return null;
     }
 
     /**
@@ -829,7 +862,7 @@ class SchoolDocumentParserService
 
         // Hapus gelar depan umum (bisa berulang misal "H. Drs.")
         for ($i = 0; $i < 3; $i++) {
-            $n = preg_replace('/^(drs|dra|dr|prof|ir|h|hj|kh|ust|ustadz)\.?\s+/i', '', $n);
+            $n = preg_replace('/^(drs|dra|dr|prof|ir|h|hj|kh|ust|ustadz|raden\s+rara|raden\s+roro|raden)\s*\.?\s+/i', '', $n);
         }
 
         // Pisahkan bagian sebelum koma (kebanyakan gelar belakang setelah koma)
