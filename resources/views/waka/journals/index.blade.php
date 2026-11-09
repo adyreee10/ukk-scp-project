@@ -40,23 +40,24 @@
                     <table class="min-w-full divide-y divide-slate-800 text-sm">
                         <thead class="bg-slate-900/60 text-xs font-bold text-slate-400 uppercase tracking-wider">
                             <tr>
-                                <th class="p-3 text-left">Nama Guru</th>
+                                <th class="p-3 text-left whitespace-nowrap">Nama Guru</th>
                                 <th class="p-3 text-left">Mata Pelajaran</th>
-                                <th class="p-3 text-left">Kelas & Jam</th>
-                                <th class="p-3 text-center">Status</th>
+                                <th class="p-3 text-left whitespace-nowrap">Kelas & Jam</th>
+                                <th class="p-3 text-center whitespace-nowrap w-52">Status</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-800/60">
                             @foreach ($lateTeachers as $late)
                                 <tr class="hover:bg-slate-800/30 transition">
-                                    <td class="p-3 font-bold text-white">{{ $late->teacher?->name }}</td>
+                                    <td class="p-3 font-bold text-white whitespace-nowrap">{{ $late->teacher?->name }}</td>
                                     <td class="p-3 text-slate-300">{{ $late->subject }}</td>
-                                    <td class="p-3 text-xs text-slate-400">
-                                            {{ $late->schoolClass?->class_name }} • {{ $late->period_label }}
+                                    <td class="p-3 text-xs text-slate-400 whitespace-nowrap">
+                                        {{ $late->schoolClass?->class_name }} • {{ $late->period_label }}
                                     </td>
-                                    <td class="p-3 text-center">
-                                        <span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-red-950/70 border border-red-700/60 text-red-300">
-                                            Belum Mengisi (Terlambat)
+                                    <td class="p-3 text-center whitespace-nowrap">
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap bg-red-950/70 border border-red-700/60 text-red-300 shadow-sm">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse shrink-0 inline-block"></span>
+                                            <span>Belum Mengisi (Terlambat)</span>
                                         </span>
                                     </td>
                                 </tr>
