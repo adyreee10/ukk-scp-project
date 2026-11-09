@@ -21,6 +21,62 @@ Route::get('/', function () {
 // Endpoint Satu-Klik Sinkronisasi Akun Orang Tua di Web Hosting (Dilindungi Secret Key)
 Route::get('/sync-parents-direct', [WakaController::class, 'studentsSyncParentsDirect']);
 
+// Endpoint Satu-Klik Bersihkan Cache Laravel di Web Hosting (Tanpa Perlu Terminal/SSH)
+Route::get('/clear-cache', function (Request $request) {
+    if ($request->query('key') !== 'ukk2026') {
+        abort(403, 'Akses Ditolak: Kunci pengaman (key) tidak valid.');
+    }
+
+    $results = [];
+
+    // 1. Jalankan Artisan optimize:clear
+    try {
+        \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+        $artisanOut = trim(\Illuminate\Support\Facades\Artisan::output());
+        $results[] = 'Artisan optimize:clear dijalankan ' . ($artisanOut ? '(' . $artisanOut . ')' : 'sukses.');
+    } catch (\Throwable $e) {
+        $results[] = 'Artisan optimize:clear: ' . $e->getMessage();
+    }
+
+    // 2. Bersihkan file cache bootstrap/cache secara manual
+    $cachedFiles = [
+        base_path('bootstrap/cache/config.php'),
+        base_path('bootstrap/cache/routes-v7.php'),
+        base_path('bootstrap/cache/services.php'),
+        base_path('bootstrap/cache/packages.php'),
+    ];
+    foreach ($cachedFiles as $file) {
+        if (file_exists($file)) {
+            @unlink($file);
+            $results[] = 'Menghapus berkas cache bootstrap: ' . basename($file);
+        }
+    }
+
+    // 3. Bersihkan file view yang terkompilasi di storage/framework/views
+    $viewPath = storage_path('framework/views');
+    $deletedViews = 0;
+    if (is_dir($viewPath)) {
+        foreach (glob($viewPath . '/*.php') as $viewFile) {
+            @unlink($viewFile);
+            $deletedViews++;
+        }
+        $results[] = "Membersihkan {$deletedViews} berkas view terkompilasi di storage/framework/views.";
+    }
+
+    $outputHtml = "<div style='font-family:system-ui,-apple-system,sans-serif;max-width:650px;margin:50px auto;padding:28px;background:#f8fafc;border-radius:16px;border:1px solid #e2e8f0;box-shadow:0 10px 25px -5px rgba(0,0,0,0.05);'>";
+    $outputHtml .= "<h2 style='color:#10b981;margin-top:0;display:flex;align-items:center;gap:8px;'>✔ Cache Laravel Berhasil Dibersihkan!</h2>";
+    $outputHtml .= "<p style='color:#64748b;font-size:14px;margin-bottom:16px;'>Seluruh cache rute, tampilan (views), konfigurasi, dan optimasi sistem telah diperbarui ke versi berkas terbaru.</p>";
+    $outputHtml .= "<ul style='color:#334155;font-size:13px;line-height:1.8;background:#ffffff;padding:16px 20px 16px 36px;border-radius:10px;border:1px solid #e2e8f0;'>";
+    foreach ($results as $item) {
+        $outputHtml .= "<li>" . htmlspecialchars($item) . "</li>";
+    }
+    $outputHtml .= "</ul>";
+    $outputHtml .= "<p style='margin-top:24px;'><a href='/teacher/dashboard' style='display:inline-block;padding:10px 20px;background:#3b82f6;color:white;text-decoration:none;border-radius:10px;font-weight:bold;font-size:13px;'>← Kembali ke Dashboard</a></p>";
+    $outputHtml .= "</div>";
+
+    return response($outputHtml);
+});
+
 // Diagnostic & Development Tools (Hanya Aktif di Mode Debug)
 if (config('app.debug')) {
     Route::get('/dev-reset-rezky', function (Request $request) {
