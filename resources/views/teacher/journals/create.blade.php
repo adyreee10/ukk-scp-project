@@ -151,8 +151,21 @@
 
                                     <div>
                                         <span class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Bukti Foto Real-Time KBM:</span>
-                                        @if($existingJournalToday->photo_url)
-                                            <img src="{{ $existingJournalToday->photo_url }}" alt="Bukti KBM" class="w-full max-h-48 object-cover rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-md">
+                                        @php
+                                            $photoSrc = $existingJournalToday->photo_path 
+                                                ? (str_starts_with($existingJournalToday->photo_path, 'http') ? $existingJournalToday->photo_path : url('media/' . ltrim($existingJournalToday->photo_path, '/')))
+                                                : $existingJournalToday->photo_url;
+                                        @endphp
+                                        @if($photoSrc)
+                                            <div class="relative group rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-md bg-slate-900">
+                                                <a href="{{ $photoSrc }}" target="_blank" rel="noopener noreferrer" title="Klik untuk memperbesar foto KBM">
+                                                    <img src="{{ $photoSrc }}" alt="Bukti KBM" class="w-full max-h-48 object-cover rounded-xl transition duration-200 group-hover:scale-105">
+                                                    <div class="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-bold gap-1.5 backdrop-blur-[1px]">
+                                                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                                        <span>Lihat Foto Penuh</span>
+                                                    </div>
+                                                </a>
+                                            </div>
                                         @else
                                             <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 text-center">
                                                 Tidak ada foto dokumentasi

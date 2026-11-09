@@ -212,9 +212,10 @@ Route::get('/media/{path}', function (string $path) {
     $fullPath = storage_path('app/public/' . $cleanPath);
 
     if (!file_exists($fullPath)) {
-        $altPath = storage_path('app/' . $cleanPath);
-        if (file_exists($altPath)) {
-            $fullPath = $altPath;
+        if (file_exists(storage_path('app/' . $cleanPath))) {
+            $fullPath = storage_path('app/' . $cleanPath);
+        } elseif (file_exists(public_path('storage/' . $cleanPath))) {
+            $fullPath = public_path('storage/' . $cleanPath);
         } else {
             abort(404, 'Berkas tidak ditemukan.');
         }
@@ -232,9 +233,10 @@ Route::get('/storage/{path}', function (string $path) {
     $fullPath = storage_path('app/public/' . $cleanPath);
 
     if (!file_exists($fullPath)) {
-        $altPath = storage_path('app/' . $cleanPath);
-        if (file_exists($altPath)) {
-            $fullPath = $altPath;
+        if (file_exists(storage_path('app/' . $cleanPath))) {
+            $fullPath = storage_path('app/' . $cleanPath);
+        } elseif (file_exists(public_path('storage/' . $cleanPath))) {
+            $fullPath = public_path('storage/' . $cleanPath);
         } else {
             abort(404, 'Berkas tidak ditemukan.');
         }

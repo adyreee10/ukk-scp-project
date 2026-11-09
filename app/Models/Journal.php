@@ -22,12 +22,17 @@ class Journal extends Model
     protected $appends = ['photo_url'];
     
 // Ini adalah Accessor (Pembentuk 'photo_url')
-    public function getPhotoUrlAttribute()
+    public function getPhotoUrlAttribute(): ?string
     {
-        if ($this->photo_path) {
-            return \Illuminate\Support\Facades\Storage::disk('public')->url($this->photo_path);
+        if (!$this->photo_path) {
+            return null;
         }
-        return null;
+
+        if (str_starts_with($this->photo_path, 'http://') || str_starts_with($this->photo_path, 'https://')) {
+            return $this->photo_path;
+        }
+
+        return url('media/' . ltrim($this->photo_path, '/'));
     }
 
     public function schedule(): BelongsTo
