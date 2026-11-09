@@ -468,6 +468,52 @@ class WakaController extends Controller
      */
         public function teachersIndex(Request $request)
     {
+        // Auto-standardisasi username guru: Pastikan semua akun guru menggunakan format simpel guru_(namaDepan)
+        // dan khusus Tatik Herawati menggunakan username guru_tatikhera (serta Tatik Wardayati menggunakan guru_tatik)
+        $legacyTeachers = User::whereHas('role', fn($q) => $q->whereIn('role_name', ['Guru', 'Wali Kelas', 'Guru BK']))
+            ->where(function ($q) {
+                $q->where('username', 'like', 'guru_19%')
+                  ->orWhere('username', 'like', 'guru_20%')
+                  ->orWhere('username', 'like', 'guru_34%')
+                  ->orWhere('username', 'like', 'guru_32%')
+                  ->orWhere('username', 'not like', 'guru_%')
+                  ->orWhere(function ($sub) {
+                      $sub->whereRaw('LOWER(name) LIKE ?', ['%tatik herawati%'])
+                          ->where('username', '!=', 'guru_tatikhera');
+                  });
+            })
+            ->get();
+
+        if ($legacyTeachers->isNotEmpty()) {
+            $docService = app(\App\Services\SchoolDocumentParserService::class);
+            $existingUsernames = User::whereNotNull('username')->pluck('username')->flip()->toArray();
+            $existingEmails = User::whereNotNull('email')->pluck('email')->flip()->toArray();
+
+            foreach ($legacyTeachers as $lt) {
+                unset($existingUsernames[$lt->username]);
+                if ($lt->email) {
+                    unset($existingEmails[$lt->email]);
+                }
+
+                $clean = trim(preg_replace('/^\d+[\.\)]\s*/', '', $lt->name), " \t\n\r\0\x0B\"'");
+                $newUser = $docService->generateSimpleUsername($clean, $existingUsernames, $lt->id);
+                $newEmail = "{$newUser}@guru.smk.sch.id";
+                $c = 1;
+                while (isset($existingEmails[$newEmail]) || User::where('email', $newEmail)->where('id', '!=', $lt->id)->exists()) {
+                    $newEmail = "{$newUser}{$c}@guru.smk.sch.id";
+                    $c++;
+                }
+
+                $existingUsernames[$newUser] = true;
+                $existingEmails[$newEmail] = true;
+
+                $lt->update([
+                    'username' => $newUser,
+                    'email'    => $newEmail,
+                ]);
+            }
+        }
+
         $baseQuery = User::whereHas('role', fn($q) => $q->whereIn('role_name', ['Guru', 'Wali Kelas', 'Guru BK']));
 
         // Hitung jumlah guru untuk setiap kategori peran
@@ -564,19 +610,7 @@ class WakaController extends Controller
 
         if (empty($validated['username'])) {
             $docService = app(\App\Services\SchoolDocumentParserService::class);
-            $norm = $docService->stripAcademicTitles($validated['name']);
-            $words = preg_split('/\s+/', trim($norm));
-            $firstWord = preg_replace('/[^a-z0-9]/', '', strtolower($words[0] ?? ''));
-            $baseUser = !empty($firstWord) ? "guru_{$firstWord}" : 'guru_user';
-            $baseUser = substr($baseUser, 0, 30);
-
-            $uniqueUser = $baseUser;
-            $counter = 1;
-            while (User::where('username', $uniqueUser)->exists()) {
-                $uniqueUser = "{$baseUser}{$counter}";
-                $counter++;
-            }
-            $validated['username'] = $uniqueUser;
+            $validated['username'] = $docService->generateSimpleUsername($validated['name']);
         }
 
         if (empty($validated['email'])) {

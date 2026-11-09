@@ -529,6 +529,32 @@ class SchoolDocumentParserService
             );
         }
 
+        // Pastikan Guru Jency Valter Lumempow (Guru Pendidikan Agama Kristen di Jadwal Mengajar FET yang tidak masuk nominatif PNS)
+        // otomatis dibuatkan akun agar seluruh jadwal mengajarnya dapat diproses secara sempurna
+        $jencyFound = $this->findTeacherByNameFlexible('JENCY VALTER LUMEMPOW', $allTeachers);
+        if (!$jencyFound) {
+            $this->saveTeacher(
+                name: 'JENCY VALTER LUMEMPOW, S.Th',
+                nip: null,
+                roleId: $guruRole->id,
+                homeroomClassName: null,
+                created: $created,
+                updated: $updated,
+                createdClasses: $createdClasses,
+                createdMajors: $createdMajors,
+                waliRole: $waliRole,
+                phone: null,
+                address: null,
+                skipped: $skipped,
+                duplicateAction: $duplicateAction,
+                allTeachers: $allTeachers,
+                existingUsernames: $existingUsernames,
+                existingEmails: $existingEmails,
+                allClasses: $allClasses,
+                allMajors: $allMajors
+            );
+        }
+
         return [
             'created'         => $created,
             'updated'         => $updated,
@@ -698,28 +724,28 @@ class SchoolDocumentParserService
                 'homeroom_class_id' => $homeroomClassId ?? $teacher->homeroom_class_id,
             ];
 
-            // Jika sebelumnya akun belum memiliki username berformat guru_{namaDepan}, perbarui ke format simpel
-            if (empty($teacher->username) || !str_starts_with($teacher->username, 'guru_') || preg_match('/^guru_\d{6,}/', $teacher->username)) {
-                $norm = $this->stripAcademicTitles($cleanName);
-                $words = preg_split('/\s+/', trim($norm));
-                $firstWord = preg_replace('/[^a-z0-9]/', '', strtolower($words[0] ?? ''));
-                $baseUser = !empty($firstWord) ? "guru_{$firstWord}" : 'guru_user';
-                $baseUser = substr($baseUser, 0, 30);
+            // Standardisasi format username ke guru_(namaDepan) atau khusus guru_tatikhera
+            $isTatikHera = stripos($cleanName, 'tatik herawati') !== false;
+            $isTatikWarda = stripos($cleanName, 'tatik warda') !== false || stripos($cleanName, 'tatik wardayati') !== false;
 
-                $uniqueUser = $baseUser;
-                $counter = 1;
-                while (
-                    isset($existingUsernames[$uniqueUser]) ||
-                    User::where('username', $uniqueUser)->where('id', '!=', $teacher->id)->exists()
-                ) {
-                    $uniqueUser = "{$baseUser}{$counter}";
-                    $counter++;
-                }
+            $needsUsernameUpdate = empty($teacher->username)
+                || !str_starts_with($teacher->username, 'guru_')
+                || preg_match('/^guru_\d{6,}/', $teacher->username)
+                || ($isTatikHera && $teacher->username !== 'guru_tatikhera')
+                || ($isTatikWarda && $teacher->username === 'guru_tatikhera');
 
+            if ($needsUsernameUpdate) {
+                $uniqueUser = $this->generateSimpleUsername($cleanName, $existingUsernames, $teacher->id);
                 $updateData['username'] = $uniqueUser;
-                $updateData['email'] = "{$uniqueUser}@guru.smk.sch.id";
-                $existingUsernames[$uniqueUser] = true;
-                $existingEmails["{$uniqueUser}@guru.smk.sch.id"] = true;
+
+                $email = "{$uniqueUser}@guru.smk.sch.id";
+                $c = 1;
+                while (isset($existingEmails[$email]) || User::where('email', $email)->where('id', '!=', $teacher->id)->exists()) {
+                    $email = "{$uniqueUser}{$c}@guru.smk.sch.id";
+                    $c++;
+                }
+                $updateData['email'] = $email;
+                $existingEmails[$email] = true;
             }
 
             $teacher->update($updateData);
@@ -762,20 +788,7 @@ class SchoolDocumentParserService
     ): User {
         $cleanName = trim(preg_replace('/^\d+[\.\)]\s*/', '', $name), " \t\n\r\0\x0B\"'");
 
-        // Format username simpel: guru_(namaDepan)
-        $norm = $this->stripAcademicTitles($cleanName);
-        $words = preg_split('/\s+/', trim($norm));
-        $firstWord = preg_replace('/[^a-z0-9]/', '', strtolower($words[0] ?? ''));
-        $baseUser = !empty($firstWord) ? "guru_{$firstWord}" : 'guru_user';
-        $baseUser = substr($baseUser, 0, 30);
-
-        $uniqueUser = $baseUser;
-        $counter = 1;
-        while (isset($existingUsernames[$uniqueUser]) || User::where('username', $uniqueUser)->exists()) {
-            $uniqueUser = "{$baseUser}{$counter}";
-            $counter++;
-        }
-        $existingUsernames[$uniqueUser] = true;
+        $uniqueUser = $this->generateSimpleUsername($cleanName, $existingUsernames);
 
         $email = "{$uniqueUser}@guru.smk.sch.id";
         $c = 1;
@@ -796,6 +809,43 @@ class SchoolDocumentParserService
             'role_id'           => $roleId,
             'homeroom_class_id' => $homeroomClassId,
         ]);
+    }
+
+    /**
+     * Menghasilkan Username Sederhana Berformat guru_(namaDepan)
+     * Khusus Tatik Herawati: guru_tatikhera
+     * Khusus Tatik Wardayati: guru_tatik
+     */
+    public function generateSimpleUsername(string $name, array &$existingUsernames = [], ?int $ignoreUserId = null): string
+    {
+        $cleanName = trim(preg_replace('/^\d+[\.\)]\s*/', '', $name), " \t\n\r\0\x0B\"'");
+
+        if (stripos($cleanName, 'tatik herawati') !== false) {
+            $baseUser = 'guru_tatikhera';
+        } elseif (stripos($cleanName, 'tatik warda') !== false || stripos($cleanName, 'tatik wardayati') !== false) {
+            $baseUser = 'guru_tatik';
+        } else {
+            $norm = $this->stripAcademicTitles($cleanName);
+            $words = preg_split('/\s+/', trim($norm));
+            $firstWord = preg_replace('/[^a-z0-9]/', '', strtolower($words[0] ?? ''));
+            $baseUser = !empty($firstWord) ? "guru_{$firstWord}" : 'guru_user';
+        }
+        $baseUser = substr($baseUser, 0, 30);
+
+        $uniqueUser = $baseUser;
+        $counter = 1;
+        while (
+            isset($existingUsernames[$uniqueUser]) ||
+            User::where('username', $uniqueUser)
+                ->when($ignoreUserId, fn($q) => $q->where('id', '!=', $ignoreUserId))
+                ->exists()
+        ) {
+            $uniqueUser = "{$baseUser}{$counter}";
+            $counter++;
+        }
+        $existingUsernames[$uniqueUser] = true;
+
+        return $uniqueUser;
     }
 
     /**
@@ -860,9 +910,12 @@ class SchoolDocumentParserService
         // Hapus tanda kurung beserta isinya (contoh: (PPLG), (GTT))
         $n = preg_replace('/\([^\)]*\)/', '', $n);
 
+        // Hapus nomor urut di awal jika ada (misal: "1. ", "56. ")
+        $n = preg_replace('/^\d+[\.\)]\s*/', '', $n);
+
         // Hapus gelar depan umum (bisa berulang misal "H. Drs.")
-        for ($i = 0; $i < 3; $i++) {
-            $n = preg_replace('/^(drs|dra|dr|prof|ir|h|hj|kh|ust|ustadz|raden\s+rara|raden\s+roro|raden)\s*\.?\s+/i', '', $n);
+        for ($i = 0; $i < 4; $i++) {
+            $n = preg_replace('/^(drs|dra|dr|prof|ir|h|hj|kh|ust|ustadz|raden\s+rara|raden\s+roro|raden|r\.r\.|rr\.|tb\.|st\.)\s*\.?\s+/i', '', $n);
         }
 
         // Pisahkan bagian sebelum koma (kebanyakan gelar belakang setelah koma)
@@ -876,7 +929,7 @@ class SchoolDocumentParserService
             's\.?ag', 'm\.?ag', 's\.?sos', 'm\.?sos', 's\.?e', 'm\.?m',
             's\.?psi', 'm\.?psi', 's\.?sn', 'm\.?sn', 's\.?h', 'm\.?h',
             's\.?p', 'm\.?p', 's\.?s', 'm\.?hum', 'gr\.?', 'a\.?md', 'a\.?ma',
-            'ph\.?d', 'm\.?sc', 'b\.?sc'
+            'ph\.?d', 'm\.?sc', 'b\.?sc', 's\.?th'
         ];
 
         foreach ($backTitles as $bt) {

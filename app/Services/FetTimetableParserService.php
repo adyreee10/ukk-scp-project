@@ -79,6 +79,7 @@ class FetTimetableParserService
                     $allClasses = SchoolClass::all()->keyBy(fn($c) => strtoupper(trim($c->class_name)));
                     $allRooms = Room::all()->keyBy(fn($r) => strtoupper(trim($r->room_name)));
                     $allMajors = Major::all()->keyBy(fn($m) => strtoupper(trim($m->code)));
+                    $existingUsernames = User::whereNotNull('username')->pluck('username')->flip()->toArray();
 
                     // Pre-load data jadwal yang sudah ada pada siklus ini untuk pengecekan duplikasi
                     $existingSchedules = Schedule::where('cycle_type', $cycleType)
@@ -113,7 +114,7 @@ class FetTimetableParserService
                             $classId = $sc->id;
                         }
 
-                        // 2. Resolve Guru: HANYA MENCOCOKKAN DENGAN DATA GURU, TIDAK MEMBUAT AKUN BARU
+                        // 2. Resolve Guru: Mencocokkan dengan data guru, atau auto-create jika guru resmi terdaftar di jadwal FET (misal: Jency Valter Lumempow)
                         $tCode = $item['teacher_code'] ?? null;
                         $tName = trim($item['teacher_name'] ?? '');
                         $teacher = $this->findTeacherStrict(
@@ -121,6 +122,24 @@ class FetTimetableParserService
                             code: $tCode,
                             allTeachers: $allTeachers
                         );
+
+                        if (!$teacher && !empty($tName) && strlen($tName) >= 3 && !preg_match('/^(ruang|lab|kelas|total|senin|selasa|rabu|kamis|jumat|guru|mata|pelajaran)/i', $tName)) {
+                            $guruRole = Role::firstOrCreate(['role_name' => 'Guru']);
+                            $uniqueUser = $this->schoolDocService->generateSimpleUsername($tName, $existingUsernames);
+                            $teacher = User::create([
+                                'name'     => $tName,
+                                'username' => $uniqueUser,
+                                'nip'      => $tCode && strlen($tCode) >= 6 ? $tCode : null,
+                                'email'    => "{$uniqueUser}@guru.smk.sch.id",
+                                'password' => Hash::make('password123'),
+                                'role_id'  => $guruRole->id,
+                            ]);
+                            $teacher->setRelation('role', $guruRole);
+                            if ($allTeachers !== null) {
+                                $allTeachers->push($teacher);
+                            }
+                            $createdTeachers++;
+                        }
 
                         if (!$teacher) {
                             $skipped++;
