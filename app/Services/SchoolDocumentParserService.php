@@ -785,14 +785,6 @@ class SchoolDocumentParserService
             return null;
         }
 
-        // Resolusi alias penulisan nama yang salah ketik (typo) di dokumen resmi sekolah
-        $knownAliases = [
-            'tatik herawati' => 'tatik wardayati',
-        ];
-        if (isset($knownAliases[$normSearch])) {
-            $normSearch = $knownAliases[$normSearch];
-        }
-
         foreach ($allTeachers as $t) {
             $tNorm = $this->stripAcademicTitles($t->name);
             if ($tNorm === $normSearch) {
