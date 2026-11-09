@@ -1589,14 +1589,20 @@ class SchoolDocumentParserService
 
         $targetRooms = !empty($extractedNames) ? array_merge($extractedNames, $canonical55Rooms) : $canonical55Rooms;
 
-        \Illuminate\Support\Facades\DB::transaction(function () use ($targetRooms, $duplicateAction, &$created, &$existing) {
+        $fetService = app(\App\Services\FetTimetableParserService::class);
+        $uniqueTargets = [];
+        foreach ($targetRooms as $rRaw) {
+            $cleanName = $fetService->canonicalRoomName($rRaw);
+            $key = strtoupper(trim($cleanName));
+            if (!empty($key) && !isset($uniqueTargets[$key])) {
+                $uniqueTargets[$key] = $cleanName;
+            }
+        }
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($uniqueTargets, $duplicateAction, &$created, &$existing) {
             $existingRooms = Room::all()->keyBy(fn($r) => strtoupper(trim($r->room_name)));
-            $fetService = app(\App\Services\FetTimetableParserService::class);
 
-            foreach ($targetRooms as $rRaw) {
-                $cleanName = $fetService->canonicalRoomName($rRaw);
-                $key = strtoupper(trim($cleanName));
-
+            foreach ($uniqueTargets as $key => $cleanName) {
                 if (isset($existingRooms[$key])) {
                     $existing++;
                     // Jika aksi 'replace' dan format huruf berbeda, sinkronkan ke title case yang rapi
@@ -1617,6 +1623,7 @@ class SchoolDocumentParserService
         return [
             'created'  => $created,
             'existing' => $existing,
+            'total'    => count($uniqueTargets),
         ];
     }
 
@@ -1632,13 +1639,23 @@ class SchoolDocumentParserService
         $existingRooms = Room::all()->keyBy(fn($r) => strtoupper(trim($r->room_name)));
         $fetService = app(\App\Services\FetTimetableParserService::class);
 
+        // Kumpulkan daftar nama ruangan unik dari seluruh baris berkas (deduplikasi baris slot waktu)
+        $uniqueRooms = [];
         foreach ($rows as $row) {
-            $roomName = $this->getField($row, ['nama_ruang', 'ruang', 'nama', 'nama_ruangan', 'room_name', 'lab', 'laboratorium']);
+            $roomName = $this->getField($row, [
+                'nama_ruang', 'ruang', 'ruang_penggunaan', 'nama_ruangan', 'nama_ruangan___fasilitas',
+                'nama', 'room_name', 'lab', 'laboratorium', 'fasilitas'
+            ]);
             if (empty($roomName)) continue;
 
             $cleanName = $fetService->canonicalRoomName($roomName);
             $key = strtoupper(trim($cleanName));
+            if (!empty($key) && !isset($uniqueRooms[$key])) {
+                $uniqueRooms[$key] = $cleanName;
+            }
+        }
 
+        foreach ($uniqueRooms as $key => $cleanName) {
             if (isset($existingRooms[$key])) {
                 $existing++;
                 if ($duplicateAction === 'replace') {
@@ -1657,6 +1674,7 @@ class SchoolDocumentParserService
         return [
             'created'  => $created,
             'existing' => $existing,
+            'total'    => count($uniqueRooms),
         ];
     }
 

@@ -1528,6 +1528,7 @@ public function classesDestroy(SchoolClass $schoolClass)
 
         $totalCreated = 0;
         $totalExisting = 0;
+        $totalProcessed = 0;
         $processedFiles = 0;
         $errors = [];
 
@@ -1536,6 +1537,7 @@ public function classesDestroy(SchoolClass $schoolClass)
                 $res = $documentService->importRooms($file, $duplicateAction);
                 $totalCreated += $res['created'] ?? 0;
                 $totalExisting += $res['existing'] ?? 0;
+                $totalProcessed += $res['total'] ?? (($res['created'] ?? 0) + ($res['existing'] ?? 0));
                 $processedFiles++;
             } catch (\Throwable $e) {
                 $errors[] = $file->getClientOriginalName() . ': ' . $e->getMessage();
@@ -1546,7 +1548,11 @@ public function classesDestroy(SchoolClass $schoolClass)
             return redirect()->back()->with('error', 'Gagal memproses berkas data ruangan: ' . implode('; ', $errors));
         }
 
-        $msg = "Sukses! Berhasil memproses {$processedFiles} berkas data ruangan: {$totalCreated} ruangan baru ditambahkan ({$totalExisting} ruangan sudah ada).";
+        if ($totalCreated > 0) {
+            $msg = "Sukses! Berhasil memproses {$processedFiles} berkas: {$totalProcessed} ruangan berhasil diinput/disinkronkan ({$totalCreated} ruangan baru ditambahkan).";
+        } else {
+            $msg = "Sukses! Berhasil memproses {$processedFiles} berkas: {$totalProcessed} data ruangan berhasil disinkronkan.";
+        }
         if (!empty($errors)) {
             $msg .= " Catatan peringatan: " . implode('; ', $errors);
         }

@@ -286,6 +286,17 @@ class SpreadsheetImportService
             $allSheets = $this->filterTeacherSheets($allSheets);
         }
 
+        // Jika terdapat sheet komprehensif/gabungan ("Semua Jadwal" / "Semua Data"), utamakan sheet tersebut
+        // agar tidak menduplikasi baris dari sheet pecahan (misal sheet per Putaran)
+        if (count($allSheets) > 1) {
+            foreach ($allSheets as $sheetName => $sheetRows) {
+                $normName = strtolower(trim((string)$sheetName));
+                if (str_contains($normName, 'semua') || str_contains($normName, 'all') || str_contains($normName, 'gabung') || str_contains($normName, 'lengkap')) {
+                    return $sheetRows;
+                }
+            }
+        }
+
         // Gabungkan seluruh baris dari semua sheet terpilih
         $combined = [];
         foreach ($allSheets as $sheetRows) {

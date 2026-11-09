@@ -729,20 +729,20 @@ class FetTimetableParserService
         $createdRooms = 0;
 
         foreach ($rows as $row) {
-            $teacherInput = trim($row['nama_guru_atau_nip'] ?? $row['guru'] ?? $row['nama_guru'] ?? $row['nip'] ?? '');
+            $teacherInput = trim($row['nama_guru_atau_nip'] ?? $row['nama_guru___nip'] ?? $row['guru'] ?? $row['nama_guru'] ?? $row['nip'] ?? $row['teacher'] ?? '');
             if (empty($teacherInput)) continue;
 
-            $className = trim($row['kelas'] ?? $row['nama_kelas'] ?? '');
+            $className = trim($row['kelas'] ?? $row['nama_kelas'] ?? $row['class'] ?? '');
             if (empty($className)) continue;
 
-            $roomName = trim($row['ruang'] ?? $row['nama_ruang'] ?? $row['ruangan'] ?? 'Ruang Teori');
-            $subject  = trim($row['mapel'] ?? $row['mata_pelajaran'] ?? 'Mata Pelajaran Umum');
+            $roomName = trim($row['ruang'] ?? $row['ruang_aktual'] ?? $row['nama_ruang'] ?? $row['ruangan'] ?? $row['room'] ?? 'Ruang Teori');
+            $subject  = trim($row['mapel'] ?? $row['mata_pelajaran'] ?? $row['subject'] ?? 'Mata Pelajaran Umum');
 
-            $dayRaw   = ucfirst(strtolower(trim($row['hari'] ?? 'Senin')));
+            $dayRaw   = ucfirst(strtolower(trim($row['hari'] ?? $row['day'] ?? 'Senin')));
             $dayOfWeek = in_array($dayRaw, Schedule::DAYS) ? $dayRaw : 'Senin';
 
-            $startRaw = trim((string)($row['jam_mulai'] ?? '1'));
-            $endRaw   = trim((string)($row['jam_selesai'] ?? '2'));
+            $startRaw = trim((string)($row['jam_mulai'] ?? $row['jam_ke'] ?? $row['start'] ?? '1'));
+            $endRaw   = trim((string)($row['jam_selesai'] ?? $row['end'] ?? $startRaw));
             $startTime = str_contains($startRaw, ':') ? $startRaw : str_pad((int)$startRaw, 2, '0', STR_PAD_LEFT) . ':00';
             $endTime   = str_contains($endRaw, ':') ? $endRaw : str_pad((int)$endRaw, 2, '0', STR_PAD_LEFT) . ':00';
 
