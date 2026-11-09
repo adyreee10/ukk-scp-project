@@ -40,24 +40,24 @@
                     <table class="min-w-full divide-y divide-slate-800 text-sm">
                         <thead class="bg-slate-900/60 text-xs font-bold text-slate-400 uppercase tracking-wider">
                             <tr>
-                                <th class="p-3 text-left whitespace-nowrap">Nama Guru</th>
+                                <th class="p-3 text-left whitespace-nowrap" style="white-space: nowrap !important;">Nama Guru</th>
                                 <th class="p-3 text-left">Mata Pelajaran</th>
-                                <th class="p-3 text-left whitespace-nowrap">Kelas & Jam</th>
-                                <th class="p-3 text-center whitespace-nowrap w-52">Status</th>
+                                <th class="p-3 text-left whitespace-nowrap" style="white-space: nowrap !important;">Kelas & Jam</th>
+                                <th class="p-3 text-center whitespace-nowrap" style="white-space: nowrap !important; width: 1%; min-width: 220px;">Status</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-800/60">
                             @foreach ($lateTeachers as $late)
                                 <tr class="hover:bg-slate-800/30 transition">
-                                    <td class="p-3 font-bold text-white whitespace-nowrap">{{ $late->teacher?->name }}</td>
+                                    <td class="p-3 font-bold text-white whitespace-nowrap" style="white-space: nowrap !important;">{{ $late->teacher?->name }}</td>
                                     <td class="p-3 text-slate-300">{{ $late->subject }}</td>
-                                    <td class="p-3 text-xs text-slate-400 whitespace-nowrap">
+                                    <td class="p-3 text-xs text-slate-400 whitespace-nowrap" style="white-space: nowrap !important;">
                                         {{ $late->schoolClass?->class_name }} • {{ $late->period_label }}
                                     </td>
-                                    <td class="p-3 text-center whitespace-nowrap">
-                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap bg-red-950/70 border border-red-700/60 text-red-300 shadow-sm">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse shrink-0 inline-block"></span>
-                                            <span>Belum Mengisi (Terlambat)</span>
+                                    <td class="p-3 text-center whitespace-nowrap" style="white-space: nowrap !important; width: 1%; min-width: 220px;">
+                                        <span class="badge-late-status inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap bg-red-950/70 border border-red-700/60 text-red-300 shadow-sm" style="white-space: nowrap !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 6px !important;">
+                                            <span style="width: 6px; height: 6px; border-radius: 9999px; background-color: #ef4444; flex-shrink: 0; display: inline-block;"></span>
+                                            <span style="white-space: nowrap !important;">Belum Mengisi (Terlambat)</span>
                                         </span>
                                     </td>
                                 </tr>
