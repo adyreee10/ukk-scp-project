@@ -272,6 +272,7 @@ Route::middleware(['auth', 'role:Waka Kurikulum'])->group(function () {
     Route::post('/waka/rooms/import', [WakaController::class, 'roomsImport'])->name('waka.rooms.import');
     Route::post('/waka/rooms', [WakaController::class, 'roomsStore'])->name('waka.rooms.store');
     Route::delete('/waka/rooms/{room}', [WakaController::class, 'roomsDestroy'])->name('waka.rooms.destroy');
+    Route::post('/waka/rooms/delete-all', [WakaController::class, 'roomsDeleteAll'])->name('waka.rooms.delete-all');
 
     // Monitoring & Riwayat Jurnal Guru
     Route::get('/waka/journals', [WakaController::class, 'journalsIndex'])->name('waka.journals.index');

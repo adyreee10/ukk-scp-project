@@ -282,30 +282,38 @@ class TeacherController extends Controller
             $photoPath = $filename;
         }
 
-        DB::transaction(function () use ($schedule, $date, $validated, $photoPath, $attendanceService) {
-            $journal = Journal::create([
-                'schedule_id'       => $schedule->id,
-                'date'              => $date->toDateString(),
-                'topic_description' => $validated['topic_description'],
-                'photo_path'        => $photoPath,
-            ]);
+        $notes = $validated['attendance_notes'] ?? $request->input('attendance_notes', []);
 
-            $attendanceService->syncApprovedLeaves($journal);
+        try {
+            DB::transaction(function () use ($schedule, $date, $validated, $photoPath, $attendanceService, $notes, $request) {
+                $journal = Journal::create([
+                    'schedule_id'       => $schedule->id,
+                    'date'              => $date->toDateString(),
+                    'topic_description' => $validated['topic_description'],
+                    'photo_path'        => $photoPath,
+                ]);
 
-            if (!empty($validated['attendances'])) {
-                $rows = [];
-                $notes = $request->input('attendance_notes', []);
-                foreach ($validated['attendances'] as $studentId => $status) {
-                    $rows[] = [
-                        'student_id' => (int) $studentId,
-                        'status'     => $status,
-                        'note'       => !empty($notes[$studentId]) ? trim($notes[$studentId]) : null,
-                    ];
+                $attendanceService->syncApprovedLeaves($journal);
+
+                if (!empty($validated['attendances'])) {
+                    $rows = [];
+                    foreach ($validated['attendances'] as $studentId => $status) {
+                        $rows[] = [
+                            'student_id' => (int) $studentId,
+                            'status'     => $status,
+                            'note'       => !empty($notes[$studentId]) ? trim($notes[$studentId]) : null,
+                        ];
+                    }
+                    $attendanceService->saveBatch($journal, $rows);
                 }
-                $attendanceService->saveBatch($journal, $rows);
-            }
 
-        });
+            });
+        } catch (\Throwable $e) {
+            if ($photoPath && Storage::disk('public')->exists($photoPath)) {
+                Storage::disk('public')->delete($photoPath);
+            }
+            throw $e;
+        }
 
         return redirect()->route('teacher.dashboard')
             ->with('success', 'Jurnal pembelajaran dan presensi siswa berhasil disimpan ke sistem!');

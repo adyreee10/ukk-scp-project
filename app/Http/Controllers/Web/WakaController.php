@@ -1477,6 +1477,29 @@ public function classesDestroy(SchoolClass $schoolClass)
     }
 
     /**
+     * Hapus Seluruh Data Ruangan dari Sistem
+     */
+    public function roomsDeleteAll(Request $request)
+    {
+        $rooms = Room::all();
+        $count = $rooms->count();
+        if ($count === 0) {
+            return redirect()->back()->with('error', 'Tidak ada data ruangan yang dapat dihapus.');
+        }
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($rooms) {
+            // Bersihkan relasi penugasan jadwal yang memakai ruangan agar aman dari foreign key restriction
+            $roomIds = $rooms->pluck('id')->toArray();
+            \App\Models\Schedule::whereIn('room_id', $roomIds)->delete();
+
+            // Hapus seluruh ruangan
+            Room::whereIn('id', $roomIds)->delete();
+        });
+
+        return redirect()->route('waka.rooms.index')->with('success', "Sukses! Berhasil menghapus seluruh data ruangan ({$count} ruangan) beserta jadwal terkait.");
+    }
+
+    /**
      * Download Template Excel / CSV Data Ruangan
      */
     public function roomsTemplate(SpreadsheetImportService $spreadsheetService)

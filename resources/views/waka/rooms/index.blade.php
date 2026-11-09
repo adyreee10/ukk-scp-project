@@ -3,6 +3,7 @@
             addModalOpen: false, 
             viewModalOpen: false, 
             importModalOpen: false,
+            deleteAllModalOpen: false,
             selectedRoom: {
                 id: '',
                 room_name: '',
@@ -25,7 +26,12 @@
                 <h1 class="text-xl sm:text-2xl font-black text-white tracking-tight">Master Data Ruang</h1>
                 <p class="text-xs font-semibold text-slate-400 mt-0.5">Kelola data ruang teori, laboratorium komputer, dan pantau jadwal penggunaan ruangan</p>
             </div>
-            <div class="flex items-center gap-2 shrink-0">
+            <div class="flex items-center gap-2 shrink-0 flex-wrap">
+                <!-- Tombol Hapus Semua Ruangan (Merah Solid & Kontras) -->
+                <button @click="deleteAllModalOpen = true" type="button" class="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold text-xs sm:text-sm shadow-md shadow-red-950/30 cursor-pointer transition flex items-center gap-1.5 whitespace-nowrap">
+                    <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    <span class="text-white">Hapus Semua Ruangan</span>
+                </button>
                 <button @click="importModalOpen = true" type="button" class="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs sm:text-sm font-bold text-white shadow-md shadow-emerald-950/40 cursor-pointer transition flex items-center gap-1.5">
                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                     <span>Import Excel / Dokumen</span>
@@ -361,6 +367,40 @@
                                 class="px-5 py-2.5 rounded-xl font-bold text-white shadow-md shadow-emerald-950/40 transition flex items-center gap-1.5">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                             Mulai Import Ruangan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- MODAL KONFIRMASI: HAPUS SEMUA DATA RUANGAN -->
+        <div x-show="deleteAllModalOpen" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
+            <div @click="deleteAllModalOpen = false" class="fixed inset-0 bg-black/70 backdrop-blur-sm"></div>
+            <div class="relative w-full max-w-md bg-[#0f172a] p-6 shadow-2xl border border-rose-500/40 space-y-4 my-auto max-h-[90vh] overflow-y-auto" style="border-radius: 20px;">
+                <div class="flex items-center gap-3 border-b border-slate-800 pb-3">
+                    <div class="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-white">Hapus Semua Data Ruangan</h3>
+                        <p class="text-xs text-rose-400 font-semibold">Tindakan ini tidak dapat dibatalkan</p>
+                    </div>
+                </div>
+
+                <div class="p-3.5 rounded-xl bg-rose-950/40 border border-rose-800/60 text-xs text-rose-200 leading-relaxed space-y-2">
+                    <p>PERINGATAN: Tindakan ini akan menghapus <strong>seluruh data ruangan</strong> dari sistem, beserta seluruh keterkaitan penugasan jadwal yang menggunakan ruangan tersebut.</p>
+                    <p class="text-[11px] text-rose-300">Gunakan fitur ini jika Anda ingin mengosongkan dan mengatur ulang master ruangan dari awal.</p>
+                </div>
+
+                <form method="POST" action="{{ route('waka.rooms.delete-all') }}" class="space-y-4 text-xs">
+                    @csrf
+                    <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
+                        <button @click="deleteAllModalOpen = false" type="button" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:bg-slate-800 hover:text-white transition cursor-pointer">
+                            Batal
+                        </button>
+                        <button type="submit" class="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-xs font-bold text-white shadow-md shadow-rose-950/60 transition cursor-pointer flex items-center gap-1.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            <span>Ya, Hapus Semua Ruangan</span>
                         </button>
                     </div>
                 </form>
