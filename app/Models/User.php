@@ -75,7 +75,11 @@ class User extends Authenticatable
             return $this->homeroom_class_id ? [$this->homeroom_class_id] : [];
         }
         if ($roleName === 'Guru BK') {
-            return $this->counselorClasses()->pluck('classes.id')->toArray();
+            $classIds = $this->counselorClasses()->pluck('classes.id')->toArray();
+            if ($this->homeroom_class_id && !in_array($this->homeroom_class_id, $classIds)) {
+                $classIds[] = $this->homeroom_class_id;
+            }
+            return $classIds;
         }
         return [];
     }

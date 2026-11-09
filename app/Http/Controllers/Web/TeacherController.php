@@ -131,22 +131,23 @@ class TeacherController extends Controller
             ->pluck('schedule_id')
             ->toArray();
 
-        // 2. Pemilihan jadwal dilakukan 100% otomatis oleh sistem (guru tidak bisa memilih jadwal):
-        //    a. Cek apakah ada sesi KBM yang sedang berlangsung saat ini (sesuai jam pelajaran real-time)
-        $currentTime = now()->format('H:i:s');
-        $ongoingSchedule = $schedules->first(function ($s) use ($currentTime) {
-            return $currentTime >= $s->start_time && $currentTime <= $s->end_time;
-        });
-
-        //    b. Aturan pemilihan otomatis oleh sistem:
-        //       - Jika ada sesi KBM yang sedang berlangsung dan belum diisi -> otomatis pilih sesi tersebut
-        //       - Jika tidak, pilih sesi KBM hari ini yang paling awal yang belum diisi
-        //       - Jika semua sesi hari ini sudah diisi, pilih sesi terakhir yang diisi (untuk masa edit presensi 24 jam)
-        if ($ongoingSchedule && !in_array($ongoingSchedule->id, $filledScheduleIdsToday)) {
-            $selectedSchedule = $ongoingSchedule;
+        // 2. Pemilihan jadwal dilakukan 100% otomatis oleh sistem (atau berdasarkan request schedule_id jika valid):
+        if ($request->filled('schedule_id')) {
+            $selectedSchedule = $schedules->firstWhere('id', (int) $request->schedule_id)
+                ?? $allSchedules->firstWhere('id', (int) $request->schedule_id);
         } else {
-            $selectedSchedule = $schedules->first(fn($s) => !in_array($s->id, $filledScheduleIdsToday)) 
-                ?? $schedules->last();
+            // Cek apakah ada sesi KBM yang sedang berlangsung saat ini (sesuai jam pelajaran real-time)
+            $currentTime = now()->format('H:i:s');
+            $ongoingSchedule = $schedules->first(function ($s) use ($currentTime) {
+                return $currentTime >= $s->real_start_time && $currentTime <= $s->real_end_time;
+            });
+
+            if ($ongoingSchedule && !in_array($ongoingSchedule->id, $filledScheduleIdsToday)) {
+                $selectedSchedule = $ongoingSchedule;
+            } else {
+                $selectedSchedule = $schedules->first(fn($s) => !in_array($s->id, $filledScheduleIdsToday)) 
+                    ?? $schedules->last();
+            }
         }
 
         // Cek apakah jadwal ini sudah memiliki rekaman jurnal pada hari ini
@@ -160,9 +161,21 @@ class TeacherController extends Controller
                 ->first();
 
             if ($existingJournalToday) {
-                // Periksa apakah masih dalam toleransi 24 jam untuk pengeditan absensi siswa
-                $journalTime = $existingJournalToday->created_at ?? $existingJournalToday->date;
-                $isEditableWithin24Hours = $journalTime->diffInHours(now()) <= 24;
+                // Periksa apakah masih dalam toleransi hari KBM (bisa edit presensi hingga pukul 23:59 malam ini)
+                $isEditableWithin24Hours = Carbon::parse($existingJournalToday->date)->isToday();
+            } else {
+                // VALIDASI WAKTU MENGAJAR: Guru hanya bisa isi jurnal jika sudah memasuki jam mengajar
+                // Jika waktu saat ini belum mencapai jam mulai mengajar, sistem langsung menolak!
+                if ($selectedSchedule->day_of_week !== $todayName) {
+                    return redirect()->route('teacher.dashboard')
+                        ->with('error', "Belum jadwal mengajar! Sesi pembelajaran {$selectedSchedule->subject} berada di hari {$selectedSchedule->day_of_week}.");
+                }
+
+                if (!$selectedSchedule->isTeachingTimeStarted()) {
+                    $startTimeFormatted = substr($selectedSchedule->real_start_time, 0, 5);
+                    return redirect()->route('teacher.dashboard')
+                        ->with('error', "Belum waktunya mengisi jurnal! Sesi pembelajaran {$selectedSchedule->subject} baru dimulai pada pukul {$startTimeFormatted} WIB. Pengisian jurnal dan presensi hanya dapat dilakukan saat jam mengajar Anda telah dimulai.");
+                }
             }
         }
 
@@ -233,6 +246,24 @@ class TeacherController extends Controller
         }
 
         $schedule = Schedule::where('teacher_id', auth()->id())->findOrFail($validated['schedule_id']);
+        $todayName = IndonesianDay::from(now());
+
+        // Validasi 1: Hari mengajar harus sesuai hari ini
+        if ($schedule->day_of_week !== $todayName) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', "Gagal: Jadwal mengajar untuk mata pelajaran ini adalah hari {$schedule->day_of_week}. Anda hanya dapat mengisi jurnal pada hari jadwal berlangsung.");
+        }
+
+        // Validasi 2: Guru hanya bisa isi jurnal dan absensi jika sudah waktu ia mengajar
+        // Jika belum jam mengajar, sistem langsung menolak!
+        if (!$schedule->isTeachingTimeStarted()) {
+            $startTimeFormatted = substr($schedule->real_start_time, 0, 5);
+            return redirect()->back()
+                ->withInput()
+                ->with('error', "Gagal: Belum waktunya mengisi jurnal! Sesi pembelajaran baru dimulai pada pukul {$startTimeFormatted} WIB. Pengisian jurnal hanya dapat dilakukan saat jam mengajar telah dimulai.");
+        }
+
         $date = Carbon::parse($validated['date'])->startOfDay();
 
         if (Journal::where('schedule_id', $schedule->id)->whereDate('date', $date)->exists()) {
@@ -290,11 +321,10 @@ class TeacherController extends Controller
             abort(403, 'Anda tidak memiliki hak akses untuk mengedit jurnal ini.');
         }
 
-        // Cek batasan waktu 24 jam
-        $journalTime = $journal->created_at ?? $journal->date;
-        if ($journalTime->diffInHours(now()) > 24) {
+        // Cek batasan waktu: hanya bisa edit di hari KBM hingga pukul 23:59
+        if (!Carbon::parse($journal->date)->isToday()) {
             return redirect()->back()
-                ->with('error', 'Batas waktu 24 jam untuk mengedit presensi siswa pada jurnal ini telah berakhir. Data presensi telah terkunci permanen.');
+                ->with('error', 'Batas waktu pengeditan presensi siswa pada jurnal ini telah berakhir pada pukul 23:59 di hari KBM. Data presensi telah terkunci permanen.');
         }
 
         $validated = $request->validate([
@@ -405,8 +435,18 @@ class TeacherController extends Controller
                 7 => 'Minggu',
             ];
 
-            if ($startDate->lessThanOrEqualTo($scanEndDate)) {
-                $period = \Carbon\CarbonPeriod::create($startDate, $scanEndDate);
+            // Pengoperasian riwayat dimulai efektif per hari ini (2026-11-09)
+            // Seluruh tanggal sebelum hari ini tidak dicatat sebagai "Tidak Mengisi Jurnal" (Riwayat bersih)
+            $systemOperationStartDate = Carbon::parse('2026-11-09')->startOfDay();
+            $effectiveScanStart = $startDate->greaterThanOrEqualTo($systemOperationStartDate) ? $startDate : $systemOperationStartDate;
+            
+            // Hari ini masih berjalan aktif dan memiliki masa pengisian hingga pukul 23:59 malam ini,
+            // sehingga status "Tidak Mengisi Jurnal" hanya berlaku bagi hari KBM yang telah berakhir (kemarin ke belakang)
+            $yesterday = now()->subDay()->endOfDay();
+            $effectiveScanEnd = $scanEndDate->lessThan($yesterday) ? $scanEndDate : $yesterday;
+
+            if ($effectiveScanStart->lessThanOrEqualTo($effectiveScanEnd)) {
+                $period = \Carbon\CarbonPeriod::create($effectiveScanStart, $effectiveScanEnd);
                 foreach ($period as $date) {
                     $dayName = $daysMap[$date->dayOfWeekIso] ?? '';
                     if (in_array($dayName, ['Sabtu', 'Minggu'])) {
@@ -420,25 +460,21 @@ class TeacherController extends Controller
                             continue; // Sudah diisi
                         }
 
-                        // Cek apakah sudah melewati batas waktu 24 jam
-                        $sessionEnd = Carbon::parse($date->toDateString() . ' ' . $schedule->end_time);
-                        $isOver24Hours = now()->diffInHours($sessionEnd, false) < -24;
+                        $sessionEnd = Carbon::parse($date->toDateString() . ' ' . $schedule->real_end_time);
 
-                        if ($isOver24Hours) {
-                            $historyList->push((object)[
-                                'id'                => null,
-                                'date'              => $date->toDateString(),
-                                'schedule'          => $schedule,
-                                'is_filled'         => false,
-                                'status_label'      => 'Tidak Mengisi Jurnal',
-                                'status_color'      => 'rose',
-                                'topic_description' => 'Tidak mengisi jurnal pembelajaran (Melewati batas toleransi 24 jam)',
-                                'photo_path'        => null,
-                                'attendances'       => collect(),
-                                'created_at'        => $sessionEnd,
-                                'start_time'        => $schedule->start_time ?? '00:00:00',
-                            ]);
-                        }
+                        $historyList->push((object)[
+                            'id'                => null,
+                            'date'              => $date->toDateString(),
+                            'schedule'          => $schedule,
+                            'is_filled'         => false,
+                            'status_label'      => 'Tidak Mengisi Jurnal',
+                            'status_color'      => 'rose',
+                            'topic_description' => 'Tidak mengisi jurnal pembelajaran (Melewati batas toleransi 23:59)',
+                            'photo_path'        => null,
+                            'attendances'       => collect(),
+                            'created_at'        => $sessionEnd,
+                            'start_time'        => $schedule->real_start_time ?? '00:00:00',
+                        ]);
                     }
                 }
             }

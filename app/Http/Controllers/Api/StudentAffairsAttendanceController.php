@@ -17,9 +17,21 @@ class StudentAffairsAttendanceController extends Controller
         ]);
 
         $user = $request->user();
-        $classId = $user->hasRole('Wali Kelas') ? $user->homeroom_class_id : ($validated['class_id'] ?? null);
-
-        abort_if ($user->hasRole('Wali Kelas') && $classId === null, 403, 'Kelas perwalian belum ditetapkan.');
+        if ($user->hasRole('Wali Kelas')) {
+            $classId = $user->homeroom_class_id;
+            abort_if($classId === null, 403, 'Kelas perwalian belum ditetapkan.');
+        } elseif ($user->hasRole('Guru BK')) {
+            $handledClassIds = $user->getHandledClassIds();
+            $requestedClassId = $validated['class_id'] ?? null;
+            if ($requestedClassId && in_array($requestedClassId, $handledClassIds)) {
+                $classId = $requestedClassId;
+            } else {
+                $classId = $handledClassIds[0] ?? null;
+            }
+            abort_if($classId === null, 403, 'Kelas binaan belum ditetapkan.');
+        } else {
+            $classId = $validated['class_id'] ?? null;
+        }
 
         $base = Attendance::query()
         ->when($classId, fn ($query, $id) => $query->whereHas('student', fn ($student) => $student->where('class_id', $id)))

@@ -514,49 +514,38 @@ Route::middleware(['auth', 'role:Wali Kelas,Guru BK,Waka Kurikulum'])->group(fun
     Route::get('/student-affairs/attendance', function (Request $request) {
         $user = $request->user();
         $isWaka = ($user->role?->role_name === 'Waka Kurikulum');
-        $handledClassIds = $user->getHandledClassIds();
+        $isGuruBk = ($user->role?->role_name === 'Guru BK');
+        $isWaliKelas = ($user->role?->role_name === 'Wali Kelas');
 
-        $selectedGrade  = $request->query('grade');
-        $selectedMajor  = $request->query('major');
-        $selectedRombel = $request->query('rombel');
+        $selectedClassId = $request->query('class_id');
+        $selectedGrade   = $request->query('grade');
+        $selectedMajor   = $request->query('major');
+        $selectedRombel  = $request->query('rombel');
 
         $activeClass = null;
         $majors = \App\Models\Major::orderBy('name')->get();
 
-        if (!$isWaka) {
-            // Wali Kelas & Guru BK dibatasi HANYA ke kelas perwaliannya
+        if ($isWaliKelas) {
+            // Wali Kelas HANYA kelas perwaliannya (1 kelas)
+            $activeClassId = $user->homeroom_class_id;
+            $classes = \App\Models\SchoolClass::where('id', $activeClassId)->get();
+            $activeClass = $classes->first();
+            $targetClassIds = $activeClassId ? [$activeClassId] : [];
+            $selectedClassId = $activeClassId;
+        } elseif ($isGuruBk) {
+            // Guru BK HANYA kelas binaan/wali yang diwakilinya (9-10 kelas)
+            $handledClassIds = $user->getHandledClassIds();
             $classes = \App\Models\SchoolClass::whereIn('id', $handledClassIds)->orderBy('class_name')->get();
 
-            if ($user->role?->role_name === 'Wali Kelas') {
-                $activeClassId = $user->homeroom_class_id;
-                $activeClass = $classes->firstWhere('id', $activeClassId);
-                $targetClassIds = $activeClassId ? [$activeClassId] : [];
+            // Hanya menampilkan 1 kelas binaan pada satu waktu (rekap presensi semua siswa hanya untuk Waka)
+            if ($selectedClassId && $classes->contains('id', (int) $selectedClassId)) {
+                $activeClass = $classes->firstWhere('id', (int) $selectedClassId);
             } else {
-                // Guru BK memfilter dalam cakupan kelas yang diampunya
-                $classQuery = \App\Models\SchoolClass::whereIn('id', $handledClassIds);
-                if ($selectedGrade) {
-                    $classQuery->where('class_name', 'like', "{$selectedGrade} %");
-                }
-                if ($selectedMajor) {
-                    $classQuery->where(function ($q) use ($selectedMajor) {
-                        $q->where('class_name', 'like', "% {$selectedMajor} %")
-                          ->orWhere('class_name', 'like', "% {$selectedMajor}");
-                    });
-                }
-                if ($selectedRombel) {
-                    $classQuery->where('class_name', 'like', "% {$selectedRombel}");
-                }
-
-                $matchedClasses = $classQuery->get();
-                if ($matchedClasses->isNotEmpty()) {
-                    $targetClassIds = $matchedClasses->pluck('id')->toArray();
-                    $activeClass = ($matchedClasses->count() === 1) ? $matchedClasses->first() : null;
-                } else {
-                    $firstClass = $classes->first();
-                    $targetClassIds = $firstClass ? [$firstClass->id] : [];
-                    $activeClass = $firstClass;
-                }
+                $activeClass = $classes->first();
             }
+
+            $targetClassIds = $activeClass ? [$activeClass->id] : [];
+            $selectedClassId = $activeClass?->id;
         } else {
             // Waka Kurikulum memiliki akses menyeluruh ke seluruh kelas
             $classes = \App\Models\SchoolClass::orderBy('class_name')->get();
@@ -598,13 +587,22 @@ Route::middleware(['auth', 'role:Wali Kelas,Guru BK,Waka Kurikulum'])->group(fun
                 ->orderBy('name')
                 ->get();
 
-            $studentsAttendance = $students->map(function ($student) {
-                $attendances = Attendance::where('student_id', $student->id)->get();
-                $totalSessions = $attendances->count();
-                $hadir = $attendances->where('status', 'Hadir')->count();
-                $sakit = $attendances->where('status', 'Sakit')->count();
-                $izin = $attendances->where('status', 'Izin')->count();
-                $alpa = $attendances->where('status', 'Alpa')->count();
+            $studentIds = $students->pluck('id');
+
+            // 1 Query cepat untuk seluruh kehadiran siswa yang difilter (Tanpa N+1 loop)
+            $attendanceStats = \App\Models\Attendance::whereIn('student_id', $studentIds)
+                ->selectRaw('student_id, status, count(*) as total')
+                ->groupBy('student_id', 'status')
+                ->get()
+                ->groupBy('student_id');
+
+            $studentsAttendance = $students->map(function ($student) use ($attendanceStats) {
+                $stats = $attendanceStats->get($student->id, collect());
+                $hadir = $stats->firstWhere('status', 'Hadir')?->total ?? 0;
+                $sakit = $stats->firstWhere('status', 'Sakit')?->total ?? 0;
+                $izin  = $stats->firstWhere('status', 'Izin')?->total ?? 0;
+                $alpa  = $stats->firstWhere('status', 'Alpa')?->total ?? 0;
+                $totalSessions = $hadir + $sakit + $izin + $alpa;
                 $rate = $totalSessions > 0 ? round(($hadir / $totalSessions) * 100) : 100;
 
                 // Status Disiplin Siswa
@@ -632,7 +630,7 @@ Route::middleware(['auth', 'role:Wali Kelas,Guru BK,Waka Kurikulum'])->group(fun
             });
         }
 
-        return view('student-affairs.attendance', compact('classes', 'majors', 'activeClass', 'studentsAttendance', 'selectedGrade', 'selectedMajor', 'selectedRombel'));
+        return view('student-affairs.attendance', compact('classes', 'majors', 'activeClass', 'studentsAttendance', 'selectedGrade', 'selectedMajor', 'selectedRombel', 'selectedClassId'));
     })->name('student-affairs.attendance'); 
 });
 

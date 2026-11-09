@@ -108,17 +108,27 @@
                                 <td class="p-4 text-xs text-slate-300">
                                     {{ $schedule->room?->room_name ?? '-' }}
                                 </td>
-                                 <td class="p-4 text-center">
+                                <td class="p-4 text-center">
                                     @if(in_array($schedule->id, $filledScheduleIdsToday ?? []))
-                                        <!-- BADGE HIJAU: JIKA SUDAH DIISI HARI INI -->
-                                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-950/70 border border-emerald-700/60 text-emerald-300 text-xs font-bold shadow-sm whitespace-nowrap">
+                                        <!-- BADGE HIJAU: JIKA SUDAH DIISI HARI INI (Bisa Klik untuk Edit Presensi hingga 23:59) -->
+                                        <a href="{{ route('teacher.journals.create', ['schedule_id' => $schedule->id]) }}" 
+                                           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-950/70 border border-emerald-700/60 text-emerald-300 text-xs font-bold shadow-sm whitespace-nowrap hover:bg-emerald-900/60 transition"
+                                           title="Jurnal sudah diisi. Anda dapat mengedit presensi siswa hingga pukul 23:59 malam ini">
                                             <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
                                             </svg>
-                                            Sudah Diisi
-                                        </span>
+                                            <span>Sudah Diisi (Edit Presensi)</span>
+                                        </a>
+                                    @elseif(!$schedule->isTeachingTimeStarted())
+                                        <!-- BELUM WAKTUNYA MENGAJAR: SISTEM MENOLAK (TOMBOL TERKUNCI) -->
+                                        <button type="button" disabled 
+                                                class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700/60 text-slate-500 dark:text-slate-400 text-xs font-bold cursor-not-allowed shadow-none whitespace-nowrap"
+                                                title="Pengisian jurnal KBM baru dapat diakses saat jam mengajar dimulai pada pukul {{ substr($schedule->real_start_time, 0, 5) }} WIB">
+                                            <svg class="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                            <span>Dibuka Pukul {{ substr($schedule->real_start_time, 0, 5) }}</span>
+                                        </button>
                                     @else
-                                        <!-- TOMBOL ISI JURNAL: JIKA BELUM DIISI -->
+                                        <!-- SUDAH MASUK JAM MENGAJAR: TOMBOL AKTIF ISI JURNAL -->
                                         <a href="{{ route('teacher.journals.create', ['schedule_id' => $schedule->id]) }}" 
                                            class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl scp-btn-gradient text-xs font-bold shadow-md transition whitespace-nowrap"
                                            style="color: #ffffff !important;">

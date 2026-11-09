@@ -48,9 +48,32 @@
         <div class="bg-[#0f172a]/90 backdrop-blur-md p-5 border border-slate-800 shadow-xl print:hidden" style="border-radius: 15px;">
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
                 
-                                <!-- FILTER 3 KRITERIA: TINGKAT, JURUSAN, ROMBEL (WAKA & GURU BK) -->
+                                <!-- FILTER KELAS: WALI KELAS (1 KELAS), GURU BK (KELAS BINAAN), WAKA (3 KRITERIA) -->
                 <div class="flex flex-col sm:flex-row sm:items-center gap-3">
-                    @if(auth()->user()->role?->role_name !== 'Wali Kelas')
+                    @if(auth()->user()->role?->role_name === 'Wali Kelas')
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Kelas Perwalian:</span>
+                        <span class="px-4 py-2 rounded-xl bg-indigo-950/70 border border-indigo-700/60 text-indigo-300 font-bold text-xs">
+                            Kelas {{ $activeClass?->class_name ?? 'Belum Ditentukan' }}
+                        </span>
+                    @elseif(auth()->user()->role?->role_name === 'Guru BK')
+                        <form method="GET" action="{{ route('student-affairs.attendance') }}" class="flex flex-wrap items-center gap-2.5">
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Pilih Kelas Binaan:</span>
+                            <div class="flex items-center gap-1.5 bg-slate-900/80 p-1 rounded-xl border border-slate-700">
+                                <select name="class_id" onchange="this.form.submit()" 
+                                        class="bg-slate-950 border border-slate-700 text-white text-xs font-semibold rounded-lg px-3 py-1.5 focus:outline-none focus:border-indigo-500 cursor-pointer">
+                                    @foreach($classes as $c)
+                                        <option value="{{ $c->id }}" {{ ($selectedClassId ?? '') == $c->id ? 'selected' : '' }}>
+                                            Kelas {{ $c->class_name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <span class="text-[11px] font-bold text-indigo-400 bg-indigo-950/60 border border-indigo-700/50 px-2.5 py-1.5 rounded-xl">
+                                Total: {{ $classes->count() }} Kelas Diampu
+                            </span>
+                        </form>
+                    @else
+                        {{-- Waka Kurikulum (Filter 3 Kriteria) --}}
                         <form method="GET" action="{{ route('student-affairs.attendance') }}" class="flex flex-wrap items-center gap-2.5">
                             <!-- 1. Tingkat -->
                             <div class="flex items-center gap-1.5 bg-slate-900/80 p-1 rounded-xl border border-slate-700">
@@ -96,11 +119,6 @@
                                 <a href="{{ route('student-affairs.attendance') }}" class="px-2.5 py-1.5 rounded-lg bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20 text-xs font-bold" title="Reset Filter">✕</a>
                             @endif
                         </form>
-                    @else
-                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Kelas Perwalian:</span>
-                        <span class="px-4 py-2 rounded-xl bg-indigo-950/70 border border-indigo-700/60 text-indigo-300 font-bold text-xs">
-                            Kelas {{ $activeClass?->class_name ?? 'Belum Ditentukan' }}
-                        </span>
                     @endif
                 </div>
             </div>
@@ -111,7 +129,7 @@
             <!-- Kolom Pencarian -->
             <div class="p-4 sm:p-5 border-b border-slate-800/80 bg-slate-900/40 flex items-center justify-between gap-4 print:hidden">
                 <div class="text-xs font-bold text-slate-300">
-                    Daftar Siswa Kelas {{ $activeClass?->class_name ?? '-' }} ({{ $studentsAttendance->count() }} Siswa)
+                    Daftar Siswa Kelas {{ $activeClass?->class_name ?? 'Semua Kelas' }} ({{ $studentsAttendance->count() }} Siswa)
                 </div>
                 <div class="relative w-full sm:w-72">
                     <input type="text" x-model="searchStudent" 
@@ -140,7 +158,7 @@
                             <div class="flex items-start justify-between gap-2">
                                 <div>
                                     <h3 class="font-bold text-white text-sm">{{ $st->name }}</h3>
-                                    <p class="text-xs text-slate-400 font-mono">NIS: {{ $st->nis }}</p>
+                                    <p class="text-xs text-slate-400 font-mono">NIS: {{ $st->nis }} @if(!$activeClass) • Kelas {{ $st->class_name }} @endif</p>
                                 </div>
                                 @if($st->status === 'Kritis')
                                     <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-red-950/70 text-red-300 border border-red-800/70 animate-pulse">
@@ -215,7 +233,7 @@
 
                                     <td class="p-3.5 whitespace-nowrap print:whitespace-normal print:border print:border-gray-400 print:py-1.5 print:px-2 student-name-col">
                                         <div class="font-bold text-white print:text-black print:text-xs tracking-tight print:break-normal" style="word-break: keep-all; overflow-wrap: normal;">{{ $st->name }}</div>
-                                        <span class="text-xs font-mono text-slate-400 print:text-gray-700 print:text-[10px]">NIS: {{ $st->nis }}</span>
+                                        <span class="text-xs font-mono text-slate-400 print:text-gray-700 print:text-[10px]">NIS: {{ $st->nis }} @if(!$activeClass) • Kelas {{ $st->class_name }} @endif</span>
                                     </td>
 
                                     <td class="p-3.5 text-center font-bold text-emerald-400 font-mono print:border print:border-gray-400 print:text-black print:py-1.5 print:px-0.5 print:text-xs print:whitespace-nowrap">

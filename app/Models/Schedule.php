@@ -20,7 +20,23 @@ class Schedule extends Model
         'cycle_type',
     ];
 
-            public function getPeriodLabelAttribute(): string
+            /**
+     * Cache internal master jam pelajaran agar hemat query database
+     */
+    private static function getLessonHours()
+    {
+        static $lessonHoursCache = null;
+        if ($lessonHoursCache === null) {
+            try {
+                $lessonHoursCache = \App\Models\LessonHour::all();
+            } catch (\Throwable $e) {
+                $lessonHoursCache = collect();
+            }
+        }
+        return $lessonHoursCache;
+    }
+
+    public function getPeriodLabelAttribute(): string
     {
         $start = (int) substr($this->start_time, 0, 2);
         $end = (int) substr($this->end_time, 0, 2);
@@ -29,21 +45,15 @@ class Schedule extends Model
             return '-';
         }
 
-        // Cache data jam pelajaran di memori (cukup 1x query, bukan 200x)
         $timeRange = '';
-        static $lessonHoursCache = null;
-        if ($lessonHoursCache === null) {
-            $lessonHoursCache = \Illuminate\Support\Facades\Schema::hasTable('lesson_hours')
-                ? \App\Models\LessonHour::all()
-                : collect();
-        }
+        $lessonHours = self::getLessonHours();
 
-        if ($lessonHoursCache->isNotEmpty()) {
+        if ($lessonHours->isNotEmpty()) {
             $day = $this->day_of_week ?? 'Senin';
-            $startHour = $lessonHoursCache->first(fn($h) => $h->day_of_week === $day && (int)$h->session_number === $start)
-                ?? $lessonHoursCache->first(fn($h) => (int)$h->session_number === $start);
-            $endHour   = $lessonHoursCache->first(fn($h) => $h->day_of_week === $day && (int)$h->session_number === $end)
-                ?? $lessonHoursCache->first(fn($h) => (int)$h->session_number === $end);
+            $startHour = $lessonHours->first(fn($h) => $h->day_of_week === $day && (int)$h->session_number === $start)
+                ?? $lessonHours->first(fn($h) => (int)$h->session_number === $start);
+            $endHour   = $lessonHours->first(fn($h) => $h->day_of_week === $day && (int)$h->session_number === $end)
+                ?? $lessonHours->first(fn($h) => (int)$h->session_number === $end);
 
             if ($startHour && $endHour) {
                 $timeRange = " (" . substr($startHour->start_time, 0, 5) . " - " . substr($endHour->end_time, 0, 5) . ")";
@@ -57,6 +67,86 @@ class Schedule extends Model
         }
 
         return "Jam ke - {$start} s/d Jam ke - {$end}{$timeRange}";
+    }
+
+    /**
+     * Mengambil jam mulai resmi KBM (format H:i:s, misal 07:15:00 atau 14:00:00)
+     */
+    public function getRealStartTimeAttribute(): string
+    {
+        $start = (int) substr($this->start_time, 0, 2);
+        $lessonHours = self::getLessonHours();
+
+        if ($lessonHours->isNotEmpty()) {
+            $day = $this->day_of_week ?? 'Senin';
+            $startHour = $lessonHours->first(fn($h) => $h->day_of_week === $day && (int)$h->session_number === $start)
+                ?? $lessonHours->first(fn($h) => (int)$h->session_number === $start);
+
+            if ($startHour && $startHour->start_time) {
+                $val = trim($startHour->start_time);
+                return strlen($val) === 5 ? $val . ':00' : substr($val, 0, 8);
+            }
+        }
+
+        $defaults = [
+            1 => '07:15:00',
+            2 => '08:00:00',
+            3 => '08:45:00',
+            4 => '09:45:00',
+            5 => '10:30:00',
+            6 => '11:15:00',
+            7 => '12:30:00',
+            8 => '13:15:00',
+            9 => '14:00:00',
+            10 => '14:45:00',
+        ];
+
+        return $defaults[$start] ?? '07:15:00';
+    }
+
+    /**
+     * Mengambil jam selesai resmi KBM (format H:i:s, misal 12:00:00 atau 15:30:00)
+     */
+    public function getRealEndTimeAttribute(): string
+    {
+        $end = (int) substr($this->end_time, 0, 2);
+        $lessonHours = self::getLessonHours();
+
+        if ($lessonHours->isNotEmpty()) {
+            $day = $this->day_of_week ?? 'Senin';
+            $endHour = $lessonHours->first(fn($h) => $h->day_of_week === $day && (int)$h->session_number === $end)
+                ?? $lessonHours->first(fn($h) => (int)$h->session_number === $end);
+
+            if ($endHour && $endHour->end_time) {
+                $val = trim($endHour->end_time);
+                return strlen($val) === 5 ? $val . ':00' : substr($val, 0, 8);
+            }
+        }
+
+        $defaults = [
+            1 => '08:00:00',
+            2 => '08:45:00',
+            3 => '09:30:00',
+            4 => '10:30:00',
+            5 => '11:15:00',
+            6 => '12:00:00',
+            7 => '13:15:00',
+            8 => '14:00:00',
+            9 => '14:45:00',
+            10 => '15:30:00',
+        ];
+
+        return $defaults[$end] ?? '15:30:00';
+    }
+
+    /**
+     * Cek apakah jam mengajar sesi KBM ini sudah dimulai pada hari ini.
+     * Guru HANYA BISA mengisi jurnal jika waktu sekarang >= real_start_time.
+     */
+    public function isTeachingTimeStarted(): bool
+    {
+        $currentTime = now()->format('H:i:s');
+        return $currentTime >= $this->real_start_time;
     }
 
     public function scopeActiveCycle($query)
