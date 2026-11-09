@@ -1048,7 +1048,7 @@ class SchoolDocumentParserService
             $fileClassContext = strtoupper($fnMatches[1]) . ' ' . strtoupper($fnMatches[2]) . ($fnMatches[3] ? ' ' . $fnMatches[3] : '');
         }
 
-        $headerBlacklist = '/^(DAFTAR|NO|NOMOR|NIS|NISN|NAMA|L\/P|JENIS|KELAMIN|AGAMA|ALAMAT|SMK|PEMERINTAH|DINAS|PENDIDIKAN|SEKOLAH|HALAMAN|TOTAL|JUMLAH|WALI|KEPALA|TANDA|TANGAN|KETERANGAN|TEMPAT|TANGGAL|LAHIR|CATATAN|PRESENSI|URT)/i';
+        $headerBlacklist = '/^(?:DAFTAR|NO|NOMOR|NIS\b|NISN\b|NAMA\b|L\/P|JENIS|KELAMIN|AGAMA|ALAMAT|SMK|PEMERINTAH|DINAS|PENDIDIKAN|SEKOLAH|HALAMAN|TOTAL|JUMLAH|WALI\b|KEPALA|TANDA|TANGAN|KETERANGAN|TEMPAT|TANGGAL|LAHIR|CATATAN|PRESENSI|URT\b)/i';
 
         $existingStudentsByNis = User::whereNotNull('nis')->pluck('id', 'nis')->toArray();
         $existingStudentsByNameClass = [];
@@ -1324,24 +1324,24 @@ class SchoolDocumentParserService
             $classFromFileName = strtoupper($fnMatches[1]) . ' ' . strtoupper($fnMatches[2]) . ($fnMatches[3] ? ' ' . $fnMatches[3] : '');
         }
 
-        \Illuminate\Support\Facades\DB::transaction(function () use (
-            $allSheets, $duplicateAction, $studentRole, $parentRole,
-            &$created, &$updated, &$skipped, &$createdClasses, &$createdMajors, &$createdParents,
-            &$cache, $classFromFileName
-        ) {
-            foreach ($allSheets as $sheetName => $matrix) {
-                if (empty($matrix)) continue;
+        foreach ($allSheets as $sheetName => $matrix) {
+            if (empty($matrix)) continue;
 
-                $currentClass = null;
+            $currentClass = null;
 
-                // Jika nama sheet itu sendiri adalah nama rombel (misal: "X RPL 1", "XI TKJ 2")
-                if (preg_match('/^(X|XI|XII)\s+[A-Za-z0-9\s]+$/i', trim($sheetName))) {
-                    $currentClass = $this->normalizeClassName($sheetName);
-                }
+            // Jika nama sheet itu sendiri adalah nama rombel (misal: "X RPL 1", "XI TKJ 2")
+            if (preg_match('/^(?:XII|XI|X)\s+[A-Za-z0-9\s]+$/i', trim($sheetName))) {
+                $currentClass = $this->normalizeClassName($sheetName);
+            }
 
-                $headers = null;
-                $rowCount = count($matrix);
+            $headers = null;
+            $rowCount = count($matrix);
 
+            \Illuminate\Support\Facades\DB::transaction(function () use (
+                $matrix, $rowCount, $sheetName, $duplicateAction, $studentRole, $parentRole,
+                &$created, &$updated, &$skipped, &$createdClasses, &$createdMajors, &$createdParents,
+                &$cache, $classFromFileName, &$currentClass, &$headers
+            ) {
                 for ($rowIndex = 0; $rowIndex < $rowCount; $rowIndex++) {
                     $row = $matrix[$rowIndex];
                     if (empty($row)) continue;
@@ -1349,7 +1349,7 @@ class SchoolDocumentParserService
                     $rowText = implode(' ', array_filter($row));
 
                     // 1. Deteksi Baris Deklarasi Kelas (Contoh: "KELAS : X RPL 1" atau "ROMBEL : XI TKJ 1")
-                    if (preg_match('/(?:KELAS|ROMBEL|TINGKAT)\s*[:=]\s*([X|XI|XII]+[A-Za-z0-9\s\.\-]+)/i', $rowText, $cm)) {
+                    if (preg_match('/(?:KELAS|ROMBEL|TINGKAT)\s*[:=]?\s*((?:XII|XI|X)\b[A-Za-z0-9\s\.\-]+)/i', $rowText, $cm)) {
                         $detectedClass = trim($cm[1]);
                         $detectedClass = preg_replace('/\s*(SEMESTER|TAHUN|MATA|GURU|JUMLAH|WALI).*/i', '', $detectedClass);
                         $normDetected = $this->normalizeClassName($detectedClass);
@@ -1370,19 +1370,19 @@ class SchoolDocumentParserService
                     $nameVal = null;
 
                     // Format Roster 1: Col 0 = No urut, Col 1 = NIS, Col 2 = Nama Siswa
-                    if (preg_match('/^\d{1,3}$/', $col0) && preg_match('/^\d{4,10}$/', $col1) && preg_match('/[A-Za-z]{3,}/', $col2) && !preg_match('/^(NAMA|SISWA|NOMOR|NIS|URT)/i', $col2)) {
+                    if (preg_match('/^\d{1,3}$/', $col0) && preg_match('/^\d{4,10}$/', $col1) && preg_match('/[A-Za-z]{3,}/', $col2) && !preg_match('/^(NAMA|SISWA|NOMOR|NIS|URT)\b/i', $col2)) {
                         $isRoster = true;
                         $nisVal = $col1;
                         $nameVal = $col2;
                     }
                     // Format Roster 2: Col 0 = NIS, Col 1 = Nama Siswa
-                    elseif (preg_match('/^\d{4,10}$/', $col0) && preg_match('/[A-Za-z]{3,}/', $col1) && !preg_match('/^(NAMA|SISWA|NOMOR|NIS|URT)/i', $col1)) {
+                    elseif (preg_match('/^\d{4,10}$/', $col0) && preg_match('/[A-Za-z]{3,}/', $col1) && !preg_match('/^(NAMA|SISWA|NOMOR|NIS|URT)\b/i', $col1)) {
                         $isRoster = true;
                         $nisVal = $col0;
                         $nameVal = $col1;
                     }
                     // Format Roster 3: Col 0 = No urut, Col 1 = Nama Siswa, Col 2 = NIS
-                    elseif (preg_match('/^\d{1,3}$/', $col0) && preg_match('/[A-Za-z]{3,}/', $col1) && preg_match('/^\d{4,10}$/', $col2) && !preg_match('/^(NAMA|SISWA|NOMOR|NIS|URT)/i', $col1)) {
+                    elseif (preg_match('/^\d{1,3}$/', $col0) && preg_match('/[A-Za-z]{3,}/', $col1) && preg_match('/^\d{4,10}$/', $col2) && !preg_match('/^(NAMA|SISWA|NOMOR|NIS|URT)\b/i', $col1)) {
                         $isRoster = true;
                         $nisVal = $col2;
                         $nameVal = $col1;
@@ -1475,15 +1475,15 @@ class SchoolDocumentParserService
                         );
                     }
                 }
-            }
 
-            if (!empty($cache['batchNew'])) {
-                foreach (array_chunk($cache['batchNew'], 100) as $chunk) {
-                    User::insert($chunk);
+                if (!empty($cache['batchNew'])) {
+                    foreach (array_chunk($cache['batchNew'], 100) as $chunk) {
+                        User::insert($chunk);
+                    }
+                    $cache['batchNew'] = [];
                 }
-                $cache['batchNew'] = [];
-            }
-        });
+            });
+        }
 
         return [
             'created'         => $created,
@@ -1632,11 +1632,11 @@ class SchoolDocumentParserService
                     $uniqueParentUser = substr($baseParentUser, 0, 38) . "_{$pCounter}";
                     $pCounter++;
                 }
-                $parentPasswordPlain = $nis ? "p{$nis}" : "portu123";
+                $parentPassHash = $cache['passwordHash'] ?? Hash::make('password123');
                 $parentUser = User::create([
                     'name'           => 'Orang tua ' . $cleanName,
                     'username'       => $uniqueParentUser,
-                    'password'       => Hash::make($parentPasswordPlain),
+                    'password'       => $parentPassHash,
                     'role_id'        => $parentRole->id,
                     'phone'          => $cleanPhone,
                     'address'        => $address,
@@ -1689,8 +1689,7 @@ class SchoolDocumentParserService
                 }
             }
 
-            $parentPasswordPlain = $nis ? "p{$nis}" : "portu123";
-            $parentPassHash = Hash::make($parentPasswordPlain);
+            $parentPassHash = $cache['passwordHash'] ?? Hash::make('password123');
 
             $parentUser = User::create([
                 'name'           => 'Orang tua ' . $cleanName,
