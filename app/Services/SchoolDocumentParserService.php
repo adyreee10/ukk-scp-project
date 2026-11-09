@@ -270,8 +270,8 @@ class SchoolDocumentParserService
         $allTeachers = User::whereHas('role', fn($q) => $q->whereIn('role_name', ['Guru', 'Wali Kelas', 'Guru BK', 'Waka Kurikulum', 'Admin']))
             ->with('role')
             ->get();
-        $existingUsernames = User::whereNotNull('username')->pluck('username')->flip()->toArray();
-        $existingEmails = User::whereNotNull('email')->pluck('email')->flip()->toArray();
+        $existingUsernames = User::whereNotNull('username')->pluck('username')->map(fn($u) => strtolower(trim($u)))->flip()->toArray();
+        $existingEmails = User::whereNotNull('email')->pluck('email')->map(fn($e) => strtolower(trim($e)))->flip()->toArray();
         $allClasses = SchoolClass::all()->keyBy(fn($c) => strtoupper(trim($c->class_name)));
         $allMajors = Major::all()->keyBy(fn($m) => strtoupper(trim($m->code)));
 
@@ -335,6 +335,16 @@ class SchoolDocumentParserService
             if (!empty($waliClean) && !in_array(strtolower($waliClean), ['-', '--', 'none', 'null', '0', 'nama wali kelas'])) {
                 $waliTeacher = $this->findTeacherByNameFlexible($waliClean, $allTeachers);
 
+                if (!$waliTeacher) {
+                    $normWali = $this->stripAcademicTitles($waliClean);
+                    $wordsWali = preg_split('/\s+/', trim($normWali));
+                    $firstWali = preg_replace('/[^a-z0-9]/', '', strtolower($wordsWali[0] ?? ''));
+                    if (!empty($firstWali)) {
+                        $candUser = (stripos($waliClean, 'tatik herawati') !== false) ? 'guru_tatikhera' : "guru_{$firstWali}";
+                        $waliTeacher = $allTeachers->first(fn($t) => strtolower(trim((string)$t->username)) === $candUser);
+                    }
+                }
+
                 if ($waliTeacher) {
                     if ($duplicateAction === 'keep' && $waliTeacher->homeroom_class_id && $waliTeacher->homeroom_class_id !== $schoolClass->id) {
                         $skipped++;
@@ -379,6 +389,16 @@ class SchoolDocumentParserService
 
             if (!empty($bkClean) && !in_array(strtolower($bkClean), ['-', '--', 'none', 'null', '0', 'nama guru bk'])) {
                 $bkTeacher = $this->findTeacherByNameFlexible($bkClean, $allTeachers);
+
+                if (!$bkTeacher) {
+                    $normBk = $this->stripAcademicTitles($bkClean);
+                    $wordsBk = preg_split('/\s+/', trim($normBk));
+                    $firstBk = preg_replace('/[^a-z0-9]/', '', strtolower($wordsBk[0] ?? ''));
+                    if (!empty($firstBk)) {
+                        $candBkUser = "guru_{$firstBk}";
+                        $bkTeacher = $allTeachers->first(fn($t) => strtolower(trim((string)$t->username)) === $candBkUser);
+                    }
+                }
 
                 if ($bkTeacher) {
                     // Cegah pengubahan peran Kepala Sekolah / Waka menjadi Guru BK jika nama mereka muncul di footer dokumen
@@ -449,8 +469,8 @@ class SchoolDocumentParserService
         $allTeachers = User::whereHas('role', fn($q) => $q->whereIn('role_name', ['Guru', 'Wali Kelas', 'Guru BK', 'Waka Kurikulum', 'Admin']))
             ->with('role')
             ->get();
-        $existingUsernames = User::whereNotNull('username')->pluck('username')->flip()->toArray();
-        $existingEmails = User::whereNotNull('email')->pluck('email')->flip()->toArray();
+        $existingUsernames = User::whereNotNull('username')->pluck('username')->map(fn($u) => strtolower(trim($u)))->flip()->toArray();
+        $existingEmails = User::whereNotNull('email')->pluck('email')->map(fn($e) => strtolower(trim($e)))->flip()->toArray();
         $allClasses = SchoolClass::all()->keyBy(fn($c) => strtoupper(trim($c->class_name)));
         $allMajors = Major::all()->keyBy(fn($m) => strtoupper(trim($m->code)));
 
@@ -701,6 +721,22 @@ class SchoolDocumentParserService
             $teacher = $this->findTeacherByNameFlexible($cleanName, null);
         }
 
+        // Coba cari berdasarkan username kandidat jika akun guru sudah terdaftar di sistem
+        if (!$teacher) {
+            $norm = $this->stripAcademicTitles($cleanName);
+            $words = preg_split('/\s+/', trim($norm));
+            $firstWord = preg_replace('/[^a-z0-9]/', '', strtolower($words[0] ?? ''));
+            if (!empty($firstWord)) {
+                $candUser = (stripos($cleanName, 'tatik herawati') !== false) ? 'guru_tatikhera' : "guru_{$firstWord}";
+                if ($allTeachers) {
+                    $teacher = $allTeachers->first(fn($t) => strtolower(trim((string)$t->username)) === $candUser);
+                }
+                if (!$teacher) {
+                    $teacher = User::whereRaw('LOWER(TRIM(username)) = ?', [$candUser])->first();
+                }
+            }
+        }
+
         if ($teacher) {
             if ($duplicateAction === 'keep') {
                 $skipped++;
@@ -730,9 +766,10 @@ class SchoolDocumentParserService
 
             $needsUsernameUpdate = empty($teacher->username)
                 || !str_starts_with($teacher->username, 'guru_')
-                || preg_match('/^guru_\d{6,}/', $teacher->username)
+                || preg_match('/^guru_\d+$/', $teacher->username)
+                || preg_match('/^guru_\d{4,}/', $teacher->username)
                 || ($isTatikHera && $teacher->username !== 'guru_tatikhera')
-                || ($isTatikWarda && $teacher->username === 'guru_tatikhera');
+                || ($isTatikWarda && $teacher->username !== 'guru_tatik');
 
             if ($needsUsernameUpdate) {
                 $uniqueUser = $this->generateSimpleUsername($cleanName, $existingUsernames, $teacher->id);
@@ -740,12 +777,15 @@ class SchoolDocumentParserService
 
                 $email = "{$uniqueUser}@guru.smk.sch.id";
                 $c = 1;
-                while (isset($existingEmails[$email]) || User::where('email', $email)->where('id', '!=', $teacher->id)->exists()) {
+                while (
+                    isset($existingEmails[strtolower(trim($email))]) ||
+                    (empty($existingEmails) && User::whereRaw('LOWER(TRIM(email)) = ?', [strtolower(trim($email))])->where('id', '!=', $teacher->id)->exists())
+                ) {
                     $email = "{$uniqueUser}{$c}@guru.smk.sch.id";
                     $c++;
                 }
                 $updateData['email'] = $email;
-                $existingEmails[$email] = true;
+                $existingEmails[strtolower(trim($email))] = true;
             }
 
             $teacher->update($updateData);
@@ -792,23 +832,64 @@ class SchoolDocumentParserService
 
         $email = "{$uniqueUser}@guru.smk.sch.id";
         $c = 1;
-        while (isset($existingEmails[$email]) || User::where('email', $email)->exists()) {
+        while (
+            isset($existingEmails[strtolower(trim($email))]) ||
+            (empty($existingEmails) && User::whereRaw('LOWER(TRIM(email)) = ?', [strtolower(trim($email))])->exists())
+        ) {
             $email = "{$uniqueUser}{$c}@guru.smk.sch.id";
             $c++;
         }
-        $existingEmails[$email] = true;
+        $existingEmails[strtolower(trim($email))] = true;
 
-        return User::create([
-            'name'              => $cleanName,
-            'username'          => $uniqueUser,
-            'nip'               => $nip,
-            'email'             => $email,
-            'phone'             => $phone,
-            'address'           => $address,
-            'password'          => Hash::make('password123'),
-            'role_id'           => $roleId,
-            'homeroom_class_id' => $homeroomClassId,
-        ]);
+        try {
+            return User::create([
+                'name'              => $cleanName,
+                'username'          => $uniqueUser,
+                'nip'               => $nip,
+                'email'             => $email,
+                'phone'             => $phone,
+                'address'           => $address,
+                'password'          => Hash::make('password123'),
+                'role_id'           => $roleId,
+                'homeroom_class_id' => $homeroomClassId,
+            ]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            $msg = $e->getMessage();
+            if (str_contains($msg, 'users.username') || str_contains($msg, 'users.email') || str_contains($msg, 'UNIQUE constraint')) {
+                // Periksa apakah user dengan username/email ini sudah ada di database
+                $existing = User::whereRaw('LOWER(TRIM(username)) = ?', [strtolower(trim($uniqueUser))])
+                    ->orWhereRaw('LOWER(TRIM(email)) = ?', [strtolower(trim($email))])
+                    ->first();
+                if ($existing) {
+                    $existing->update([
+                        'nip'               => $nip ?? $existing->nip,
+                        'phone'             => $phone ?? $existing->phone,
+                        'address'           => $address ?? $existing->address,
+                        'role_id'           => $roleId ?? $existing->role_id,
+                        'homeroom_class_id' => $homeroomClassId ?? $existing->homeroom_class_id,
+                    ]);
+                    return $existing;
+                }
+
+                // Jika terbentur unique constraint yang tidak terdeteksi, tambahkan suffix acak unik
+                $suffix = substr(md5(uniqid('', true)), 0, 4);
+                $uniqueUser = substr($uniqueUser, 0, 25) . '_' . $suffix;
+                $email = "{$uniqueUser}@guru.smk.sch.id";
+
+                return User::create([
+                    'name'              => $cleanName,
+                    'username'          => $uniqueUser,
+                    'nip'               => $nip,
+                    'email'             => $email,
+                    'phone'             => $phone,
+                    'address'           => $address,
+                    'password'          => Hash::make('password123'),
+                    'role_id'           => $roleId,
+                    'homeroom_class_id' => $homeroomClassId,
+                ]);
+            }
+            throw $e;
+        }
     }
 
     /**
@@ -835,15 +916,15 @@ class SchoolDocumentParserService
         $uniqueUser = $baseUser;
         $counter = 1;
         while (
-            isset($existingUsernames[$uniqueUser]) ||
-            User::where('username', $uniqueUser)
+            isset($existingUsernames[strtolower(trim($uniqueUser))]) ||
+            (empty($existingUsernames) && User::whereRaw('LOWER(TRIM(username)) = ?', [strtolower(trim($uniqueUser))])
                 ->when($ignoreUserId, fn($q) => $q->where('id', '!=', $ignoreUserId))
-                ->exists()
+                ->exists())
         ) {
             $uniqueUser = "{$baseUser}{$counter}";
             $counter++;
         }
-        $existingUsernames[$uniqueUser] = true;
+        $existingUsernames[strtolower(trim($uniqueUser))] = true;
 
         return $uniqueUser;
     }

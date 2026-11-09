@@ -472,22 +472,25 @@ class WakaController extends Controller
         // dan khusus Tatik Herawati menggunakan username guru_tatikhera (serta Tatik Wardayati menggunakan guru_tatik)
         $legacyTeachers = User::whereHas('role', fn($q) => $q->whereIn('role_name', ['Guru', 'Wali Kelas', 'Guru BK']))
             ->where(function ($q) {
-                $q->where('username', 'like', 'guru_19%')
-                  ->orWhere('username', 'like', 'guru_20%')
-                  ->orWhere('username', 'like', 'guru_34%')
-                  ->orWhere('username', 'like', 'guru_32%')
-                  ->orWhere('username', 'not like', 'guru_%')
-                  ->orWhere(function ($sub) {
-                      $sub->whereRaw('LOWER(name) LIKE ?', ['%tatik herawati%'])
-                          ->where('username', '!=', 'guru_tatikhera');
-                  });
+                $q->where('username', 'not like', 'guru_%');
+                for ($d = 0; $d <= 9; $d++) {
+                    $q->orWhere('username', 'like', "guru_{$d}%");
+                }
+                $q->orWhere(function ($sub) {
+                    $sub->whereRaw('LOWER(name) LIKE ?', ['%tatik herawati%'])
+                        ->where('username', '!=', 'guru_tatikhera');
+                })
+                ->orWhere(function ($sub) {
+                    $sub->whereRaw('LOWER(name) LIKE ?', ['%tatik warda%'])
+                        ->where('username', '!=', 'guru_tatik');
+                });
             })
             ->get();
 
         if ($legacyTeachers->isNotEmpty()) {
             $docService = app(\App\Services\SchoolDocumentParserService::class);
-            $existingUsernames = User::whereNotNull('username')->pluck('username')->flip()->toArray();
-            $existingEmails = User::whereNotNull('email')->pluck('email')->flip()->toArray();
+            $existingUsernames = User::whereNotNull('username')->pluck('username')->map(fn($u) => strtolower(trim($u)))->flip()->toArray();
+            $existingEmails = User::whereNotNull('email')->pluck('email')->map(fn($e) => strtolower(trim($e)))->flip()->toArray();
 
             foreach ($legacyTeachers as $lt) {
                 unset($existingUsernames[$lt->username]);
