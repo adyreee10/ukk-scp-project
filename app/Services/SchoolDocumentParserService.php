@@ -292,6 +292,17 @@ class SchoolDocumentParserService
                 continue;
             }
 
+            // Hentikan / Lewati baris catatan kaki, legenda, atau keterangan dokumen
+            $normClassCheck = strtolower(trim($rawClass));
+            if (str_contains($normClassCheck, 'keterangan') || str_contains($normClassCheck, 'catatan') || str_contains($normClassCheck, 'ditetapkan') || str_contains($normClassCheck, '=')) {
+                continue;
+            }
+
+            // Validasi kelas sekolah: Harus diawali dengan tingkat kelas X, XI, atau XII
+            if (!preg_match('/^(?:XII|XI|X)\b/i', trim($rawClass))) {
+                continue;
+            }
+
             // Normalisasi nama kelas (contoh: 'X RPL1' -> 'X RPL 1') & Auto-provision Jurusan & Kelas
             $normClass = $this->normalizeClassName($rawClass);
             $normClassUpper = strtoupper($normClass);
@@ -307,9 +318,19 @@ class SchoolDocumentParserService
                 $allClasses[$normClassUpper] = $schoolClass;
             }
 
+            $docNoise = ['ditetapkan', 'tanggal', 'kepala sekolah', 'ttd', 'keterangan', 'catatan', 'nama guru', 'nama wali'];
+
             // 1. PROSES WALI KELAS (1 Guru Mewakili 1 Kelas)
             $waliName = $this->getField($row, ['nama_wali_kelas', 'wali_kelas', 'nama_wali', 'wali', 'walikelas']);
             $waliClean = trim(preg_replace('/^\d+[\.\)]\s*/', '', $waliName), " \t\n\r\0\x0B\"'");
+
+            // Filter kata noise dari teks wali
+            foreach ($docNoise as $dn) {
+                if (str_contains(strtolower($waliClean), $dn)) {
+                    $waliClean = '';
+                    break;
+                }
+            }
 
             if (!empty($waliClean) && !in_array(strtolower($waliClean), ['-', '--', 'none', 'null', '0', 'nama wali kelas'])) {
                 $waliTeacher = $this->findTeacherByNameFlexible($waliClean, $allTeachers);
@@ -347,10 +368,23 @@ class SchoolDocumentParserService
             $bkName = $this->getField($row, ['nama_guru_bk', 'guru_bk', 'bk', 'nama_bk', 'bimbingan_konseling', 'guru_bimbingan_konseling']);
             $bkClean = trim(preg_replace('/^\d+[\.\)]\s*/', '', $bkName), " \t\n\r\0\x0B\"'");
 
+            // Filter kata noise dari teks BK (misal: "Ditetapkan di Bantul", "TTD", "Kepala Sekolah")
+            foreach ($docNoise as $dn) {
+                if (str_contains(strtolower($bkClean), $dn)) {
+                    $bkClean = '';
+                    break;
+                }
+            }
+
             if (!empty($bkClean) && !in_array(strtolower($bkClean), ['-', '--', 'none', 'null', '0', 'nama guru bk'])) {
                 $bkTeacher = $this->findTeacherByNameFlexible($bkClean, $allTeachers);
 
                 if ($bkTeacher) {
+                    // Cegah pengubahan peran Kepala Sekolah / Waka menjadi Guru BK jika nama mereka muncul di footer dokumen
+                    if ($bkTeacher->role?->role_name === 'Waka Kurikulum' || str_contains(strtolower($bkTeacher->name), 'raharjo')) {
+                        continue;
+                    }
+
                     // Update peran Guru BK dan pastikan homeroom_class_id null (karena BK adalah konselor banyak kelas)
                     $bkTeacher->update([
                         'role_id'           => $bkRole->id,
@@ -438,6 +472,12 @@ class SchoolDocumentParserService
                 continue;
             }
 
+            // Abaikan baris rekapitulasi/summary gender atau baris non-guru di akhir tabel (misal: "L", "P", "Total")
+            $cleanNameCheck = strtoupper(trim(preg_replace('/[^a-zA-Z]/', '', $name)));
+            if (in_array($cleanNameCheck, ['L', 'P', 'TOTAL', 'JUMLAH', 'LAKILAKI', 'PEREMPUAN', 'TANDATERIMA'])) {
+                continue;
+            }
+
             // 3. Ekstraksi NIP (Bersihkan spasi, tanda kutip, dan karakter non-angka)
             $rawNip = $this->getField($row, ['nip', 'nomor_induk_pegawai', 'no_induk', 'nip_guru']);
             $cleanNip = null;
@@ -505,22 +545,43 @@ class SchoolDocumentParserService
     {
         $jabatan = strtolower($this->getField($row, ['jabatan', 'posisi', 'tugas', 'role', 'peran', 'pekerjaan']));
         $mapel   = trim($this->getField($row, ['mapel', 'mata_pelajaran', 'mata_pelajaran_yang_diampu']));
+        $name    = trim($this->getField($row, ['nama_guru', 'nama_lengkap', 'nama', 'nama_pegawai', 'name', 'guru']));
 
-        // 1. Jika mapel terisi mata pelajaran nyata (bukan strip '-' atau kosong), orang ini terkonfirmasi Guru Mapel
-        $hasRealMapel = !empty($mapel) && !in_array(strtolower($mapel), ['-', '--', '0', 'null', 'none', 'tidak ada', 'tidak mengajar', 'kosong']);
+        // Abaikan baris summary / non-person
+        $cleanNameCheck = strtoupper(trim(preg_replace('/[^a-zA-Z]/', '', $name)));
+        if (in_array($cleanNameCheck, ['L', 'P', 'TOTAL', 'JUMLAH', 'LAKILAKI', 'PEREMPUAN', 'TANDATERIMA'])) {
+            return true;
+        }
 
-        // 2. Cek apakah jabatan mengandung kata guru, pendidik, bk, konselor, kepsek, waka, wali
-        $teacherKeywords = ['guru', 'pendidik', 'pengajar', 'bk', 'bimbingan', 'konseling', 'konselor', 'kepala sekolah', 'kepsek', 'wakil kepala', 'waka', 'wali kelas'];
-        $hasTeacherJabatan = false;
-        foreach ($teacherKeywords as $kw) {
+        // 1. Cek keyword eksplisit staf non-guru / TU / Satpam / Kebersihan
+        $nonTeachingKeywords = [
+            'tata usaha', 'staf tu', 'staff tu', 'administrasi', 'tendik', 'tenaga kependidikan',
+            'satpam', 'keamanan', 'penjaga', 'kebersihan', 'cleaning', 'pengemudi', 'sopir', 'driver'
+        ];
+        foreach ($nonTeachingKeywords as $kw) {
             if (str_contains($jabatan, $kw)) {
-                $hasTeacherJabatan = true;
-                break;
+                return true;
             }
         }
 
-        // Jika terkonfirmasi sebagai guru mapel atau jabatannya guru/pendidik/bk: BUKAN non-teaching staff (KEEEP GURU)
-        if ($hasRealMapel || $hasTeacherJabatan) {
+        // 2. Jika mapel terisi mata pelajaran nyata (bukan strip '-' atau kosong), orang ini terkonfirmasi Guru Mapel
+        $hasRealMapel = !empty($mapel) && !in_array(strtolower($mapel), ['-', '--', '0', 'null', 'none', 'tidak ada', 'tidak mengajar', 'kosong']);
+        if ($hasRealMapel) {
+            return false;
+        }
+
+        // 3. Cek apakah jabatan mengandung kata guru, pendidik, bk, konselor, kepsek, waka, wali
+        $teacherKeywords = ['guru', 'pendidik', 'pengajar', 'bk', 'bimbingan', 'konseling', 'konselor', 'kepala sekolah', 'kepsek', 'wakil kepala', 'waka', 'wali kelas'];
+        foreach ($teacherKeywords as $kw) {
+            if (str_contains($jabatan, $kw)) {
+                return false;
+            }
+        }
+
+        // 4. Jika sheet sudah disaring khusus guru, dan memiliki Nomor urut numeric atau NIP valid
+        $rawNo = $this->getField($row, ['no', 'nomor']);
+        $rawNip = $this->getField($row, ['nip', 'nomor_induk_pegawai', 'nip_guru']);
+        if (!empty($name) && (is_numeric($rawNo) || !empty($rawNip))) {
             return false;
         }
 
@@ -611,14 +672,25 @@ class SchoolDocumentParserService
                 $targetRoleId = $teacher->role_id;
             }
 
-            $teacher->update([
+            $updateData = [
                 'name'              => $cleanName,
                 'nip'               => $nip ?? $teacher->nip,
                 'phone'             => $cleanPhone ?? $teacher->phone,
                 'address'           => $address ?? $teacher->address,
                 'role_id'           => $targetRoleId,
                 'homeroom_class_id' => $homeroomClassId ?? $teacher->homeroom_class_id,
-            ]);
+            ];
+
+            // Jika sebelumnya akun dibuat tanpa NIP (misal dari matriks wali kelas), perbarui username & email dengan NIP resmi
+            if ($nip && empty($teacher->nip)) {
+                $nipUser = "guru_{$nip}";
+                if (!User::where('username', $nipUser)->where('id', '!=', $teacher->id)->exists()) {
+                    $updateData['username'] = $nipUser;
+                    $updateData['email'] = "{$nipUser}@guru.smk.sch.id";
+                }
+            }
+
+            $teacher->update($updateData);
             $updated++;
         } else {
             $newTeacher = $this->createNewTeacherAccount(
@@ -711,6 +783,14 @@ class SchoolDocumentParserService
         $normSearch = $this->stripAcademicTitles($clean);
         if (strlen($normSearch) < 3) {
             return null;
+        }
+
+        // Resolusi alias penulisan nama yang salah ketik (typo) di dokumen resmi sekolah
+        $knownAliases = [
+            'tatik herawati' => 'tatik wardayati',
+        ];
+        if (isset($knownAliases[$normSearch])) {
+            $normSearch = $knownAliases[$normSearch];
         }
 
         foreach ($allTeachers as $t) {

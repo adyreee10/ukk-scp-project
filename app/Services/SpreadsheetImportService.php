@@ -310,7 +310,7 @@ class SpreadsheetImportService
 
     /**
      * Menyaring lembar kerja (worksheet) khusus data guru
-     * Otomatis mengabaikan sheet Tata Usaha, TU, Tendik, Satpam, dll.
+     * Otomatis mengabaikan sheet Tata Usaha, TU, Tendik, Satpam, Outsourching, dll.
      */
     public function filterTeacherSheets(array $allSheets): array
     {
@@ -318,9 +318,20 @@ class SpreadsheetImportService
             return [];
         }
 
+        // Singkirkan sheet kosong terlebih dahulu
+        $nonEmptySheets = [];
+        foreach ($allSheets as $name => $rows) {
+            if (!empty($rows)) {
+                $nonEmptySheets[$name] = $rows;
+            }
+        }
+        if (empty($nonEmptySheets)) {
+            return [];
+        }
+
         // 1. Cek apakah ada sheet khusus bernama Guru / Dewan Guru / Data Guru / Pengajar
         $guruSheets = [];
-        foreach ($allSheets as $sheetName => $rows) {
+        foreach ($nonEmptySheets as $sheetName => $rows) {
             $norm = strtolower(trim((string)$sheetName));
             if (str_contains($norm, 'guru') || str_contains($norm, 'pendidik') || str_contains($norm, 'pengajar')) {
                 if (!str_contains($norm, 'non') && !str_contains($norm, 'bukan') && !str_contains($norm, 'tu')) {
@@ -329,21 +340,38 @@ class SpreadsheetImportService
             }
         }
 
-        // Jika sheet guru teridentifikasi, gunakan HANYA sheet tersebut!
+        // Jika sheet guru teridentifikasi dari nama sheet, gunakan HANYA sheet tersebut!
         if (!empty($guruSheets)) {
             return $guruSheets;
         }
 
-        // 2. Jika tidak ada sheet bernama 'guru' (contohnya Dokumen Wali Kelas atau sheet1),
-        // buang sheet yang secara eksplisit adalah Tata Usaha / Tendik / Non-Guru
+        // 1b. Jika nama sheet generic (misal Sheet1, Data), periksa header/konten baris 1-4
+        foreach ($nonEmptySheets as $sheetName => $rows) {
+            $headerText = '';
+            for ($r = 0; $r < min(5, count($rows)); $r++) {
+                $headerText .= ' ' . implode(' ', (array)$rows[$r]);
+            }
+            $normHeader = strtolower($headerText);
+            if ((str_contains($normHeader, 'nominatif guru') || str_contains($normHeader, 'data guru') || str_contains($normHeader, 'wali kelas')) 
+                && !str_contains($normHeader, 'tata usaha') && !str_contains($normHeader, 'satpam') && !str_contains($normHeader, 'outsourch')) {
+                $guruSheets[$sheetName] = $rows;
+            }
+        }
+
+        if (!empty($guruSheets)) {
+            return $guruSheets;
+        }
+
+        // 2. Jika tidak ada sheet bernama 'guru', buang sheet yang secara eksplisit adalah Tata Usaha / Tendik / Outsourching / Jarik
         $filtered = [];
         $excluded = [
             'tata usaha', 'tu', 'staf tu', 'staff tu', 'pegawai tu',
             'administrasi', 'tendik', 'tenaga kependidikan', 'non guru',
-            'karyawan', 'satpam', 'keamanan', 'kebersihan', 'penjaga'
+            'karyawan', 'satpam', 'keamanan', 'kebersihan', 'penjaga',
+            'outsourching', 'outsourcing', 'jarik', 'tanda terima'
         ];
 
-        foreach ($allSheets as $sheetName => $rows) {
+        foreach ($nonEmptySheets as $sheetName => $rows) {
             $norm = strtolower(trim((string)$sheetName));
             $isExcluded = false;
             foreach ($excluded as $kw) {
@@ -357,7 +385,7 @@ class SpreadsheetImportService
             }
         }
 
-        return !empty($filtered) ? $filtered : $allSheets;
+        return !empty($filtered) ? $filtered : $nonEmptySheets;
     }
 
     /**

@@ -770,6 +770,22 @@ class WakaController extends Controller
             return redirect()->back()->with('error', 'Silakan pilih setidaknya satu file dokumen data guru (PDF / Excel / CSV).');
         }
 
+        // Urutkan berkas agar Master Data Pegawai / Guru (yang berisi NIP & profil lengkap)
+        // diproses TERLEBIH DAHULU sebelum dokumen Matriks Penugasan Wali Kelas & Guru BK.
+        // Hal ini mencegah duplikasi akun atau pembuatan akun tanpa NIP.
+        usort($uploadedFiles, function ($a, $b) {
+            $nameA = strtolower($a->getClientOriginalName());
+            $nameB = strtolower($b->getClientOriginalName());
+
+            $isMatrixA = str_contains($nameA, 'wali') || str_contains($nameA, 'bk') || str_contains($nameA, 'matriks');
+            $isMatrixB = str_contains($nameB, 'wali') || str_contains($nameB, 'bk') || str_contains($nameB, 'matriks');
+
+            if ($isMatrixA === $isMatrixB) {
+                return 0;
+            }
+            return $isMatrixA ? 1 : -1;
+        });
+
         $duplicateAction = $request->input('duplicate_action', 'replace');
         if (!in_array($duplicateAction, ['replace', 'keep'])) {
             $duplicateAction = 'replace';
