@@ -335,16 +335,6 @@ class SchoolDocumentParserService
             if (!empty($waliClean) && !in_array(strtolower($waliClean), ['-', '--', 'none', 'null', '0', 'nama wali kelas'])) {
                 $waliTeacher = $this->findTeacherByNameFlexible($waliClean, $allTeachers);
 
-                if (!$waliTeacher) {
-                    $normWali = $this->stripAcademicTitles($waliClean);
-                    $wordsWali = preg_split('/\s+/', trim($normWali));
-                    $firstWali = preg_replace('/[^a-z0-9]/', '', strtolower($wordsWali[0] ?? ''));
-                    if (!empty($firstWali)) {
-                        $candUser = (stripos($waliClean, 'tatik herawati') !== false) ? 'guru_tatikhera' : "guru_{$firstWali}";
-                        $waliTeacher = $allTeachers->first(fn($t) => strtolower(trim((string)$t->username)) === $candUser);
-                    }
-                }
-
                 if ($waliTeacher) {
                     if ($duplicateAction === 'keep' && $waliTeacher->homeroom_class_id && $waliTeacher->homeroom_class_id !== $schoolClass->id) {
                         $skipped++;
@@ -389,16 +379,6 @@ class SchoolDocumentParserService
 
             if (!empty($bkClean) && !in_array(strtolower($bkClean), ['-', '--', 'none', 'null', '0', 'nama guru bk'])) {
                 $bkTeacher = $this->findTeacherByNameFlexible($bkClean, $allTeachers);
-
-                if (!$bkTeacher) {
-                    $normBk = $this->stripAcademicTitles($bkClean);
-                    $wordsBk = preg_split('/\s+/', trim($normBk));
-                    $firstBk = preg_replace('/[^a-z0-9]/', '', strtolower($wordsBk[0] ?? ''));
-                    if (!empty($firstBk)) {
-                        $candBkUser = "guru_{$firstBk}";
-                        $bkTeacher = $allTeachers->first(fn($t) => strtolower(trim((string)$t->username)) === $candBkUser);
-                    }
-                }
 
                 if ($bkTeacher) {
                     // Cegah pengubahan peran Kepala Sekolah / Waka menjadi Guru BK jika nama mereka muncul di footer dokumen
@@ -721,22 +701,6 @@ class SchoolDocumentParserService
             $teacher = $this->findTeacherByNameFlexible($cleanName, null);
         }
 
-        // Coba cari berdasarkan username kandidat jika akun guru sudah terdaftar di sistem
-        if (!$teacher) {
-            $norm = $this->stripAcademicTitles($cleanName);
-            $words = preg_split('/\s+/', trim($norm));
-            $firstWord = preg_replace('/[^a-z0-9]/', '', strtolower($words[0] ?? ''));
-            if (!empty($firstWord)) {
-                $candUser = (stripos($cleanName, 'tatik herawati') !== false) ? 'guru_tatikhera' : "guru_{$firstWord}";
-                if ($allTeachers) {
-                    $teacher = $allTeachers->first(fn($t) => strtolower(trim((string)$t->username)) === $candUser);
-                }
-                if (!$teacher) {
-                    $teacher = User::whereRaw('LOWER(TRIM(username)) = ?', [$candUser])->first();
-                }
-            }
-        }
-
         if ($teacher) {
             if ($duplicateAction === 'keep') {
                 $skipped++;
@@ -856,11 +820,11 @@ class SchoolDocumentParserService
         } catch (\Illuminate\Database\QueryException $e) {
             $msg = $e->getMessage();
             if (str_contains($msg, 'users.username') || str_contains($msg, 'users.email') || str_contains($msg, 'UNIQUE constraint')) {
-                // Periksa apakah user dengan username/email ini sudah ada di database
+                // Periksa apakah user dengan username/email ini memang orang yang SAMA persis (setelah gelar dibersihkan)
                 $existing = User::whereRaw('LOWER(TRIM(username)) = ?', [strtolower(trim($uniqueUser))])
                     ->orWhereRaw('LOWER(TRIM(email)) = ?', [strtolower(trim($email))])
                     ->first();
-                if ($existing) {
+                if ($existing && $this->stripAcademicTitles($existing->name) === $this->stripAcademicTitles($cleanName)) {
                     $existing->update([
                         'nip'               => $nip ?? $existing->nip,
                         'phone'             => $phone ?? $existing->phone,
@@ -871,16 +835,35 @@ class SchoolDocumentParserService
                     return $existing;
                 }
 
-                // Jika terbentur unique constraint yang tidak terdeteksi, tambahkan suffix acak unik
-                $suffix = substr(md5(uniqid('', true)), 0, 4);
-                $uniqueUser = substr($uniqueUser, 0, 25) . '_' . $suffix;
-                $email = "{$uniqueUser}@guru.smk.sch.id";
+                // Jika BUKAN orang yang sama (hanya kebetulan nama depan sama seperti Sri Sunarsih vs Sri Sunartini),
+                // JANGAN PERNAH menimpa data orang lain! Buatkan username unik baru dengan penomoran suffix:
+                $counter = 1;
+                $safeUser = "{$uniqueUser}{$counter}";
+                while (
+                    isset($existingUsernames[strtolower(trim($safeUser))]) ||
+                    User::whereRaw('LOWER(TRIM(username)) = ?', [strtolower(trim($safeUser))])->exists()
+                ) {
+                    $counter++;
+                    $safeUser = "{$uniqueUser}{$counter}";
+                }
+
+                $safeEmail = "{$safeUser}@guru.smk.sch.id";
+                while (
+                    isset($existingEmails[strtolower(trim($safeEmail))]) ||
+                    User::whereRaw('LOWER(TRIM(email)) = ?', [strtolower(trim($safeEmail))])->exists()
+                ) {
+                    $counter++;
+                    $safeEmail = "{$uniqueUser}{$counter}@guru.smk.sch.id";
+                }
+
+                $existingUsernames[strtolower(trim($safeUser))] = true;
+                $existingEmails[strtolower(trim($safeEmail))] = true;
 
                 return User::create([
                     'name'              => $cleanName,
-                    'username'          => $uniqueUser,
+                    'username'          => $safeUser,
                     'nip'               => $nip,
-                    'email'             => $email,
+                    'email'             => $safeEmail,
                     'phone'             => $phone,
                     'address'           => $address,
                     'password'          => Hash::make('password123'),
