@@ -747,6 +747,25 @@ class FetTimetableParserService
         $createdClasses = 0;
         $createdRooms = 0;
 
+        // IN-MEMORY CACHE UNTUK AKSELERASI & PERFORMA TINGGI
+        $allTeachers = User::whereHas('role', fn($q) => $q->whereIn('role_name', ['Guru', 'Wali Kelas', 'Guru BK', 'Waka Kurikulum', 'Admin']))
+            ->with('role')
+            ->get();
+        $allClasses = SchoolClass::all()->keyBy(fn($c) => strtoupper(trim($c->class_name)));
+        $allRooms = Room::all()->keyBy(fn($r) => strtoupper(trim($r->room_name)));
+        $allMajors = Major::all()->keyBy(fn($m) => strtoupper(trim($m->code)));
+
+        // Pre-load data jadwal yang sudah ada untuk pengecekan duplikasi yang cepat
+        $existingSchedules = Schedule::select('id', 'class_id', 'day_of_week', 'start_time', 'cycle_type')->get();
+        $existingScheduleMap = [];
+        foreach ($existingSchedules as $s) {
+            $key = "{$s->class_id}_{$s->day_of_week}_{$s->start_time}_{$s->cycle_type}";
+            $existingScheduleMap[$key] = $s->id;
+        }
+
+        $schedulesToInsert = [];
+        $now = now();
+
         foreach ($rows as $row) {
             $teacherInput = trim($row['nama_guru_atau_nip'] ?? $row['nama_guru___nip'] ?? $row['guru'] ?? $row['nama_guru'] ?? $row['nip'] ?? $row['teacher'] ?? '');
             if (empty($teacherInput)) continue;
@@ -766,48 +785,87 @@ class FetTimetableParserService
             $endTime   = str_contains($endRaw, ':') ? $endRaw : str_pad((int)$endRaw, 2, '0', STR_PAD_LEFT) . ':00';
 
             // Resolve Teacher (HANYA MENCOCOKKAN, TIDAK MEMBUAT BARU)
-            $teacher = $this->findTeacherStrict($teacherInput);
+            $teacher = $this->findTeacherStrict($teacherInput, null, $allTeachers);
             if (!$teacher) {
                 $skipped++;
                 continue;
             }
-            $schoolClass = $this->resolveClass($className, $createdClasses);
-            $room = $this->resolveRoom($roomName, $createdRooms);
+
+            // Resolve Class
+            $normClass = $this->normalizeClassName($className);
+            $normClassUpper = strtoupper($normClass);
+            if (isset($allClasses[$normClassUpper])) {
+                $classId = $allClasses[$normClassUpper]->id;
+            } else {
+                $this->schoolDocService->autoProvisionMajor($normClass, $createdClasses, $allMajors);
+                $sc = SchoolClass::firstOrCreate(['class_name' => $normClass]);
+                if ($sc->wasRecentlyCreated) {
+                    $createdClasses++;
+                }
+                $allClasses[$normClassUpper] = $sc;
+                $classId = $sc->id;
+            }
+
+            // Resolve Room
+            $mappedRoom = $this->canonicalRoomName($roomName);
+            $mappedRoomUpper = strtoupper($mappedRoom);
+            if (isset($allRooms[$mappedRoomUpper])) {
+                $roomId = $allRooms[$mappedRoomUpper]->id;
+            } else {
+                $r = Room::firstOrCreate(['room_name' => $mappedRoom]);
+                if ($r->wasRecentlyCreated) {
+                    $createdRooms++;
+                }
+                $allRooms[$mappedRoomUpper] = $r;
+                $roomId = $r->id;
+            }
 
             $putaranRaw = trim($row['putaran'] ?? $row['siklus'] ?? $cycleType);
-            $putaran = in_array($putaranRaw, ['Putaran 1', 'Putaran 2']) ? $putaranRaw : ($config->active_cycle ?? 'Putaran 1');
+            $putaran = in_array($putaranRaw, ['Putaran 1', 'Putaran 2']) ? $putaranRaw : ($config->active_cycle ?? $cycleType);
 
-            $existing = Schedule::where('class_id', $schoolClass->id)
-                ->where('day_of_week', $dayOfWeek)
-                ->where('start_time', $startTime)
-                ->where('cycle_type', $putaran)
-                ->first();
-
-            if ($existing) {
+            $slotKey = "{$classId}_{$dayOfWeek}_{$startTime}_{$putaran}";
+            if (isset($existingScheduleMap[$slotKey])) {
                 if ($duplicateAction === 'keep') {
                     $skipped++;
                     continue;
                 }
-                $existing->update([
-                    'teacher_id' => $teacher->id,
-                    'room_id'    => $room->id,
-                    'subject'    => $subject,
-                    'end_time'   => $endTime,
-                ]);
-            } else {
-                Schedule::create([
-                    'teacher_id'  => $teacher->id,
-                    'class_id'    => $schoolClass->id,
-                    'room_id'     => $room->id,
-                    'subject'     => $subject,
-                    'day_of_week' => $dayOfWeek,
-                    'start_time'  => $startTime,
-                    'end_time'    => $endTime,
-                    'cycle_type'  => $putaran,
-                ]);
             }
 
-            $imported++;
+            $schedulesToInsert[] = [
+                'teacher_id'  => $teacher->id,
+                'class_id'    => $classId,
+                'room_id'     => $roomId,
+                'subject'     => $subject,
+                'day_of_week' => $dayOfWeek,
+                'start_time'  => $startTime,
+                'end_time'    => $endTime,
+                'cycle_type'  => $putaran,
+                'created_at'  => $now,
+                'updated_at'  => $now,
+            ];
+            $existingScheduleMap[$slotKey] = true;
+        }
+
+        if (!empty($schedulesToInsert)) {
+            \Illuminate\Support\Facades\DB::transaction(function () use ($duplicateAction, $schedulesToInsert, &$imported) {
+                if ($duplicateAction === 'replace') {
+                    $targetCycles = array_unique(array_column($schedulesToInsert, 'cycle_type'));
+                    foreach ($targetCycles as $cType) {
+                        $cTargetClassIds = array_unique(array_filter(array_map(
+                            fn($row) => $row['cycle_type'] === $cType ? $row['class_id'] : null,
+                            $schedulesToInsert
+                        )));
+                        Schedule::where('cycle_type', $cType)
+                            ->whereIn('class_id', $cTargetClassIds)
+                            ->delete();
+                    }
+                }
+
+                foreach (array_chunk($schedulesToInsert, 200) as $chunk) {
+                    Schedule::insert($chunk);
+                    $imported += count($chunk);
+                }
+            });
         }
 
         $this->consolidateSportsRooms();

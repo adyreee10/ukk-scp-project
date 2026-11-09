@@ -20,8 +20,8 @@ nama_guru_atau_nip,kelas,ruang,mapel,hari,jam_mulai,jam_selesai,putaran
 "ERIDHA DEWI SEPITASARI, S.Pd",X AK 2,Ruang 29,Bahasa Inggris,Senin,9,10,Putaran 2
 "ERIDHA DEWI SEPITASARI, S.Pd",X AK 2,Ruang 29,Bahasa Inggris,Selasa,1,3,Putaran 2
 "SURATIMAH, S.Pd.I",X AK 2,Ruang 29,Pendidikan Agama dan Budi Pekerti,Selasa,4,6,Putaran 2
-Dra.EKO MEI WULAN,X AK 2,Ruang 29,Matematika,Selasa,7,8,Putaran 2
-"ANASTYA RATNA SULISTIYANI, S.Pd",X AK 2,Ruang 29,Sejarah,Selasa,9,10,Putaran 2
+Dra. EKO MEI WULAN,X AK 2,Ruang 29,Matematika,Selasa,7,8,Putaran 2
+"ANASTASIA RATNA SULISTIYANI, S.Pd",X AK 2,Ruang 29,Sejarah,Selasa,9,10,Putaran 2
 "TATIK WARDAYATI, S.Pd",X AK 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Rabu,1,3,Putaran 2
 "SURATIMAH, S.Pd.I",X AK 2,Ruang 29,Pendidikan Agama dan Budi Pekerti,Rabu,4,6,Putaran 2
 "TATIK HERAWATI, S.Pd",X AK 2,Ruang 29,Pendidikan Pancasila,Rabu,7,8,Putaran 2
@@ -29,9 +29,9 @@ Dra.EKO MEI WULAN,X AK 2,Ruang 29,Matematika,Selasa,7,8,Putaran 2
 "ERIDHA DEWI SEPITASARI, S.Pd",X AK 2,Ruang 29,Bahasa Inggris,Kamis,1,3,Putaran 2
 "RISA RESTI AFRIANI, S.Pd",X AK 2,Ruang 29,Bahasa Indonesia,Kamis,4,5,Putaran 2
 "RISTIYANTI, S.Pd",X AK 2,Ruang Seni Tari / Hall,Seni Budaya,Kamis,6,7,Putaran 2
-Dra.EKO MEI WULAN,X AK 2,Ruang 29,Matematika,Kamis,8,10,Putaran 2
-"ANASTYA RATNA SULISTIYANI, S.Pd",X AK 2,Ruang 29,Sejarah,Jumat,1,2,Putaran 2
-Dra.EKO MEI WULAN,X AK 2,Ruang 29,Matematika,Jumat,3,5,Putaran 2
+Dra. EKO MEI WULAN,X AK 2,Ruang 29,Matematika,Kamis,8,10,Putaran 2
+"ANASTASIA RATNA SULISTIYANI, S.Pd",X AK 2,Ruang 29,Sejarah,Jumat,1,2,Putaran 2
+Dra. EKO MEI WULAN,X AK 2,Ruang 29,Matematika,Jumat,3,5,Putaran 2
 "RISA RESTI AFRIANI, S.Pd",X AK 2,Ruang 29,Bahasa Indonesia,Jumat,6,8,Putaran 2
 "TANTRI AGUSTIANA, S.Pd",X AK 3,Laboratorium Komputer 10,Informatika,Senin,1,4,Putaran 2
 "ENENG FITRIANI PUSPITOWATI, S.Pd.Si",X AK 3,Ruang 30,Projek IPAS,Senin,5,7,Putaran 2
@@ -50,58 +50,58 @@ Dra.EKO MEI WULAN,X AK 2,Ruang 29,Matematika,Jumat,3,5,Putaran 2
 "RISA RESTI AFRIANI, S.Pd",X BD,Ruang 23,Bahasa Indonesia,Senin,1,3,Putaran 2
 "SRI NUR ARAFAH, S.Pd",X BD,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Senin,4,6,Putaran 2
 "TATIK HERAWATI, S.Pd",X BD,Ruang 20,Pendidikan Pancasila,Senin,7,8,Putaran 2
-"ANASTYA RATNA SULISTIYANI, S.Pd",X BD,Ruang 20,Sejarah,Senin,9,10,Putaran 2
+"ANASTASIA RATNA SULISTIYANI, S.Pd",X BD,Ruang 20,Sejarah,Senin,9,10,Putaran 2
 "SRI NUR ARAFAH, S.Pd",X BD,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Selasa,1,3,Putaran 2
-"ANASTYA RATNA SULISTIYANI, S.Pd",X BD,Laboratorium Komputer 22,Sejarah,Selasa,4,5,Putaran 2
+"ANASTASIA RATNA SULISTIYANI, S.Pd",X BD,Laboratorium Komputer 22,Sejarah,Selasa,4,5,Putaran 2
 "MENIK LESTARI, S.Pd",X BD,Laboratorium Komputer 22,Pendidikan Agama dan Budi Pekerti,Selasa,6,8,Putaran 2
 "RINI BHINTARTI, S.Pd",X BD,Laboratorium Komputer 22,Bahasa Inggris,Selasa,9,10,Putaran 2
 "RISTIYANTI, S.Pd",X BD,Ruang Seni Tari / Hall,Seni Budaya,Rabu,1,2,Putaran 2
 "RINI BHINTARTI, S.Pd",X BD,Ruang 14,Bahasa Inggris,Rabu,3,5,Putaran 2
-Dra.EKO MEI WULAN,X BD,Ruang 19,Matematika,Rabu,6,7,Putaran 2
+Dra. EKO MEI WULAN,X BD,Ruang 19,Matematika,Rabu,6,7,Putaran 2
 "RISA RESTI AFRIANI, S.Pd",X BD,Ruang 19,Bahasa Indonesia,Rabu,8,10,Putaran 2
 "RISTIYANTI, S.Pd",X BD,Ruang Seni Tari / Hall,Seni Budaya,Kamis,1,2,Putaran 2
 "TATIK HERAWATI, S.Pd",X BD,Ruang 19,Pendidikan Pancasila,Kamis,3,4,Putaran 2
-Dra.EKO MEI WULAN,X BD,Ruang 19,Matematika,Kamis,5,7,Putaran 2
+Dra. EKO MEI WULAN,X BD,Ruang 19,Matematika,Kamis,5,7,Putaran 2
 "MENIK LESTARI, S.Pd",X BD,Ruang 26,Pendidikan Agama dan Budi Pekerti,Kamis,8,10,Putaran 2
 "RISA RESTI AFRIANI, S.Pd",X BD,Ruang 31,Bahasa Indonesia,Jumat,1,2,Putaran 2
 "RINI BHINTARTI, S.Pd",X BD,Ruang 31,Bahasa Inggris,Jumat,3,5,Putaran 2
-Dra.EKO MEI WULAN,X BD,Ruang 31,Matematika,Jumat,6,8,Putaran 2
-"THERESIA INDRI WAHYUNI, S.P.d",X BR 1,Ruang 24,DDPK PM,Senin,1,4,Putaran 2
+Dra. EKO MEI WULAN,X BD,Ruang 31,Matematika,Jumat,6,8,Putaran 2
+"THERECIA INDRI WAHYUNI, S.Pd",X BR 1,Ruang 24,DDPK PM,Senin,1,4,Putaran 2
 "WAKHID BASHORI, S.Pd",X BR 1,Laboratorium Komputer 10,Informatika,Senin,5,8,Putaran 2
 "UMI KUNTARI, S.S",X BR 1,Ruang 13,Bahasa Jawa,Senin,9,10,Putaran 2
-"THERESIA INDRI WAHYUNI, S.P.d",X BR 1,Ruang 26,DDPK PM,Selasa,1,6,Putaran 2
+"THERECIA INDRI WAHYUNI, S.Pd",X BR 1,Ruang 26,DDPK PM,Selasa,1,6,Putaran 2
 "RADEN RARA BERNADETA SRI WIDYASTUTI, S.Pd",X BR 1,Ruang 26,Projek IPAS,Selasa,7,10,Putaran 2
-"AHMAD MUHLASIN, S.Pd",X BR 1,Laboratorium Komputer 6,DDK PM,Rabu,1,6,Putaran 2
+"AHMAD MUHLASHIN, S.Pd.",X BR 1,Laboratorium Komputer 6,DDK PM,Rabu,1,6,Putaran 2
 "UMI KUNTARI, S.S",X BR 1,Ruang 26,Bahasa Jawa,Rabu,7,8,Putaran 2
-"THERESIA INDRI WAHYUNI, S.P.d",X BR 1,Ruang 26,DDPK PM,Rabu,9,10,Putaran 2
+"THERECIA INDRI WAHYUNI, S.Pd",X BR 1,Ruang 26,DDPK PM,Rabu,9,10,Putaran 2
 "RADEN RARA BERNADETA SRI WIDYASTUTI, S.Pd",X BR 1,Ruang 32,Projek IPAS,Kamis,1,4,Putaran 2
-"AHMAD MUHLASIN, S.Pd",X BR 1,Ruang 32,DDK PM,Kamis,5,10,Putaran 2
+"AHMAD MUHLASHIN, S.Pd.",X BR 1,Ruang 32,DDK PM,Kamis,5,10,Putaran 2
 "ALIVI SAZKIA HAWIE, S.Pd",X BR 1,Ruang 13,Bimbingan dan Konseling,Jumat,1,1,Putaran 2
 "RADEN RARA BERNADETA SRI WIDYASTUTI, S.Pd",X BR 1,Ruang 13,Projek IPAS,Jumat,2,4,Putaran 2
 "WAKHID BASHORI, S.Pd",X BR 1,Laboratorium Komputer 10,Informatika,Jumat,5,8,Putaran 2
-"ANASTYA RATNA SULISTIYANI, S.Pd",X BR 2,Ruang 26,Sejarah,Senin,1,2,Putaran 2
+"ANASTASIA RATNA SULISTIYANI, S.Pd",X BR 2,Ruang 26,Sejarah,Senin,1,2,Putaran 2
 "AGATHA CHRISTIYANTI MANULLANG, S.S",X BR 2,Ruang 26,Bahasa Inggris,Senin,3,5,Putaran 2
-Dra.EKO MEI WULAN,X BR 2,Ruang 26,Matematika,Senin,6,8,Putaran 2
+Dra. EKO MEI WULAN,X BR 2,Ruang 26,Matematika,Senin,6,8,Putaran 2
 "RISA RESTI AFRIANI, S.Pd",X BR 2,Ruang 26,Bahasa Indonesia,Senin,9,10,Putaran 2
 "RISA RESTI AFRIANI, S.Pd",X BR 2,Ruang 7,Bahasa Indonesia,Selasa,1,3,Putaran 2
-Dra.EKO MEI WULAN,X BR 2,Ruang 7,Matematika,Selasa,4,6,Putaran 2
+Dra. EKO MEI WULAN,X BR 2,Ruang 7,Matematika,Selasa,4,6,Putaran 2
 "RISTIYANTI, S.Pd",X BR 2,Ruang Seni Tari / Hall,Seni Budaya,Selasa,7,8,Putaran 2
 "AGATHA CHRISTIYANTI MANULLANG, S.S",X BR 2,Ruang 18,Bahasa Inggris,Selasa,9,10,Putaran 2
 "SRI NUR ARAFAH, S.Pd",X BR 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Rabu,1,3,Putaran 2
-Dra.EKO MEI WULAN,X BR 2,Ruang 15,Matematika,Rabu,4,5,Putaran 2
+Dra. EKO MEI WULAN,X BR 2,Ruang 15,Matematika,Rabu,4,5,Putaran 2
 "RISTIYANTI, S.Pd",X BR 2,Ruang Seni Tari / Hall,Seni Budaya,Rabu,6,7,Putaran 2
 "MENIK LESTARI, S.Pd",X BR 2,Ruang 30,Pendidikan Agama dan Budi Pekerti,Rabu,8,10,Putaran 2
 "TATIK HERAWATI, S.Pd",X BR 2,Laboratorium Komputer 22,Pendidikan Pancasila,Kamis,1,2,Putaran 2
 "AGATHA CHRISTIYANTI MANULLANG, S.S",X BR 2,Laboratorium Komputer 22,Bahasa Inggris,Kamis,3,5,Putaran 2
 "RISA RESTI AFRIANI, S.Pd",X BR 2,Laboratorium Komputer 22,Bahasa Indonesia,Kamis,6,8,Putaran 2
-"ANASTYA RATNA SULISTIYANI, S.Pd",X BR 2,Laboratorium Komputer 22,Sejarah,Kamis,9,10,Putaran 2
+"ANASTASIA RATNA SULISTIYANI, S.Pd",X BR 2,Laboratorium Komputer 22,Sejarah,Kamis,9,10,Putaran 2
 "MENIK LESTARI, S.Pd",X BR 2,Ruang 32,Pendidikan Agama dan Budi Pekerti,Jumat,1,3,Putaran 2
 "SRI NUR ARAFAH, S.Pd",X BR 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Jumat,4,6,Putaran 2
 "TATIK HERAWATI, S.Pd",X BR 2,Ruang 32,Pendidikan Pancasila,Jumat,7,8,Putaran 2
 "YULI ASTUTI, S.Pd",X DKV 1,Laboratorium Komputer 20,DDPK 1 DKV Graphic Design Technology,Senin,1,5,Putaran 2
 "YULI ARBIATININGSIH, S.Pd",X DKV 1,Ruang 31,Projek IPAS,Senin,6,8,Putaran 2
 "AJENG FITRI SARASWATI, S.Pd",X DKV 1,Ruang 31,Bahasa Jawa,Senin,9,10,Putaran 2
-"TITISARI, S.Kom",X DKV 1,Laboratorium Komputer 9,DDPK 3 DKV Fotografi,Selasa,1,6,Putaran 2
+"TITI SARI, S.Kom.",X DKV 1,Laboratorium Komputer 9,DDPK 3 DKV Fotografi,Selasa,1,6,Putaran 2
 "YULI ARBIATININGSIH, S.Pd",X DKV 1,Ruang 32,Projek IPAS,Selasa,7,10,Putaran 2
 "DIANA ROHMANIAH, S.Kom",X DKV 1,Laboratorium Komputer 10,Informatika,Rabu,1,4,Putaran 2
 "NURHIDAYAT SULISTIAWAN, S.Pd",X DKV 1,Ruang 30,Bimbingan dan Konseling,Rabu,5,5,Putaran 2
@@ -113,7 +113,7 @@ Dra.EKO MEI WULAN,X BR 2,Ruang 15,Matematika,Rabu,4,5,Putaran 2
 "DIANA ROHMANIAH, S.Kom",X DKV 1,Laboratorium Komputer 10,Informatika,Jumat,1,4,Putaran 2
 "YULI ARBIATININGSIH, S.Pd",X DKV 1,Ruang 23,Projek IPAS,Jumat,5,8,Putaran 2
 "TATIK HERAWATI, S.Pd",X DKV 2,Ruang 15,Pendidikan Pancasila,Senin,1,2,Putaran 2
-"ANASTYA RATNA SULISTIYANI, S.Pd",X DKV 2,Ruang 15,Sejarah,Senin,3,4,Putaran 2
+"ANASTASIA RATNA SULISTIYANI, S.Pd",X DKV 2,Ruang 15,Sejarah,Senin,3,4,Putaran 2
 "RAHMAWATI YOGA PAMUNGKAS, M.Pd",X DKV 2,Ruang 15,Bahasa Indonesia,Senin,5,7,Putaran 2
 "EVA YUNI ASTUTI, S.Pd",X DKV 2,Ruang 15,Bahasa Inggris,Senin,8,10,Putaran 2
 "EVA YUNI ASTUTI, S.Pd",X DKV 2,Ruang 15,Bahasa Inggris,Selasa,1,3,Putaran 2
@@ -124,7 +124,7 @@ Dra.EKO MEI WULAN,X BR 2,Ruang 15,Matematika,Rabu,4,5,Putaran 2
 "SRI NUR ARAFAH, S.Pd",X DKV 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Rabu,4,6,Putaran 2
 "EVA YUNI ASTUTI, S.Pd",X DKV 2,Ruang 15,Bahasa Inggris,Rabu,7,8,Putaran 2
 "RAHMAWATI YOGA PAMUNGKAS, M.Pd",X DKV 2,Ruang 15,Bahasa Indonesia,Rabu,9,10,Putaran 2
-"ANASTYA RATNA SULISTIYANI, S.Pd",X DKV 2,Ruang 15,Sejarah,Kamis,1,2,Putaran 2
+"ANASTASIA RATNA SULISTIYANI, S.Pd",X DKV 2,Ruang 15,Sejarah,Kamis,1,2,Putaran 2
 "RISTIYANTI, S.Pd",X DKV 2,Ruang Seni Tari / Hall,Seni Budaya,Kamis,3,4,Putaran 2
 "RAHMAWATI YOGA PAMUNGKAS, M.Pd",X DKV 2,Ruang 15,Bahasa Indonesia,Kamis,5,7,Putaran 2
 "MUHAMMAD FURQON, S.Sos",X DKV 2,Ruang 15,Pendidikan Agama dan Budi Pekerti,Kamis,8,10,Putaran 2
@@ -136,24 +136,24 @@ Dra.EKO MEI WULAN,X BR 2,Ruang 15,Matematika,Rabu,4,5,Putaran 2
 "SULARDI, S.Pd",X LPS 1,Laboratorium Komputer 7,DDPK AKL,Senin,5,10,Putaran 2
 "UMI KUNTARI, S.S",X LPS 1,Ruang 32,Bahasa Jawa,Selasa,1,2,Putaran 2
 "TANTRI AGUSTIANA, S.Pd",X LPS 1,Laboratorium Komputer 7,Informatika,Selasa,3,6,Putaran 2
-"RADEN RARA UNINGSUCIASIH, S.Pd",X LPS 1,Ruang 3,DDPK AKL,Selasa,7,10,Putaran 2
+"RADEN RARA UNING SUCIASIH, S.Pd.",X LPS 1,Ruang 3,DDPK AKL,Selasa,7,10,Putaran 2
 "YULI ARBIATININGSIH, S.Pd",X LPS 1,Ruang 32,Projek IPAS,Rabu,1,4,Putaran 2
 "UMI KUNTARI, S.S",X LPS 1,Ruang 32,Bahasa Jawa,Rabu,5,6,Putaran 2
 "SULARDI, S.Pd",X LPS 1,Laboratorium Komputer 7,DDPK AKL,Rabu,7,10,Putaran 2
-"RADEN RARA UNINGSUCIASIH, S.Pd",X LPS 1,Ruang 31,DDPK AKL,Kamis,1,6,Putaran 2
+"RADEN RARA UNING SUCIASIH, S.Pd.",X LPS 1,Ruang 31,DDPK AKL,Kamis,1,6,Putaran 2
 "YULI ARBIATININGSIH, S.Pd",X LPS 1,Ruang 31,Projek IPAS,Kamis,7,10,Putaran 2
 "TANTRI AGUSTIANA, S.Pd",X LPS 1,Laboratorium Komputer 7,Informatika,Jumat,1,4,Putaran 2
-"RADEN RARA UNINGSUCIASIH, S.Pd",X LPS 1,Ruang 17,DDPK AKL,Jumat,5,8,Putaran 2
+"RADEN RARA UNING SUCIASIH, S.Pd.",X LPS 1,Ruang 17,DDPK AKL,Jumat,5,8,Putaran 2
 "SRI NUR ARAFAH, S.Pd",X LPS 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Senin,1,3,Putaran 2
 "DANUREJO, S.Pd",X LPS 2,Ruang 16,Matematika,Senin,4,6,Putaran 2
 "AGATHA CHRISTIYANTI MANULLANG, S.S",X LPS 2,Ruang 16,Bahasa Inggris,Senin,7,8,Putaran 2
 "RISTIYANTI, S.Pd",X LPS 2,Ruang Seni Tari / Hall,Seni Budaya,Senin,9,10,Putaran 2
 "DANUREJO, S.Pd",X LPS 2,Ruang 30,Matematika,Selasa,1,3,Putaran 2
 "RISTIYANTI, S.Pd",X LPS 2,Ruang Seni Tari / Hall,Seni Budaya,Selasa,4,5,Putaran 2
-"ANASTYA RATNA SULISTIYANI, S.Pd",X LPS 2,Ruang 30,Sejarah,Selasa,6,7,Putaran 2
+"ANASTASIA RATNA SULISTIYANI, S.Pd",X LPS 2,Ruang 30,Sejarah,Selasa,6,7,Putaran 2
 "MUHAMMAD FURQON, S.Sos",X LPS 2,Ruang 30,Pendidikan Agama dan Budi Pekerti,Selasa,8,10,Putaran 2
 "DANUREJO, S.Pd",X LPS 2,Ruang 31,Matematika,Rabu,1,2,Putaran 2
-"ANASTYA RATNA SULISTIYANI, S.Pd",X LPS 2,Ruang 31,Sejarah,Rabu,3,4,Putaran 2
+"ANASTASIA RATNA SULISTIYANI, S.Pd",X LPS 2,Ruang 31,Sejarah,Rabu,3,4,Putaran 2
 "RISA RESTI AFRIANI, S.Pd",X LPS 2,Ruang 31,Bahasa Indonesia,Rabu,5,7,Putaran 2
 "AGATHA CHRISTIYANTI MANULLANG, S.S",X LPS 2,Ruang 31,Bahasa Inggris,Rabu,8,10,Putaran 2
 "MUHAMMAD FURQON, S.Sos",X LPS 2,Ruang 17,Pendidikan Agama dan Budi Pekerti,Kamis,1,3,Putaran 2
@@ -185,26 +185,26 @@ Dra. SITI KHUSNUL KHOTIMAH,X MP 1,Ruang 7,DDPK MP,Kamis,1,4,Putaran 2
 "MURDIASIH KADARWATI, S.Pd",X MP 2,Ruang 9,Bahasa Indonesia,Selasa,4,6,Putaran 2
 "TATIK HERAWATI, S.Pd",X MP 2,Ruang 9,Pendidikan Pancasila,Selasa,7,8,Putaran 2
 "DIAN AWALIATI, S.Pd",X MP 2,Ruang 9,Bahasa Inggris,Selasa,9,10,Putaran 2
-"ANASTYA RATNA SULISTIYANI, S.Pd",X MP 2,Ruang 9,Sejarah,Rabu,1,2,Putaran 2
+"ANASTASIA RATNA SULISTIYANI, S.Pd",X MP 2,Ruang 9,Sejarah,Rabu,1,2,Putaran 2
 "RISTIYANTI, S.Pd",X MP 2,Ruang Seni Tari / Hall,Seni Budaya,Rabu,3,4,Putaran 2
 "TENTREM YUNIATI LESTARI, S.Pd",X MP 2,Ruang 9,Matematika,Rabu,5,7,Putaran 2
 "DIAN AWALIATI, S.Pd",X MP 2,Ruang 9,Bahasa Inggris,Rabu,8,10,Putaran 2
 "SRI NUR ARAFAH, S.Pd",X MP 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Kamis,1,3,Putaran 2
 "TENTREM YUNIATI LESTARI, S.Pd",X MP 2,Ruang 9,Matematika,Kamis,4,5,Putaran 2
-"ANASTYA RATNA SULISTIYANI, S.Pd",X MP 2,Ruang 9,Sejarah,Kamis,6,7,Putaran 2
+"ANASTASIA RATNA SULISTIYANI, S.Pd",X MP 2,Ruang 9,Sejarah,Kamis,6,7,Putaran 2
 "DIAN AWALIATI, S.Pd",X MP 2,Ruang 9,Bahasa Inggris,Kamis,8,10,Putaran 2
 "SRI NUR ARAFAH, S.Pd",X MP 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Jumat,1,3,Putaran 2
 "TATIK HERAWATI, S.Pd",X MP 2,Ruang 9,Pendidikan Pancasila,Jumat,4,5,Putaran 2
 "MURDIASIH KADARWATI, S.Pd",X MP 2,Ruang 9,Bahasa Indonesia,Jumat,6,8,Putaran 2
 "RUSDIYANTO, S.Pd",X RPL 1,Laboratorium Komputer 16,DDPK 1 RPL Dasar Profesi dan Budaya kerja,Senin,1,4,Putaran 2
-"YULITA EKA WINAJENG, S.Pd",X RPL 1,Ruang 22,Bahasa Jawa,Senin,5,6,Putaran 2
+"YULITA EKAWINAJENG, S.Pd.",X RPL 1,Ruang 22,Bahasa Jawa,Senin,5,6,Putaran 2
 "RENY MURNI HIDAYATI, S.Pd",X RPL 1,Laboratorium Komputer 16,DDPK 2 RPL Analisa Perancangan Sistem,Senin,7,10,Putaran 2
 "RYAWIDYANINGTYAS, S.Pd",X RPL 1,Ruang 10,Bimbingan dan Konseling,Selasa,1,1,Putaran 2
 "ENENG FITRIANI PUSPITOWATI, S.Pd.Si",X RPL 1,Ruang 10,Projek IPAS,Selasa,2,4,Putaran 2
 "HARIS BUDIAWAN, S.Pd",X RPL 1,Laboratorium Komputer 16,DDPK 4 RPL Dasar Web dan jaringan Komputer,Selasa,5,10,Putaran 2
 "ROSYIDA RAMADHANI, S.Pd",X RPL 1,Laboratorium Komputer 16,DDPK 3 RPL Dasar Algoritma Pemrograman,Rabu,1,6,Putaran 2
 "RENY MURNI HIDAYATI, S.Pd",X RPL 1,Laboratorium Komputer 16,DDPK 2 RPL Analisa Perancangan Sistem,Rabu,7,10,Putaran 2
-"YULITA EKA WINAJENG, S.Pd",X RPL 1,Ruang 12,Bahasa Jawa,Kamis,1,2,Putaran 2
+"YULITA EKAWINAJENG, S.Pd.",X RPL 1,Ruang 12,Bahasa Jawa,Kamis,1,2,Putaran 2
 "ENENG FITRIANI PUSPITOWATI, S.Pd.Si",X RPL 1,Ruang 12,Projek IPAS,Kamis,3,6,Putaran 2
 "ROHMAD DWIYANTO, S.Pd",X RPL 1,Laboratorium Komputer 14,Informatika,Kamis,7,10,Putaran 2
 "ROHMAD DWIYANTO, S.Pd",X RPL 1,Laboratorium Komputer 14,Informatika,Jumat,1,4,Putaran 2
@@ -219,34 +219,34 @@ Dra. SITI KHUSNUL KHOTIMAH,X MP 1,Ruang 7,DDPK MP,Kamis,1,4,Putaran 2
 "SURATIMAH, S.Pd.I",X RPL 2,Ruang 12,Pendidikan Agama dan Budi Pekerti,Selasa,8,10,Putaran 2
 "SURATIMAH, S.Pd.I",X RPL 2,Ruang 12,Pendidikan Agama dan Budi Pekerti,Rabu,1,3,Putaran 2
 "TATIK HERAWATI, S.Pd",X RPL 2,Ruang 12,Pendidikan Pancasila,Rabu,4,5,Putaran 2
-"ANASTYA RATNA SULISTIYANI, S.Pd",X RPL 2,Ruang 12,Sejarah,Rabu,6,7,Putaran 2
+"ANASTASIA RATNA SULISTIYANI, S.Pd",X RPL 2,Ruang 12,Sejarah,Rabu,6,7,Putaran 2
 "SUJAR HARTONO, S.Pd",X RPL 2,Ruang 12,Bahasa Inggris,Rabu,8,10,Putaran 2
 "RAHMAWATI YOGA PAMUNGKAS, M.Pd",X RPL 2,Ruang 11,Bahasa Indonesia,Kamis,1,3,Putaran 2
 "TATIK WARDAYATI, S.Pd",X RPL 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Kamis,4,6,Putaran 2
 "DWI LESMIYATI, S.Pd",X RPL 2,Ruang 12,Matematika,Kamis,7,8,Putaran 2
 "RISTIYANTI, S.Pd",X RPL 2,Ruang Seni Tari / Hall,Seni Budaya,Kamis,9,10,Putaran 2
 "TATIK WARDAYATI, S.Pd",X RPL 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Jumat,1,3,Putaran 2
-"ANASTYA RATNA SULISTIYANI, S.Pd",X RPL 2,Ruang 12,Sejarah,Jumat,4,5,Putaran 2
+"ANASTASIA RATNA SULISTIYANI, S.Pd",X RPL 2,Ruang 12,Sejarah,Jumat,4,5,Putaran 2
 "RAHMAWATI YOGA PAMUNGKAS, M.Pd",X RPL 2,Ruang 12,Bahasa Indonesia,Jumat,6,8,Putaran 2
 "NURHIDAYAT SULISTIAWAN, S.Pd",X TKJ 1,Laboratorium Komputer 11,Bimbingan dan Konseling,Senin,1,1,Putaran 2
-"TRI SUSILOWATI, S.T., M.Pd",X TKJ 1,Laboratorium Komputer 11,DDPK 1 TKJ K3LH & Budaya Kerja,Senin,2,3,Putaran 2
+"TRI SUSILAWATI, S.T., M.Pd.",X TKJ 1,Laboratorium Komputer 11,DDPK 1 TKJ K3LH & Budaya Kerja,Senin,2,3,Putaran 2
 SUNARSIH S.Pd,X TKJ 1,Laboratorium Komputer 11,Projek IPAS,Senin,4,6,Putaran 2
 "ROHMAD DWIYANTO, S.Pd",X TKJ 1,Laboratorium Komputer 11,DDPK 2 TKJ Media & Jaringan Telekomunikasi,Senin,7,10,Putaran 2
-"YULITA EKA WINAJENG, S.Pd",X TKJ 1,Ruang 20,Bahasa Jawa,Selasa,1,2,Putaran 2
+"YULITA EKAWINAJENG, S.Pd.",X TKJ 1,Ruang 20,Bahasa Jawa,Selasa,1,2,Putaran 2
 SUNARSIH S.Pd,X TKJ 1,Laboratorium IPA,Projek IPAS,Selasa,3,6,Putaran 2
 "RUSDIYANTO, S.Pd",X TKJ 1,Laboratorium Komputer 10,Informatika,Selasa,7,10,Putaran 2
-"YULITA EKA WINAJENG, S.Pd",X TKJ 1,Ruang 21,Bahasa Jawa,Rabu,1,2,Putaran 2
+"YULITA EKAWINAJENG, S.Pd.",X TKJ 1,Ruang 21,Bahasa Jawa,Rabu,1,2,Putaran 2
 SUNARSIH S.Pd,X TKJ 1,Laboratorium IPA,Projek IPAS,Rabu,3,6,Putaran 2
 "DUWI RIANTO, S.Pd",X TKJ 1,Laboratorium Komputer 11,DDPK 3 TKJ Perkembangan Teknologi,Rabu,7,10,Putaran 2
 "RUSDIYANTO, S.Pd",X TKJ 1,Laboratorium Komputer 10,Informatika,Kamis,1,4,Putaran 2
-"TRI SUSILOWATI, S.T., M.Pd",X TKJ 1,Laboratorium Komputer 11,DDPK 1 TKJ K3LH & Budaya Kerja,Kamis,5,10,Putaran 2
+"TRI SUSILAWATI, S.T., M.Pd.",X TKJ 1,Laboratorium Komputer 11,DDPK 1 TKJ K3LH & Budaya Kerja,Kamis,5,10,Putaran 2
 "DUWI RIANTO, S.Pd",X TKJ 1,Laboratorium Komputer 11,DDPK 3 TKJ Perkembangan Teknologi,Jumat,1,4,Putaran 2
 "ROHMAD DWIYANTO, S.Pd",X TKJ 1,Laboratorium Komputer 11,DDPK 2 TKJ Media & Jaringan Telekomunikasi,Jumat,5,8,Putaran 2
 "RAHMAWATI YOGA PAMUNGKAS, M.Pd",X TKJ 2,Ruang 22,Bahasa Indonesia,Senin,1,3,Putaran 2
 "TATIK WARDAYATI, S.Pd",X TKJ 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Senin,4,6,Putaran 2
 "DWI LESMIYATI, S.Pd",X TKJ 2,Ruang 22,Matematika,Senin,7,8,Putaran 2
 "TATIK HERAWATI, S.Pd",X TKJ 2,Ruang 22,Pendidikan Pancasila,Senin,9,10,Putaran 2
-"ANASTYA RATNA SULISTIYANI, S.Pd",X TKJ 2,Ruang 22,Sejarah,Selasa,1,2,Putaran 2
+"ANASTASIA RATNA SULISTIYANI, S.Pd",X TKJ 2,Ruang 22,Sejarah,Selasa,1,2,Putaran 2
 "AMAT SUKARDI, S.Pd",X TKJ 2,Ruang 22,Bahasa Inggris,Selasa,3,5,Putaran 2
 "DWI LESMIYATI, S.Pd",X TKJ 2,Ruang 22,Matematika,Selasa,6,8,Putaran 2
 "RISTIYANTI, S.Pd",X TKJ 2,Ruang Seni Tari / Hall,Seni Budaya,Selasa,9,10,Putaran 2
@@ -255,15 +255,15 @@ SUNARSIH S.Pd,X TKJ 1,Laboratorium IPA,Projek IPAS,Rabu,3,6,Putaran 2
 "RAHMAWATI YOGA PAMUNGKAS, M.Pd",X TKJ 2,Ruang 22,Bahasa Indonesia,Rabu,7,8,Putaran 2
 "TATIK HERAWATI, S.Pd",X TKJ 2,Ruang 22,Pendidikan Pancasila,Rabu,9,10,Putaran 2
 "AMAT SUKARDI, S.Pd",X TKJ 2,Ruang 22,Bahasa Inggris,Kamis,1,2,Putaran 2
-"ANASTYA RATNA SULISTIYANI, S.Pd",X TKJ 2,Ruang 22,Sejarah,Kamis,3,4,Putaran 2
+"ANASTASIA RATNA SULISTIYANI, S.Pd",X TKJ 2,Ruang 22,Sejarah,Kamis,3,4,Putaran 2
 "MUHAMMAD FURQON, S.Sos",X TKJ 2,Ruang 22,Pendidikan Agama dan Budi Pekerti,Kamis,5,7,Putaran 2
 "RAHMAWATI YOGA PAMUNGKAS, M.Pd",X TKJ 2,Ruang 22,Bahasa Indonesia,Kamis,8,10,Putaran 2
 "RISTIYANTI, S.Pd",X TKJ 2,Ruang Seni Tari / Hall,Seni Budaya,Jumat,1,2,Putaran 2
 "DWI LESMIYATI, S.Pd",X TKJ 2,Ruang 22,Matematika,Jumat,3,5,Putaran 2
 "MUHAMMAD FURQON, S.Sos",X TKJ 2,Ruang 22,Pendidikan Agama dan Budi Pekerti,Jumat,6,8,Putaran 2
 "Drs. SUSANTO DWI PRIHANTORO, M.Pd",XI AK 1,Laboratorium Komputer 13,KK AK (Komputer Akuntansi)],Senin,1,4,Putaran 2
-"Dra. YATIMATIN NAFIAH, MM",XI AK 1,Ruang 2,"KK AK (Praktikum akuntansi, jasa, dagang dan manufaktur)",Senin,5,10,Putaran 2
-"Dra. YATIMATIN NAFIAH, MM",XI AK 1,Ruang 17,"KK AK (Praktikum akuntansi, jasa, dagang dan manufaktur)",Selasa,1,4,Putaran 2
+"Dra. YATIMATUN NAFIAH, M.M.",XI AK 1,Ruang 2,"KK AK (Praktikum akuntansi, jasa, dagang dan manufaktur)",Senin,5,10,Putaran 2
+"Dra. YATIMATUN NAFIAH, M.M.",XI AK 1,Ruang 17,"KK AK (Praktikum akuntansi, jasa, dagang dan manufaktur)",Selasa,1,4,Putaran 2
 "Drs. SUSANTO DWI PRIHANTORO, M.Pd",XI AK 1,Laboratorium Komputer 13,KK AK (Komputer Akuntansi)],Selasa,5,10,Putaran 2
 "MARGIYATI, S.Pd",XI AK 1,Ruang 1,KK AK (Akuntansi Keuangan),Rabu,1,4,Putaran 2
 "ISTI FITRIANA, S.Pd",XI AK 1,Laboratorium Komputer 21,KK AK (Perpajakan),Rabu,5,6,Putaran 2
@@ -296,8 +296,8 @@ SUNARSIH S.Pd,X TKJ 1,Laboratorium IPA,Projek IPAS,Rabu,3,6,Putaran 2
 "Drs. SUSANTO DWI PRIHANTORO, M.Pd",XI AK 3,Laboratorium Komputer 13,KK AK (Komputer Akuntansi)],Senin,5,10,Putaran 2
 "MARGIYATI, S.Pd",XI AK 3,Ruang 16,KK AK (Akuntansi Keuangan),Selasa,1,4,Putaran 2
 "ISTI FITRIANA, S.Pd",XI AK 3,Laboratorium Komputer 21,KK AK (Perpajakan),Selasa,5,6,Putaran 2
-"Dra. YATIMATIN NAFIAH, MM",XI AK 3,Ruang 16,"KK AK (Praktikum akuntansi, jasa, dagang dan manufaktur)",Selasa,7,10,Putaran 2
-"Dra. YATIMATIN NAFIAH, MM",XI AK 3,Ruang 16,"KK AK (Praktikum akuntansi, jasa, dagang dan manufaktur)",Rabu,1,6,Putaran 2
+"Dra. YATIMATUN NAFIAH, M.M.",XI AK 3,Ruang 16,"KK AK (Praktikum akuntansi, jasa, dagang dan manufaktur)",Selasa,7,10,Putaran 2
+"Dra. YATIMATUN NAFIAH, M.M.",XI AK 3,Ruang 16,"KK AK (Praktikum akuntansi, jasa, dagang dan manufaktur)",Rabu,1,6,Putaran 2
 "LAUHIN ILMI AGUSTIN, S.Pd",XI AK 3,Laboratorium Komputer 13,KK AK (Akuntansi Lembaga/Instansi pemerintah),Rabu,7,10,Putaran 2
 "SRI WIDAYATI, S.Pd, M.Pd",XI AK 3,Ruang 16,"Kreatifitas, Inovasi dan kewirausahaan",Kamis,1,4,Putaran 2
 "ISTI FITRIANA, S.Pd",XI AK 3,Laboratorium Komputer 14,KK AK (Perpajakan),Kamis,5,6,Putaran 2
@@ -354,22 +354,22 @@ SUNARSIH S.Pd,X TKJ 1,Laboratorium IPA,Projek IPAS,Rabu,3,6,Putaran 2
 "AGATHA CHRISTIYANTI MANULLANG, S.S",XI BR 2,Ruang 24,Bahasa Inggris,Jumat,3,5,Putaran 2
 "NOVIA RAHMALINA, S.Pd",XI BR 2,Ruang 24,Pendidikan Agama dan Budi Pekerti,Jumat,6,8,Putaran 2
 "FIANI NUR AJI PANGASTUTI, S.Pd",XI DKV 1,Laboratorium Komputer 3,KK 1 DKV Karya UI/UX,Senin,1,4,Putaran 2
-"AHMAD MUHLASIN, S.Pd",XI DKV 1,Laboratorium Komputer 9,Mapel Pilihan DKV (Digital Marketing),Senin,5,6,Putaran 2
-"TITISARI, S.Kom",XI DKV 1,Laboratorium Komputer 20,KK 3 DKV Fotografi,Senin,7,10,Putaran 2
+"AHMAD MUHLASHIN, S.Pd.",XI DKV 1,Laboratorium Komputer 9,Mapel Pilihan DKV (Digital Marketing),Senin,5,6,Putaran 2
+"TITI SARI, S.Kom.",XI DKV 1,Laboratorium Komputer 20,KK 3 DKV Fotografi,Senin,7,10,Putaran 2
 "ANDRIYANI, S.Kom",XI DKV 1,Laboratorium Komputer 3,KK 2 DKV Game Art,Selasa,1,2,Putaran 2
 "FIANI NUR AJI PANGASTUTI, S.Pd",XI DKV 1,Laboratorium Komputer 20,KK 1 DKV Karya UI/UX,Selasa,3,6,Putaran 2
 "FIANI NUR AJI PANGASTUTI, S.Pd",XI DKV 1,Laboratorium Komputer 9,"Kreatifitas, Inovasi dan kewirausahaan",Selasa,7,10,Putaran 2
-"TITISARI, S.Kom",XI DKV 1,Laboratorium Komputer 20,KK 4 DKV Teknik Audio Video,Rabu,1,6,Putaran 2
+"TITI SARI, S.Kom.",XI DKV 1,Laboratorium Komputer 20,KK 4 DKV Teknik Audio Video,Rabu,1,6,Putaran 2
 "PUTRI WULANJARI, S.Pd",XI DKV 1,Laboratorium Komputer 9,Mapel Pilihan DKV (Digital Marketing),Rabu,7,8,Putaran 2
-"AHMAD MUHLASIN, S.Pd",XI DKV 1,Laboratorium Komputer 9,Mapel Pilihan DKV (Digital Marketing),Rabu,9,10,Putaran 2
+"AHMAD MUHLASHIN, S.Pd.",XI DKV 1,Laboratorium Komputer 9,Mapel Pilihan DKV (Digital Marketing),Rabu,9,10,Putaran 2
 "ANDRIYANI, S.Kom",XI DKV 1,Laboratorium Komputer 3,KK 2 DKV Game Art,Kamis,1,4,Putaran 2
-"TITISARI, S.Kom",XI DKV 1,Laboratorium Komputer 20,KK 4 DKV Teknik Audio Video,Kamis,5,8,Putaran 2
+"TITI SARI, S.Kom.",XI DKV 1,Laboratorium Komputer 20,KK 4 DKV Teknik Audio Video,Kamis,5,8,Putaran 2
 "PUTRI WULANJARI, S.Pd",XI DKV 1,Laboratorium Komputer 9,Mapel Pilihan DKV (Digital Marketing),Kamis,9,10,Putaran 2
 "FIANI NUR AJI PANGASTUTI, S.Pd",XI DKV 1,Laboratorium Komputer 20,KK 1 DKV Karya UI/UX,Jumat,1,4,Putaran 2
-"TITISARI, S.Kom",XI DKV 1,Laboratorium Komputer 20,KK 3 DKV Fotografi,Jumat,5,8,Putaran 2
+"TITI SARI, S.Kom.",XI DKV 1,Laboratorium Komputer 20,KK 3 DKV Fotografi,Jumat,5,8,Putaran 2
 "HERMI CAHYAWATI, S.Pd.I",XI DKV 2,Ruang 14,Pendidikan Agama dan Budi Pekerti,Senin,1,3,Putaran 2
 "KURNIA SAFITRI,S.Pd",XI DKV 2,Ruang 14,Bahasa Indonesia,Senin,4,6,Putaran 2
-"YULITA EKA WINAJENG, S.Pd",XI DKV 2,Ruang 14,Bahasa Jawa,Senin,7,8,Putaran 2
+"YULITA EKAWINAJENG, S.Pd.",XI DKV 2,Ruang 14,Bahasa Jawa,Senin,7,8,Putaran 2
 "WAHYUNI, S.Pd",XI DKV 2,Ruang 14,Sejarah,Senin,9,10,Putaran 2
 "TATIK WARDAYATI, S.Pd",XI DKV 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Selasa,1,2,Putaran 2
 "JUNIA SARI, S.Pd",XI DKV 2,Ruang 14,Pendidikan Pancasila,Selasa,3,4,Putaran 2
@@ -383,16 +383,16 @@ SUNARSIH S.Pd,X TKJ 1,Laboratorium IPA,Projek IPAS,Rabu,3,6,Putaran 2
 "NURHIDAYAT SULISTIAWAN, S.Pd",XI DKV 2,Ruang 14,Bimbingan dan Konseling,Kamis,7,7,Putaran 2
 "EVA YUNI ASTUTI, S.Pd",XI DKV 2,Ruang 14,Bahasa Inggris,Kamis,8,10,Putaran 2
 "WAHYUNI, S.Pd",XI DKV 2,Ruang 14,Sejarah,Jumat,1,2,Putaran 2
-"YULITA EKA WINAJENG, S.Pd",XI DKV 2,Ruang 14,Bahasa Jawa,Jumat,3,4,Putaran 2
+"YULITA EKAWINAJENG, S.Pd.",XI DKV 2,Ruang 14,Bahasa Jawa,Jumat,3,4,Putaran 2
 "TATIK WARDAYATI, S.Pd",XI DKV 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Jumat,5,6,Putaran 2
 "JUNIA SARI, S.Pd",XI DKV 2,Ruang 14,Pendidikan Pancasila,Jumat,7,8,Putaran 2
 "ISTI FITRIANA, S.Pd",XI LPS 1,Ruang 18,Mapel Pilihan LPS,Senin,1,4,Putaran 2
 "MARGIYATI, S.Pd",XI LPS 1,Ruang 18,KK LPS (Ekonomi Islam),Senin,5,7,Putaran 2
-"RADEN RARA UNINGSUCIASIH, S.Pd",XI LPS 1,Ruang 18,KK LPS (Layanan Lembaga Keuangan Syariah),Senin,8,10,Putaran 2
+"RADEN RARA UNING SUCIASIH, S.Pd.",XI LPS 1,Ruang 18,KK LPS (Layanan Lembaga Keuangan Syariah),Senin,8,10,Putaran 2
 "ISTI FITRIANA, S.Pd",XI LPS 1,Ruang 18,Mapel Pilihan LPS,Selasa,1,4,Putaran 2
 "RIRIH DAMAYANTI WISNU GIYONO, M.Acc",XI LPS 1,Ruang 18,KK LPS (Akuntansi perbankan syariah),Selasa,5,6,Putaran 2
 "RIRIH DAMAYANTI WISNU GIYONO, M.Acc",XI LPS 1,Ruang 18,"Kreatifitas, Inovasi dan kewirausahaan",Selasa,7,10,Putaran 2
-"RADEN RARA UNINGSUCIASIH, S.Pd",XI LPS 1,Ruang 18,KK LPS (Layanan Lembaga Keuangan Syariah),Rabu,1,3,Putaran 2
+"RADEN RARA UNING SUCIASIH, S.Pd.",XI LPS 1,Ruang 18,KK LPS (Layanan Lembaga Keuangan Syariah),Rabu,1,3,Putaran 2
 "RIRIH DAMAYANTI WISNU GIYONO, M.Acc",XI LPS 1,Ruang 18,KK LPS (Akuntansi perbankan syariah),Rabu,4,7,Putaran 2
 "MARGIYATI, S.Pd",XI LPS 1,Ruang 18,KK LPS (Ekonomi Islam),Rabu,8,10,Putaran 2
 "TANTRI AGUSTIANA, S.Pd",XI LPS 1,Ruang 18,KK AK (Komputer Akuntansi)],Kamis,1,6,Putaran 2
@@ -473,18 +473,18 @@ Dra. SITI KHUSNUL KHOTIMAH,XI MP 2,Laboratorium Komputer 5,"Kreatifitas, Inovasi
 "NOVIA RAHMALINA, S.Pd",XI RPL 2,Ruang 11,Pendidikan Agama dan Budi Pekerti,Selasa,8,10,Putaran 2
 "YANU ISWANTARA, S.Pd",XI RPL 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Rabu,1,2,Putaran 2
 "SUJAR HARTONO, S.Pd",XI RPL 2,Ruang 11,Bahasa Inggris,Rabu,3,5,Putaran 2
-"YULITA EKA WINAJENG, S.Pd",XI RPL 2,Ruang 11,Bahasa Jawa,Rabu,6,7,Putaran 2
+"YULITA EKAWINAJENG, S.Pd.",XI RPL 2,Ruang 11,Bahasa Jawa,Rabu,6,7,Putaran 2
 "NOVIA RAHMALINA, S.Pd",XI RPL 2,Ruang 11,Pendidikan Agama dan Budi Pekerti,Rabu,8,10,Putaran 2
 "SELLYANA NURUL AZIZAH, S.Pd",XI RPL 2,Laboratorium Komputer 16,"Kreatifitas, Inovasi dan kewirausahaan",Kamis,1,5,Putaran 2
 "SUJAR HARTONO, S.Pd",XI RPL 2,Ruang 11,Bahasa Inggris,Kamis,6,8,Putaran 2
 "YANU ISWANTARA, S.Pd",XI RPL 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Kamis,9,10,Putaran 2
 "RYAWIDYANINGTYAS, S.Pd",XI RPL 2,Ruang 11,Bimbingan dan Konseling,Jumat,1,1,Putaran 2
 "KURNIA SAFITRI,S.Pd",XI RPL 2,Ruang 11,Bahasa Indonesia,Jumat,2,4,Putaran 2
-"YULITA EKA WINAJENG, S.Pd",XI RPL 2,Ruang 11,Bahasa Jawa,Jumat,5,6,Putaran 2
+"YULITA EKAWINAJENG, S.Pd.",XI RPL 2,Ruang 11,Bahasa Jawa,Jumat,5,6,Putaran 2
 "WAHYUNI, S.Pd",XI RPL 2,Ruang 11,Sejarah,Jumat,7,8,Putaran 2
 "DUWI RIANTO, S.Pd",XI TKJ 1,Laboratorium Komputer 17,"KK 1 TKJ Perencanaan dan Pengalamatan Jaringan, Pemasangan dan konfigurasi Perangkat Jaringan",Senin,1,4,Putaran 2
 "DARIYATI, S.Kom",XI TKJ 1,Laboratorium Komputer 2,KK 2 TKJ Teknologi Jaringan Kabel dan Nirkabel,Senin,5,6,Putaran 2
-"TRI SUSILOWATI, S.T., M.Pd",XI TKJ 1,Laboratorium Komputer 14,"Kreatifitas, Inovasi dan kewirausahaan",Senin,7,10,Putaran 2
+"TRI SUSILAWATI, S.T., M.Pd.",XI TKJ 1,Laboratorium Komputer 14,"Kreatifitas, Inovasi dan kewirausahaan",Senin,7,10,Putaran 2
 "DIAH UTAMININGSIH, S.T",XI TKJ 1,Laboratorium Komputer 2,KK 3 TKJ Keamanan Jaringan,Selasa,1,4,Putaran 2
 "DARIYATI, S.Kom",XI TKJ 1,Laboratorium Komputer 2,KK 2 TKJ Teknologi Jaringan Kabel dan Nirkabel,Selasa,5,10,Putaran 2
 "DUWI RIANTO, S.Pd",XI TKJ 1,Laboratorium Komputer 17,"KK 1 TKJ Perencanaan dan Pengalamatan Jaringan, Pemasangan dan konfigurasi Perangkat Jaringan",Rabu,1,6,Putaran 2
@@ -498,13 +498,13 @@ Dra. SITI KHUSNUL KHOTIMAH,XI MP 2,Laboratorium Komputer 5,"Kreatifitas, Inovasi
 "AMAT SUKARDI, S.Pd",XI TKJ 2,Ruang 21,Bahasa Inggris,Senin,6,7,Putaran 2
 "HERMI CAHYAWATI, S.Pd.I",XI TKJ 2,Ruang 21,Pendidikan Agama dan Budi Pekerti,Senin,8,10,Putaran 2
 "WAHYUNI, S.Pd",XI TKJ 2,Ruang 21,Sejarah,Selasa,1,2,Putaran 2
-"YULITA EKA WINAJENG, S.Pd",XI TKJ 2,Ruang 21,Bahasa Jawa,Selasa,3,4,Putaran 2
+"YULITA EKAWINAJENG, S.Pd.",XI TKJ 2,Ruang 21,Bahasa Jawa,Selasa,3,4,Putaran 2
 "HERMI CAHYAWATI, S.Pd.I",XI TKJ 2,Ruang 21,Pendidikan Agama dan Budi Pekerti,Selasa,5,7,Putaran 2
 "MULATI, S.Pd",XI TKJ 2,Ruang 21,Matematika,Selasa,8,10,Putaran 2
-"TRI SUSILOWATI, S.T., M.Pd",XI TKJ 2,Laboratorium Komputer 14,"Kreatifitas, Inovasi dan kewirausahaan",Rabu,1,5,Putaran 2
+"TRI SUSILAWATI, S.T., M.Pd.",XI TKJ 2,Laboratorium Komputer 14,"Kreatifitas, Inovasi dan kewirausahaan",Rabu,1,5,Putaran 2
 "JUNIA SARI, S.Pd",XI TKJ 2,Ruang 21,Pendidikan Pancasila,Rabu,6,7,Putaran 2
 "CANDRA RAHADIAN, S.Pd",XI TKJ 2,Ruang 21,Bimbingan dan Konseling,Rabu,8,8,Putaran 2
-"YULITA EKA WINAJENG, S.Pd",XI TKJ 2,Ruang 21,Bahasa Jawa,Rabu,9,10,Putaran 2
+"YULITA EKAWINAJENG, S.Pd.",XI TKJ 2,Ruang 21,Bahasa Jawa,Rabu,9,10,Putaran 2
 "WAHYUNI, S.Pd",XI TKJ 2,Ruang 21,Sejarah,Kamis,1,2,Putaran 2
 "YANU ISWANTARA, S.Pd",XI TKJ 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Kamis,3,4,Putaran 2
 "MULATI, S.Pd",XI TKJ 2,Ruang 21,Matematika,Kamis,5,7,Putaran 2
@@ -519,20 +519,20 @@ Dra. SITI KHUSNUL KHOTIMAH,XI MP 2,Laboratorium Komputer 5,"Kreatifitas, Inovasi
 "SUTARMI, S.Pd",XII AK 1,Laboratorium Komputer 1,KK AK (Komputer Akuntansi)],Selasa,5,10,Putaran 2
 "SUTARMI, S.Pd",XII AK 1,Laboratorium Komputer 1,KK AK (Komputer Akuntansi)],Rabu,1,6,Putaran 2
 "ISTI FITRIANA, S.Pd",XII AK 1,Ruang 16,KK AK (Akuntansi Keuangan),Rabu,7,10,Putaran 2
-"Dra. YATIMATIN NAFIAH, MM",XII AK 1,Ruang 2,"KK AK (Praktikum akuntansi, jasa, dagang dan manufaktur)",Kamis,1,10,Putaran 2
+"Dra. YATIMATUN NAFIAH, M.M.",XII AK 1,Ruang 2,"KK AK (Praktikum akuntansi, jasa, dagang dan manufaktur)",Kamis,1,10,Putaran 2
 "ISTI FITRIANA, S.Pd",XII AK 1,Ruang 2,KK AK (Akuntansi Keuangan),Jumat,1,4,Putaran 2
-"Dra. YATIMATIN NAFIAH, MM",XII AK 1,Ruang 2,"KK AK (Praktikum akuntansi, jasa, dagang dan manufaktur)",Jumat,5,8,Putaran 2
+"Dra. YATIMATUN NAFIAH, M.M.",XII AK 1,Ruang 2,"KK AK (Praktikum akuntansi, jasa, dagang dan manufaktur)",Jumat,5,8,Putaran 2
 "MULATI, S.Pd",XII AK 2,Ruang 1,Matematika,Senin,1,3,Putaran 2
 "SRI WIDAYATI, S.Pd, M.Pd",XII AK 2,Ruang 1,"Kreatifitas, Inovasi dan kewirausahaan",Senin,4,8,Putaran 2
 "WIDODO, S.Pd",XII AK 2,Ruang 1,Pendidikan Pancasila,Senin,9,10,Putaran 2
-"MUHAMMAD HERU PURNOMO, M.S.I",XII AK 2,Ruang 1,Bahasa Indonesia,Selasa,1,3,Putaran 2
+"MUHAMAD HERU PURNOMO, S.Pd.",XII AK 2,Ruang 1,Bahasa Indonesia,Selasa,1,3,Putaran 2
 "RINI BHINTARTI, S.Pd",XII AK 2,Ruang 1,Bahasa Inggris,Selasa,4,5,Putaran 2
 "AJENG FITRI SARASWATI, S.Pd",XII AK 2,Ruang 1,Bahasa Jawa,Selasa,6,7,Putaran 2
 "WATI, S.Pd",XII AK 2,Ruang 1,Pendidikan Agama dan Budi Pekerti,Selasa,8,10,Putaran 2
 "Drs. SUSANTO DWI PRIHANTORO, M.Pd",XII AK 2,Laboratorium Komputer 13,Mapil AK,Rabu,1,4,Putaran 2
 "WATI, S.Pd",XII AK 2,Ruang 1,Pendidikan Agama dan Budi Pekerti,Rabu,5,7,Putaran 2
 "RINI BHINTARTI, S.Pd",XII AK 2,Ruang 1,Bahasa Inggris,Rabu,8,10,Putaran 2
-"MUHAMMAD HERU PURNOMO, M.S.I",XII AK 2,Ruang 1,Bahasa Indonesia,Kamis,1,3,Putaran 2
+"MUHAMAD HERU PURNOMO, S.Pd.",XII AK 2,Ruang 1,Bahasa Indonesia,Kamis,1,3,Putaran 2
 "RINI BHINTARTI, S.Pd",XII AK 2,Ruang 1,Bahasa Inggris,Kamis,4,6,Putaran 2
 "RYAWIDYANINGTYAS, S.Pd",XII AK 2,Ruang 1,Bimbingan dan Konseling,Kamis,7,8,Putaran 2
 "AJENG FITRI SARASWATI, S.Pd",XII AK 2,Ruang 1,Bahasa Jawa,Kamis,9,10,Putaran 2
@@ -547,7 +547,7 @@ Dra. SITI KHUSNUL KHOTIMAH,XI MP 2,Laboratorium Komputer 5,"Kreatifitas, Inovasi
 "Drs. SUSANTO DWI PRIHANTORO, M.Pd",XII AK 3,Laboratorium Komputer 13,Mapil AK,Kamis,7,10,Putaran 2
 "LAUHIN ILMI AGUSTIN, S.Pd",XII AK 3,Laboratorium Komputer 21,KK AK (Akuntansi Lembaga/Instansi pemerintah),Jumat,1,4,Putaran 2
 "ISTI FITRIANA, S.Pd",XII AK 3,Laboratorium Komputer 21,KK AK (Perpajakan),Jumat,5,8,Putaran 2
-"RADEN RARA UNINGSUCIASIH, S.Pd",XII AK 4,Ruang 3,"Kreatifitas, Inovasi dan kewirausahaan",Senin,1,4,Putaran 2
+"RADEN RARA UNING SUCIASIH, S.Pd.",XII AK 4,Ruang 3,"Kreatifitas, Inovasi dan kewirausahaan",Senin,1,4,Putaran 2
 "RETNANINGSIH, S.Pd",XII AK 4,Ruang 3,Matematika,Senin,5,7,Putaran 2
 "WATI, S.Pd",XII AK 4,Ruang 3,Pendidikan Agama dan Budi Pekerti,Senin,8,10,Putaran 2
 "WATI, S.Pd",XII AK 4,Ruang 3,Pendidikan Agama dan Budi Pekerti,Selasa,1,3,Putaran 2
@@ -555,7 +555,7 @@ Dra. SITI KHUSNUL KHOTIMAH,XI MP 2,Laboratorium Komputer 5,"Kreatifitas, Inovasi
 "SULARDI, S.Pd",XII AK 4,Laboratorium Komputer 7,Mapil AK,Selasa,7,10,Putaran 2
 "CANDRA RAHADIAN, S.Pd",XII AK 4,Ruang 3,Bimbingan dan Konseling,Rabu,1,2,Putaran 2
 "ERIDHA DEWI SEPITASARI, S.Pd",XII AK 4,Ruang 3,Bahasa Inggris,Rabu,3,4,Putaran 2
-"RADEN RARA UNINGSUCIASIH, S.Pd",XII AK 4,Ruang 3,"Kreatifitas, Inovasi dan kewirausahaan",Rabu,5,10,Putaran 2
+"RADEN RARA UNING SUCIASIH, S.Pd.",XII AK 4,Ruang 3,"Kreatifitas, Inovasi dan kewirausahaan",Rabu,5,10,Putaran 2
 "RISA RESTI AFRIANI, S.Pd",XII AK 4,Ruang 3,Bahasa Indonesia,Kamis,1,3,Putaran 2
 "ERIDHA DEWI SEPITASARI, S.Pd",XII AK 4,Ruang 3,Bahasa Inggris,Kamis,4,6,Putaran 2
 "AJENG FITRI SARASWATI, S.Pd",XII AK 4,Ruang 3,Bahasa Jawa,Kamis,7,8,Putaran 2
@@ -570,16 +570,16 @@ Dra. SITI KHUSNUL KHOTIMAH,XI MP 2,Laboratorium Komputer 5,"Kreatifitas, Inovasi
 "PUTRI WULANJARI, S.Pd",XII BD,Laboratorium Komputer 4,KK 2 BD XII Perencanaan Bisnis,Rabu,1,6,Putaran 2
 "WINDU MAHMUD, M.Eng",XII BD,Laboratorium Komputer 4,KK 4 BD Digital On Boarding,Rabu,7,10,Putaran 2
 "WINDU MAHMUD, M.Eng",XII BD,Laboratorium Komputer 4,KK 4 BD Digital On Boarding,Kamis,1,10,Putaran 2
-"AHMAD MUHLASIN, S.Pd",XII BD,Laboratorium Komputer 4,Mapel Pilihan BD (Public Speaking),Jumat,1,4,Putaran 2
+"AHMAD MUHLASHIN, S.Pd.",XII BD,Laboratorium Komputer 4,Mapel Pilihan BD (Public Speaking),Jumat,1,4,Putaran 2
 "PUTRI WULANJARI, S.Pd",XII BD,Laboratorium Komputer 4,KK 2 BD XII Perencanaan Bisnis,Jumat,5,8,Putaran 2
 "SRI SUNARTINI, S.Pd",XII BR 1,Laboratorium Komputer 8,KK BR (Bisnis Retail),Senin,1,4,Putaran 2
 "ARIS PURWANTINAH, S.Pd",XII BR 1,Laboratorium Komputer 6,KK BR (Bisnis Retail),Senin,5,10,Putaran 2
 "ARIS PURWANTINAH, S.Pd",XII BR 1,Laboratorium Komputer 6,KK BR (Bisnis Retail),Selasa,1,10,Putaran 2
-"THERESIA INDRI WAHYUNI, S.P.d",XII BR 1,Ruang 26,KK BR (Bisnis Retail),Rabu,1,3,Putaran 2
+"THERECIA INDRI WAHYUNI, S.Pd",XII BR 1,Ruang 26,KK BR (Bisnis Retail),Rabu,1,3,Putaran 2
 "SRI SUNARTINI, S.Pd",XII BR 1,Ruang 26,KK BR (Bisnis Retail),Rabu,4,10,Putaran 2
-"THERESIA INDRI WAHYUNI, S.P.d",XII BR 1,Ruang 26,KK BR (Bisnis Retail),Kamis,1,6,Putaran 2
+"THERECIA INDRI WAHYUNI, S.Pd",XII BR 1,Ruang 26,KK BR (Bisnis Retail),Kamis,1,6,Putaran 2
 "SRI SUNARSIH, S.Pd",XII BR 1,Laboratorium Komputer 8,Mapel Pilihan BR ( Bisnis Online),Kamis,7,10,Putaran 2
-"THERESIA INDRI WAHYUNI, S.P.d",XII BR 1,Ruang 26,KK BR (Bisnis Retail),Jumat,1,3,Putaran 2
+"THERECIA INDRI WAHYUNI, S.Pd",XII BR 1,Ruang 26,KK BR (Bisnis Retail),Jumat,1,3,Putaran 2
 "SRI SUNARTINI, S.Pd",XII BR 1,Laboratorium Komputer 8,KK BR (Bisnis Retail),Jumat,4,8,Putaran 2
 "RADEN RARA BERNADETA SRI WIDYASTUTI, S.Pd",XII BR 2,Laboratorium Komputer 14,"Kreatifitas, Inovasi dan kewirausahaan",Senin,1,6,Putaran 2
 "UMI KUNTARI, S.S",XII BR 2,Ruang 23,Bahasa Jawa,Senin,7,8,Putaran 2
@@ -604,12 +604,12 @@ Dra. SITI KHUSNUL KHOTIMAH,XI MP 2,Laboratorium Komputer 5,"Kreatifitas, Inovasi
 "ANDRIYANI, S.Kom",XII DKV 1,Laboratorium Komputer 3,KK 2 DKV Produk Iklan Animasi,Selasa,3,4,Putaran 2
 "YULI ASTUTI, S.Pd",XII DKV 1,Laboratorium Komputer 3,KK 1 DKV Motion Grafis,Selasa,5,10,Putaran 2
 "YULI ASTUTI, S.Pd",XII DKV 1,Laboratorium Komputer 3,KK 1 DKV Motion Grafis,Rabu,1,6,Putaran 2
-"TITISARI, S.Kom",XII DKV 1,Laboratorium Komputer 3,KK 4 DKV Videografi,Rabu,7,10,Putaran 2
+"TITI SARI, S.Kom.",XII DKV 1,Laboratorium Komputer 3,KK 4 DKV Videografi,Rabu,7,10,Putaran 2
 "FIANI NUR AJI PANGASTUTI, S.Pd",XII DKV 1,Laboratorium Komputer 9,KK 3 DKV Fotografi,Kamis,1,6,Putaran 2
 "YULI ASTUTI, S.Pd",XII DKV 1,Ruang Siniar (Podcast),Mapel Pilihan DKV Public Speaking,Kamis,7,10,Putaran 2
-"TITISARI, S.Kom",XII DKV 1,Laboratorium Komputer 3,KK 4 DKV Videografi,Jumat,1,4,Putaran 2
+"TITI SARI, S.Kom.",XII DKV 1,Laboratorium Komputer 3,KK 4 DKV Videografi,Jumat,1,4,Putaran 2
 "ANDRIYANI, S.Kom",XII DKV 1,Laboratorium Komputer 9,KK 5 DKV Percetakan dan Grafika,Jumat,5,8,Putaran 2
-"MUHAMMAD HERU PURNOMO, M.S.I",XII DKV 2,Ruang 13,Bahasa Indonesia,Senin,1,3,Putaran 2
+"MUHAMAD HERU PURNOMO, S.Pd.",XII DKV 2,Ruang 13,Bahasa Indonesia,Senin,1,3,Putaran 2
 "MUHAMMAD FURQON, S.Sos",XII DKV 2,Ruang 13,Pendidikan Agama dan Budi Pekerti,Senin,4,6,Putaran 2
 "NINDA APRILIA, S.Pd",XII DKV 2,Laboratorium Komputer 9,"Kreatifitas, Inovasi dan kewirausahaan",Senin,7,10,Putaran 2
 "YULI ASTUTI, S.Pd",XII DKV 2,Ruang Siniar (Podcast),Mapel Pilihan DKV Public Speaking,Selasa,1,4,Putaran 2
@@ -618,27 +618,27 @@ Dra. SITI KHUSNUL KHOTIMAH,XI MP 2,Laboratorium Komputer 5,"Kreatifitas, Inovasi
 "DWI LESMIYATI, S.Pd",XII DKV 2,Ruang 13,Matematika,Rabu,1,3,Putaran 2
 "EVA YUNI ASTUTI, S.Pd",XII DKV 2,Ruang 13,Bahasa Inggris,Rabu,4,5,Putaran 2
 "WIDODO, S.Pd",XII DKV 2,Ruang 13,Pendidikan Pancasila,Rabu,6,7,Putaran 2
-"MUHAMMAD HERU PURNOMO, M.S.I",XII DKV 2,Ruang 13,Bahasa Indonesia,Rabu,8,10,Putaran 2
+"MUHAMAD HERU PURNOMO, S.Pd.",XII DKV 2,Ruang 13,Bahasa Indonesia,Rabu,8,10,Putaran 2
 "EVA YUNI ASTUTI, S.Pd",XII DKV 2,Ruang 13,Bahasa Inggris,Kamis,1,3,Putaran 2
 "DWI LESMIYATI, S.Pd",XII DKV 2,Ruang 13,Matematika,Kamis,4,6,Putaran 2
 "NINDA APRILIA, S.Pd",XII DKV 2,Laboratorium Komputer 9,"Kreatifitas, Inovasi dan kewirausahaan",Kamis,7,8,Putaran 2
-"YULITA EKA WINAJENG, S.Pd",XII DKV 2,Ruang 13,Bahasa Jawa,Kamis,9,10,Putaran 2
+"YULITA EKAWINAJENG, S.Pd.",XII DKV 2,Ruang 13,Bahasa Jawa,Kamis,9,10,Putaran 2
 "NINDA APRILIA, S.Pd",XII DKV 2,Laboratorium Komputer 9,"Kreatifitas, Inovasi dan kewirausahaan",Jumat,1,4,Putaran 2
 "NURHIDAYAT SULISTIAWAN, S.Pd",XII DKV 2,Ruang 13,Bimbingan dan Konseling,Jumat,5,6,Putaran 2
-"YULITA EKA WINAJENG, S.Pd",XII DKV 2,Ruang 13,Bahasa Jawa,Jumat,7,8,Putaran 2
+"YULITA EKAWINAJENG, S.Pd.",XII DKV 2,Ruang 13,Bahasa Jawa,Jumat,7,8,Putaran 2
 "TENTREM YUNIATI LESTARI, S.Pd",XII LPS,Ruang 4,Matematika,Senin,1,3,Putaran 2
 "AJENG FITRI SARASWATI, S.Pd",XII LPS,Ruang 4,Bahasa Jawa,Senin,4,5,Putaran 2
 "WIDODO, S.Pd",XII LPS,Ruang 4,Pendidikan Pancasila,Senin,6,7,Putaran 2
 "MENIK LESTARI, S.Pd",XII LPS,Ruang 4,Pendidikan Agama dan Budi Pekerti,Senin,8,10,Putaran 2
-"RADEN RARA UNINGSUCIASIH, S.Pd",XII LPS,Ruang 4,"Kreatifitas, Inovasi dan kewirausahaan",Selasa,1,6,Putaran 2
+"RADEN RARA UNING SUCIASIH, S.Pd.",XII LPS,Ruang 4,"Kreatifitas, Inovasi dan kewirausahaan",Selasa,1,6,Putaran 2
 "AMAT SUKARDI, S.Pd",XII LPS,Ruang 4,Bahasa Inggris,Selasa,7,8,Putaran 2
 "CANDRA RAHADIAN, S.Pd",XII LPS,Ruang 4,Bimbingan dan Konseling,Selasa,9,10,Putaran 2
 "SULARDI, S.Pd",XII LPS,Laboratorium Komputer 7,Mapil AK,Rabu,1,4,Putaran 2
-"MUHAMMAD HERU PURNOMO, M.S.I",XII LPS,Ruang 4,Bahasa Indonesia,Rabu,5,7,Putaran 2
+"MUHAMAD HERU PURNOMO, S.Pd.",XII LPS,Ruang 4,Bahasa Indonesia,Rabu,5,7,Putaran 2
 "AMAT SUKARDI, S.Pd",XII LPS,Ruang 4,Bahasa Inggris,Rabu,8,10,Putaran 2
 "TENTREM YUNIATI LESTARI, S.Pd",XII LPS,Ruang 4,Matematika,Kamis,1,3,Putaran 2
-"MUHAMMAD HERU PURNOMO, M.S.I",XII LPS,Ruang 4,Bahasa Indonesia,Kamis,4,6,Putaran 2
-"RADEN RARA UNINGSUCIASIH, S.Pd",XII LPS,Ruang 4,"Kreatifitas, Inovasi dan kewirausahaan",Kamis,7,10,Putaran 2
+"MUHAMAD HERU PURNOMO, S.Pd.",XII LPS,Ruang 4,Bahasa Indonesia,Kamis,4,6,Putaran 2
+"RADEN RARA UNING SUCIASIH, S.Pd.",XII LPS,Ruang 4,"Kreatifitas, Inovasi dan kewirausahaan",Kamis,7,10,Putaran 2
 "AMAT SUKARDI, S.Pd",XII LPS,Ruang 4,Bahasa Inggris,Jumat,1,3,Putaran 2
 "AJENG FITRI SARASWATI, S.Pd",XII LPS,Ruang 4,Bahasa Jawa,Jumat,4,5,Putaran 2
 "MENIK LESTARI, S.Pd",XII LPS,Ruang 4,Pendidikan Agama dan Budi Pekerti,Jumat,6,8,Putaran 2
@@ -687,27 +687,27 @@ Dra. SITI KHUSNUL KHOTIMAH,XI MP 2,Laboratorium Komputer 5,"Kreatifitas, Inovasi
 "DINDA AYU DEWANTI, S.Kom",XII RPL 1,Laboratorium Komputer 19,KK 3 RPL Pemrograman Website,Jumat,5,8,Putaran 2
 "DWI LESMIYATI, S.Pd",XII RPL 2,Ruang 10,Matematika,Senin,1,3,Putaran 2
 "SUJAR HARTONO, S.Pd",XII RPL 2,Ruang 10,Bahasa Inggris,Senin,4,5,Putaran 2
-"MUHAMMAD HERU PURNOMO, M.S.I",XII RPL 2,Ruang 10,Bahasa Indonesia,Senin,6,8,Putaran 2
-"YULITA EKA WINAJENG, S.Pd",XII RPL 2,Ruang 10,Bahasa Jawa,Senin,9,10,Putaran 2
+"MUHAMAD HERU PURNOMO, S.Pd.",XII RPL 2,Ruang 10,Bahasa Indonesia,Senin,6,8,Putaran 2
+"YULITA EKAWINAJENG, S.Pd.",XII RPL 2,Ruang 10,Bahasa Jawa,Senin,9,10,Putaran 2
 "RUSDIYANTO, S.Pd",XII RPL 2,Laboratorium Komputer 16,Mapel Pilihan RPL Internet Of Thinks,Selasa,1,4,Putaran 2
 "NOVIA RAHMALINA, S.Pd",XII RPL 2,Ruang 10,Pendidikan Agama dan Budi Pekerti,Selasa,5,7,Putaran 2
 "SUJAR HARTONO, S.Pd",XII RPL 2,Ruang 10,Bahasa Inggris,Selasa,8,10,Putaran 2
-"MUHAMMAD HERU PURNOMO, M.S.I",XII RPL 2,Ruang 10,Bahasa Indonesia,Rabu,1,3,Putaran 2
+"MUHAMAD HERU PURNOMO, S.Pd.",XII RPL 2,Ruang 10,Bahasa Indonesia,Rabu,1,3,Putaran 2
 "RYAWIDYANINGTYAS, S.Pd",XII RPL 2,Ruang 10,Bimbingan dan Konseling,Rabu,4,5,Putaran 2
 "DWI LESMIYATI, S.Pd",XII RPL 2,Ruang 10,Matematika,Rabu,6,8,Putaran 2
 "WIDODO, S.Pd",XII RPL 2,Ruang 10,Pendidikan Pancasila,Rabu,9,10,Putaran 2
 "SUJAR HARTONO, S.Pd",XII RPL 2,Ruang 10,Bahasa Inggris,Kamis,1,3,Putaran 2
-"YULITA EKA WINAJENG, S.Pd",XII RPL 2,Ruang 10,Bahasa Jawa,Kamis,4,5,Putaran 2
+"YULITA EKAWINAJENG, S.Pd.",XII RPL 2,Ruang 10,Bahasa Jawa,Kamis,4,5,Putaran 2
 "HARIS BUDIAWAN, S.Pd",XII RPL 2,Laboratorium Komputer 16,"Kreatifitas, Inovasi dan kewirausahaan",Kamis,6,10,Putaran 2
 "NOVIA RAHMALINA, S.Pd",XII RPL 2,Ruang 10,Pendidikan Agama dan Budi Pekerti,Jumat,1,3,Putaran 2
 "HARIS BUDIAWAN, S.Pd",XII RPL 2,Laboratorium Komputer 16,"Kreatifitas, Inovasi dan kewirausahaan",Jumat,4,8,Putaran 2
 "DIANA ROHMANIAH, S.Kom",XII TKJ 1,Laboratorium Komputer 2,Mapel Pilihan TKJ Bigdata & Machine Learning,Senin,1,4,Putaran 2
 "DUWI RIANTO, S.Pd",XII TKJ 1,Laboratorium Komputer 17,KK 4 TKJ Administrasi Sistem Jaringan,Senin,5,10,Putaran 2
-"TRI SUSILOWATI, S.T., M.Pd",XII TKJ 1,Laboratorium Komputer 17,"KK 1 TKJ Perencanaan dan Pengalamatan Jaringan, Pemasangan dan konfigurasi Perangkat Jaringan",Selasa,1,4,Putaran 2
+"TRI SUSILAWATI, S.T., M.Pd.",XII TKJ 1,Laboratorium Komputer 17,"KK 1 TKJ Perencanaan dan Pengalamatan Jaringan, Pemasangan dan konfigurasi Perangkat Jaringan",Selasa,1,4,Putaran 2
 "DUWI RIANTO, S.Pd",XII TKJ 1,Laboratorium Komputer 17,KK 4 TKJ Administrasi Sistem Jaringan,Selasa,5,10,Putaran 2
 "DIAH UTAMININGSIH, S.T",XII TKJ 1,Laboratorium Komputer 2,KK 3 TKJ Keamanan Jaringan,Rabu,1,6,Putaran 2
-"TRI SUSILOWATI, S.T., M.Pd",XII TKJ 1,Laboratorium Komputer 17,"KK 1 TKJ Perencanaan dan Pengalamatan Jaringan, Pemasangan dan konfigurasi Perangkat Jaringan",Rabu,7,10,Putaran 2
-"TRI SUSILOWATI, S.T., M.Pd",XII TKJ 1,Laboratorium Komputer 17,"KK 1 TKJ Perencanaan dan Pengalamatan Jaringan, Pemasangan dan konfigurasi Perangkat Jaringan",Kamis,1,4,Putaran 2
+"TRI SUSILAWATI, S.T., M.Pd.",XII TKJ 1,Laboratorium Komputer 17,"KK 1 TKJ Perencanaan dan Pengalamatan Jaringan, Pemasangan dan konfigurasi Perangkat Jaringan",Rabu,7,10,Putaran 2
+"TRI SUSILAWATI, S.T., M.Pd.",XII TKJ 1,Laboratorium Komputer 17,"KK 1 TKJ Perencanaan dan Pengalamatan Jaringan, Pemasangan dan konfigurasi Perangkat Jaringan",Kamis,1,4,Putaran 2
 "DIAH UTAMININGSIH, S.T",XII TKJ 1,Laboratorium Komputer 2,KK 3 TKJ Keamanan Jaringan,Kamis,5,10,Putaran 2
 "DARIYATI, S.Kom",XII TKJ 1,Laboratorium Komputer 2,KK 2 TKJ Teknologi Jaringan Kabel dan Nirkabel,Jumat,1,8,Putaran 2
 "AMAT SUKARDI, S.Pd",XII TKJ 2,Ruang 20,Bahasa Inggris,Senin,1,3,Putaran 2
@@ -717,12 +717,12 @@ Dra. SITI KHUSNUL KHOTIMAH,XI MP 2,Laboratorium Komputer 5,"Kreatifitas, Inovasi
 "CANDRA RAHADIAN, S.Pd",XII TKJ 2,Ruang 20,Bimbingan dan Konseling,Selasa,7,8,Putaran 2
 "WIDODO, S.Pd",XII TKJ 2,Ruang 20,Pendidikan Pancasila,Selasa,9,10,Putaran 2
 "HERMI CAHYAWATI, S.Pd.I",XII TKJ 2,Ruang 20,Pendidikan Agama dan Budi Pekerti,Rabu,1,3,Putaran 2
-"YULITA EKA WINAJENG, S.Pd",XII TKJ 2,Ruang 20,Bahasa Jawa,Rabu,4,5,Putaran 2
+"YULITA EKAWINAJENG, S.Pd.",XII TKJ 2,Ruang 20,Bahasa Jawa,Rabu,4,5,Putaran 2
 "AMAT SUKARDI, S.Pd",XII TKJ 2,Ruang 20,Bahasa Inggris,Rabu,6,7,Putaran 2
 "KURNIA SAFITRI,S.Pd",XII TKJ 2,Ruang 20,Bahasa Indonesia,Rabu,8,10,Putaran 2
 "DITA RIZKI DEWINTA SARI, S.Pd",XII TKJ 2,Laboratorium Komputer 11,"Kreatifitas, Inovasi dan kewirausahaan",Kamis,1,4,Putaran 2
 "AMAT SUKARDI, S.Pd",XII TKJ 2,Ruang 20,Bahasa Inggris,Kamis,5,7,Putaran 2
 "HERMI CAHYAWATI, S.Pd.I",XII TKJ 2,Ruang 20,Pendidikan Agama dan Budi Pekerti,Kamis,8,10,Putaran 2
-"YULITA EKA WINAJENG, S.Pd",XII TKJ 2,Ruang 20,Bahasa Jawa,Jumat,1,2,Putaran 2
+"YULITA EKAWINAJENG, S.Pd.",XII TKJ 2,Ruang 20,Bahasa Jawa,Jumat,1,2,Putaran 2
 "TENTREM YUNIATI LESTARI, S.Pd",XII TKJ 2,Ruang 20,Matematika,Jumat,3,5,Putaran 2
 "KURNIA SAFITRI,S.Pd",XII TKJ 2,Ruang 20,Bahasa Indonesia,Jumat,6,8,Putaran 2

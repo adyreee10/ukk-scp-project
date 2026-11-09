@@ -946,7 +946,17 @@ class SchoolDocumentParserService
             }
         }
 
-        // 4. Jika belum ditemukan dalam koleksi memori, coba cari langsung ke database
+        // 4. Pencocokan Kompak & Kamus Alias Ejaan (mengabaikan perbedaan spasi, tanda petik, dan variasi ejaan)
+        $compactSearch = $this->canonicalCompactTeacherName($clean);
+        if (strlen($compactSearch) >= 3) {
+            foreach ($allTeachers as $t) {
+                if ($this->canonicalCompactTeacherName($t->name) === $compactSearch) {
+                    return $t;
+                }
+            }
+        }
+
+        // 5. Jika belum ditemukan dalam koleksi memori, coba cari langsung ke database
         if ($cachedTeachers !== null) {
             $dbTeacher = User::whereRaw('LOWER(name) = ?', [$lowerClean])
                 ->whereHas('role', fn($q) => $q->whereIn('role_name', ['Guru', 'Wali Kelas', 'Guru BK', 'Waka Kurikulum', 'Admin']))
@@ -958,10 +968,35 @@ class SchoolDocumentParserService
                 if ($this->stripAcademicTitles($t->name) === $normSearch) {
                     return $t;
                 }
+                if ($this->canonicalCompactTeacherName($t->name) === $compactSearch) {
+                    return $t;
+                }
             }
         }
 
         return null;
+    }
+
+    /**
+     * Menghasilkan string nama kompak tanpa spasi dan karakter khusus, serta memetakan variasi ejaan resmi
+     */
+    public function canonicalCompactTeacherName(string $name): string
+    {
+        $norm = $this->stripAcademicTitles($name);
+        $compact = preg_replace('/[^a-z0-9]/', '', strtolower($norm));
+
+        // Kamus variasi ejaan & singkatan nama guru (FET PDF/CSV vs Nominatif Pegawai Resmi)
+        static $teacherAliases = [
+            'anastyaratnasulistiyani' => 'anastasiaratnasulistiyani',
+            'trisusilowati'           => 'trisusilawati',
+            'theresiaindriwahyuni'    => 'thereciaindriwahyuni',
+            'alivisazkiahamie'        => 'alivisazkiahawie',
+            'ahmadmuhlasin'           => 'ahmadmuhlashin',
+            'yatimatinnafiah'         => 'yatimatunnafiah',
+            'muhammadherupurnomo'     => 'muhamadherupurnomo',
+        ];
+
+        return $teacherAliases[$compact] ?? $compact;
     }
 
     /**
@@ -979,7 +1014,7 @@ class SchoolDocumentParserService
 
         // Hapus gelar depan umum (bisa berulang misal "H. Drs.")
         for ($i = 0; $i < 4; $i++) {
-            $n = preg_replace('/^(drs|dra|dr|prof|ir|h|hj|kh|ust|ustadz|raden\s+rara|raden\s+roro|raden|r\.r\.|rr\.|tb\.|st\.)\s*\.?\s+/i', '', $n);
+            $n = preg_replace('/^(drs|dra|dr|prof|ir|h|hj|kh|ust|ustadz|raden\s*rara|raden\s*roro|raden|r\.r\.|rr\.|tb\.|st\.)\s*\.?\s*/i', '', $n);
         }
 
         // Pisahkan bagian sebelum koma (kebanyakan gelar belakang setelah koma)
