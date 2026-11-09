@@ -392,7 +392,6 @@
                                                 'id' => $s->id,
                                                 'day_of_week' => $s->day_of_week,
                                                 'period_label' => $s->period_label,
-                                                'time_range' => ($s->start_time ? substr($s->start_time, 0, 5) : '') . ' - ' . ($s->end_time ? substr($s->end_time, 0, 5) : ''),
                                                 'subject' => $s->subject,
                                                 'class_name' => $s->schoolClass?->class_name ?? '-',
                                                 'room_name' => $s->room?->room_name ?? '-',
@@ -546,7 +545,6 @@
                                             <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-300" x-text="sch.day_of_week"></span>
                                             <span x-text="sch.period_label"></span>
                                         </div>
-                                        <div class="text-[11px] font-mono text-slate-400 mt-0.5" x-text="sch.time_range"></div>
                                     </td>
                                     <td class="p-3 text-center whitespace-nowrap">
                                         <span class="px-2 py-0.5 rounded-md text-[10px] font-bold"
