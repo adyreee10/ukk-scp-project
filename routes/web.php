@@ -291,6 +291,7 @@ Route::middleware(['auth', 'role:Waka Kurikulum'])->group(function () {
     // Jadwal Pelajaran (Input Jadwal Mandiri & Import)
     Route::get('/waka/schedules', [WakaController::class, 'schedulesIndex'])->name('waka.schedules.index');
     Route::get('/waka/schedules/template', [WakaController::class, 'schedulesTemplate'])->name('waka.schedules.template');
+    Route::get('/waka/schedules/import', fn() => redirect()->route('waka.schedules.index'));
     Route::post('/waka/schedules/import', [WakaController::class, 'schedulesImport'])->name('waka.schedules.import');
     Route::post('/waka/schedules', [WakaController::class, 'schedulesStore'])->name('waka.schedules.store');
     Route::delete('/waka/schedules/{schedule}', [WakaController::class, 'schedulesDestroy'])->name('waka.schedules.destroy');
@@ -301,6 +302,7 @@ Route::middleware(['auth', 'role:Waka Kurikulum'])->group(function () {
     // Master Data Guru & Import
     Route::get('/waka/teachers', [WakaController::class, 'teachersIndex'])->name('waka.teachers.index');
     Route::get('/waka/teachers/template', [WakaController::class, 'teachersTemplate'])->name('waka.teachers.template');
+    Route::get('/waka/teachers/import', fn() => redirect()->route('waka.teachers.index'));
     Route::post('/waka/teachers/import', [WakaController::class, 'teachersImport'])->name('waka.teachers.import');
     Route::post('/waka/teachers', [WakaController::class, 'teachersStore'])->name('waka.teachers.store');
     Route::put('/waka/teachers/{teacher}', [WakaController::class, 'teachersUpdate'])->name('waka.teachers.update');
@@ -311,6 +313,7 @@ Route::middleware(['auth', 'role:Waka Kurikulum'])->group(function () {
     // Master Data Siswa & Import
     Route::get('/waka/students', [WakaController::class, 'studentsIndex'])->name('waka.students.index');
     Route::get('/waka/students/template', [WakaController::class, 'studentsTemplate'])->name('waka.students.template');
+    Route::get('/waka/students/import', fn() => redirect()->route('waka.students.index'));
     Route::post('/waka/students/import', [WakaController::class, 'studentsImport'])->name('waka.students.import');
     Route::post('/waka/students', [WakaController::class, 'studentsStore'])->name('waka.students.store');
     Route::put('/waka/students/{student}', [WakaController::class, 'studentsUpdate'])->name('waka.students.update');
@@ -327,6 +330,7 @@ Route::middleware(['auth', 'role:Waka Kurikulum'])->group(function () {
     // Master Data Ruang & Import
     Route::get('/waka/rooms', [WakaController::class, 'roomsIndex'])->name('waka.rooms.index');
     Route::get('/waka/rooms/template', [WakaController::class, 'roomsTemplate'])->name('waka.rooms.template');
+    Route::get('/waka/rooms/import', fn() => redirect()->route('waka.rooms.index'));
     Route::post('/waka/rooms/import', [WakaController::class, 'roomsImport'])->name('waka.rooms.import');
     Route::post('/waka/rooms', [WakaController::class, 'roomsStore'])->name('waka.rooms.store');
     Route::delete('/waka/rooms/{room}', [WakaController::class, 'roomsDestroy'])->name('waka.rooms.destroy');
