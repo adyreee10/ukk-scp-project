@@ -824,7 +824,6 @@ class FetTimetableParserService
             // silent fallback
         }
     }
-    }
 
     /**
      * Mencari dan mencocokkan akun guru yang sudah ada di sistem (HANYA MENCOCOKKAN, TIDAK MEMBUAT BARU)
