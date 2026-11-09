@@ -1537,13 +1537,38 @@ class SchoolDocumentParserService
      */
     public function importRooms(UploadedFile $file, string $duplicateAction = 'replace'): array
     {
+        $this->consolidateSportsRooms();
+
         $extension = strtolower($file->getClientOriginalExtension());
+        $res = ($extension === 'pdf')
+            ? $this->parseRoomsPdf($file->getRealPath(), $duplicateAction)
+            : $this->parseRoomsSpreadsheet($file, $duplicateAction);
 
-        if ($extension === 'pdf') {
-            return $this->parseRoomsPdf($file->getRealPath(), $duplicateAction);
+        $this->consolidateSportsRooms();
+        return $res;
+    }
+
+    /**
+     * Menyatukan seluruh varian ruangan olahraga (OR1, OR2, OR3, Lapangan Olahraga 1/2/3) ke Lapangan Olahraga
+     */
+    public function consolidateSportsRooms(): void
+    {
+        try {
+            $mainSportRoom = Room::whereRaw('UPPER(TRIM(room_name)) = ?', ['LAPANGAN OLAHRAGA'])->first();
+            if ($mainSportRoom) {
+                $dupSportRooms = Room::whereIn('room_name', [
+                    'Lapangan Olahraga 1', 'Lapangan Olahraga 2', 'Lapangan Olahraga 3',
+                    'OR1', 'OR2', 'OR3', 'Lapangan 1', 'Lapangan 2', 'Lapangan 3'
+                ])->get();
+
+                foreach ($dupSportRooms as $dr) {
+                    \App\Models\Schedule::where('room_id', $dr->id)->update(['room_id' => $mainSportRoom->id]);
+                    $dr->delete();
+                }
+            }
+        } catch (\Throwable $e) {
+            // silent fallback
         }
-
-        return $this->parseRoomsSpreadsheet($file, $duplicateAction);
     }
 
     /**

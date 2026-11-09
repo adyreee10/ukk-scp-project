@@ -137,7 +137,7 @@ def canonical_room_py(rm_raw, extracted_rooms=None):
     m_r = re.match(r'^(?:RUANG|R\.?)\s*(\d+)$', rm_raw, re.I)
     if m_r:
         return f"Ruang {m_r.group(1)}"
-    if clean in ['OR', 'OR1', 'OR2']:
+    if re.match(r'^(?:OR\d*|LAPANGAN(?:\s*OLAHRAGA)?(?:\s*\d+)?)$', clean, re.I):
         return "Lapangan Olahraga"
     if clean == 'HALL':
         return "Ruang Seni Tari / Hall"
@@ -358,7 +358,7 @@ def parse_pdf(file_path):
                                     resolved_rm = extracted_rooms[clean_rm]
                                 elif rm_raw.isdigit():
                                     resolved_rm = f"Ruang {rm_raw}"
-                                elif clean_rm == 'OR':
+                                elif re.match(r'^(?:OR\d*|LAPANGAN(?:\s*OLAHRAGA)?(?:\s*\d+)?)$', clean_rm, re.I):
                                     resolved_rm = "Lapangan Olahraga"
                                 elif clean_rm == 'HALL':
                                     resolved_rm = "Ruang Seni Tari / Hall"

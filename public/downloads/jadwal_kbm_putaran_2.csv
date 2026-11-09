@@ -14,7 +14,7 @@ nama_guru_atau_nip,kelas,ruang,mapel,hari,jam_mulai,jam_selesai,putaran
 "ENENG FITRIANI PUSPITOWATI, S.Pd.Si",X AK 1,Ruang 19,Projek IPAS,Kamis,7,10,Putaran 2
 "Dra. MUKIRAH, SPd",X AK 1,Ruang 19,DDPK AKL,Jumat,1,4,Putaran 2
 "SULARDI, S.Pd",X AK 1,Laboratorium Komputer 13,DDPK AKL,Jumat,5,8,Putaran 2
-"TATIK WARDAYATI, S.Pd",X AK 2,Lapangan Olahraga 1,"Pendidikan Jasmani, Olahraga dan Kesehatan",Senin,1,3,Putaran 2
+"TATIK WARDAYATI, S.Pd",X AK 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Senin,1,3,Putaran 2
 "TATIK HERAWATI, S.Pd",X AK 2,Ruang 29,Pendidikan Pancasila,Senin,4,5,Putaran 2
 "RISA RESTI AFRIANI, S.Pd",X AK 2,Ruang 29,Bahasa Indonesia,Senin,6,8,Putaran 2
 "ERIDHA DEWI SEPITASARI, S.Pd",X AK 2,Ruang 29,Bahasa Inggris,Senin,9,10,Putaran 2
@@ -22,7 +22,7 @@ nama_guru_atau_nip,kelas,ruang,mapel,hari,jam_mulai,jam_selesai,putaran
 "SURATIMAH, S.Pd.I",X AK 2,Ruang 29,Pendidikan Agama dan Budi Pekerti,Selasa,4,6,Putaran 2
 Dra.EKO MEI WULAN,X AK 2,Ruang 29,Matematika,Selasa,7,8,Putaran 2
 "ANASTYA RATNA SULISTIYANI, S.Pd",X AK 2,Ruang 29,Sejarah,Selasa,9,10,Putaran 2
-"TATIK WARDAYATI, S.Pd",X AK 2,Lapangan Olahraga 1,"Pendidikan Jasmani, Olahraga dan Kesehatan",Rabu,1,3,Putaran 2
+"TATIK WARDAYATI, S.Pd",X AK 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Rabu,1,3,Putaran 2
 "SURATIMAH, S.Pd.I",X AK 2,Ruang 29,Pendidikan Agama dan Budi Pekerti,Rabu,4,6,Putaran 2
 "TATIK HERAWATI, S.Pd",X AK 2,Ruang 29,Pendidikan Pancasila,Rabu,7,8,Putaran 2
 "RISTIYANTI, S.Pd",X AK 2,Ruang Seni Tari / Hall,Seni Budaya,Rabu,9,10,Putaran 2
@@ -48,10 +48,10 @@ Dra.EKO MEI WULAN,X AK 2,Ruang 29,Matematika,Jumat,3,5,Putaran 2
 "CANDRA RAHADIAN, S.Pd",X AK 3,Ruang 30,Bimbingan dan Konseling,Jumat,5,5,Putaran 2
 "Dra. MUKIRAH, SPd",X AK 3,Ruang 30,DDPK AKL,Jumat,6,8,Putaran 2
 "RISA RESTI AFRIANI, S.Pd",X BD,Ruang 23,Bahasa Indonesia,Senin,1,3,Putaran 2
-"SRI NUR ARAFAH, S.Pd",X BD,Lapangan Olahraga 3,"Pendidikan Jasmani, Olahraga dan Kesehatan",Senin,4,6,Putaran 2
+"SRI NUR ARAFAH, S.Pd",X BD,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Senin,4,6,Putaran 2
 "TATIK HERAWATI, S.Pd",X BD,Ruang 20,Pendidikan Pancasila,Senin,7,8,Putaran 2
 "ANASTYA RATNA SULISTIYANI, S.Pd",X BD,Ruang 20,Sejarah,Senin,9,10,Putaran 2
-"SRI NUR ARAFAH, S.Pd",X BD,Lapangan Olahraga 3,"Pendidikan Jasmani, Olahraga dan Kesehatan",Selasa,1,3,Putaran 2
+"SRI NUR ARAFAH, S.Pd",X BD,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Selasa,1,3,Putaran 2
 "ANASTYA RATNA SULISTIYANI, S.Pd",X BD,Laboratorium Komputer 22,Sejarah,Selasa,4,5,Putaran 2
 "MENIK LESTARI, S.Pd",X BD,Laboratorium Komputer 22,Pendidikan Agama dan Budi Pekerti,Selasa,6,8,Putaran 2
 "RINI BHINTARTI, S.Pd",X BD,Laboratorium Komputer 22,Bahasa Inggris,Selasa,9,10,Putaran 2
@@ -87,7 +87,7 @@ Dra.EKO MEI WULAN,X BR 2,Ruang 26,Matematika,Senin,6,8,Putaran 2
 Dra.EKO MEI WULAN,X BR 2,Ruang 7,Matematika,Selasa,4,6,Putaran 2
 "RISTIYANTI, S.Pd",X BR 2,Ruang Seni Tari / Hall,Seni Budaya,Selasa,7,8,Putaran 2
 "AGATHA CHRISTIYANTI MANULLANG, S.S",X BR 2,Ruang 18,Bahasa Inggris,Selasa,9,10,Putaran 2
-"SRI NUR ARAFAH, S.Pd",X BR 2,Lapangan Olahraga 3,"Pendidikan Jasmani, Olahraga dan Kesehatan",Rabu,1,3,Putaran 2
+"SRI NUR ARAFAH, S.Pd",X BR 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Rabu,1,3,Putaran 2
 Dra.EKO MEI WULAN,X BR 2,Ruang 15,Matematika,Rabu,4,5,Putaran 2
 "RISTIYANTI, S.Pd",X BR 2,Ruang Seni Tari / Hall,Seni Budaya,Rabu,6,7,Putaran 2
 "MENIK LESTARI, S.Pd",X BR 2,Ruang 30,Pendidikan Agama dan Budi Pekerti,Rabu,8,10,Putaran 2
@@ -96,7 +96,7 @@ Dra.EKO MEI WULAN,X BR 2,Ruang 15,Matematika,Rabu,4,5,Putaran 2
 "RISA RESTI AFRIANI, S.Pd",X BR 2,Laboratorium Komputer 22,Bahasa Indonesia,Kamis,6,8,Putaran 2
 "ANASTYA RATNA SULISTIYANI, S.Pd",X BR 2,Laboratorium Komputer 22,Sejarah,Kamis,9,10,Putaran 2
 "MENIK LESTARI, S.Pd",X BR 2,Ruang 32,Pendidikan Agama dan Budi Pekerti,Jumat,1,3,Putaran 2
-"SRI NUR ARAFAH, S.Pd",X BR 2,Lapangan Olahraga 3,"Pendidikan Jasmani, Olahraga dan Kesehatan",Jumat,4,6,Putaran 2
+"SRI NUR ARAFAH, S.Pd",X BR 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Jumat,4,6,Putaran 2
 "TATIK HERAWATI, S.Pd",X BR 2,Ruang 32,Pendidikan Pancasila,Jumat,7,8,Putaran 2
 "YULI ASTUTI, S.Pd",X DKV 1,Laboratorium Komputer 20,DDPK 1 DKV Graphic Design Technology,Senin,1,5,Putaran 2
 "YULI ARBIATININGSIH, S.Pd",X DKV 1,Ruang 31,Projek IPAS,Senin,6,8,Putaran 2
@@ -117,11 +117,11 @@ Dra.EKO MEI WULAN,X BR 2,Ruang 15,Matematika,Rabu,4,5,Putaran 2
 "RAHMAWATI YOGA PAMUNGKAS, M.Pd",X DKV 2,Ruang 15,Bahasa Indonesia,Senin,5,7,Putaran 2
 "EVA YUNI ASTUTI, S.Pd",X DKV 2,Ruang 15,Bahasa Inggris,Senin,8,10,Putaran 2
 "EVA YUNI ASTUTI, S.Pd",X DKV 2,Ruang 15,Bahasa Inggris,Selasa,1,3,Putaran 2
-"SRI NUR ARAFAH, S.Pd",X DKV 2,Lapangan Olahraga 3,"Pendidikan Jasmani, Olahraga dan Kesehatan",Selasa,4,6,Putaran 2
+"SRI NUR ARAFAH, S.Pd",X DKV 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Selasa,4,6,Putaran 2
 "TENTREM YUNIATI LESTARI, S.Pd",X DKV 2,Ruang 15,Matematika,Selasa,7,8,Putaran 2
 "TATIK HERAWATI, S.Pd",X DKV 2,Ruang 15,Pendidikan Pancasila,Selasa,9,10,Putaran 2
 "TENTREM YUNIATI LESTARI, S.Pd",X DKV 2,Ruang 15,Matematika,Rabu,1,3,Putaran 2
-"SRI NUR ARAFAH, S.Pd",X DKV 2,Lapangan Olahraga 3,"Pendidikan Jasmani, Olahraga dan Kesehatan",Rabu,4,6,Putaran 2
+"SRI NUR ARAFAH, S.Pd",X DKV 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Rabu,4,6,Putaran 2
 "EVA YUNI ASTUTI, S.Pd",X DKV 2,Ruang 15,Bahasa Inggris,Rabu,7,8,Putaran 2
 "RAHMAWATI YOGA PAMUNGKAS, M.Pd",X DKV 2,Ruang 15,Bahasa Indonesia,Rabu,9,10,Putaran 2
 "ANASTYA RATNA SULISTIYANI, S.Pd",X DKV 2,Ruang 15,Sejarah,Kamis,1,2,Putaran 2
@@ -144,7 +144,7 @@ Dra.EKO MEI WULAN,X BR 2,Ruang 15,Matematika,Rabu,4,5,Putaran 2
 "YULI ARBIATININGSIH, S.Pd",X LPS 1,Ruang 31,Projek IPAS,Kamis,7,10,Putaran 2
 "TANTRI AGUSTIANA, S.Pd",X LPS 1,Laboratorium Komputer 7,Informatika,Jumat,1,4,Putaran 2
 "RADEN RARA UNINGSUCIASIH, S.Pd",X LPS 1,Ruang 17,DDPK AKL,Jumat,5,8,Putaran 2
-"SRI NUR ARAFAH, S.Pd",X LPS 2,Lapangan Olahraga 3,"Pendidikan Jasmani, Olahraga dan Kesehatan",Senin,1,3,Putaran 2
+"SRI NUR ARAFAH, S.Pd",X LPS 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Senin,1,3,Putaran 2
 "DANUREJO, S.Pd",X LPS 2,Ruang 16,Matematika,Senin,4,6,Putaran 2
 "AGATHA CHRISTIYANTI MANULLANG, S.S",X LPS 2,Ruang 16,Bahasa Inggris,Senin,7,8,Putaran 2
 "RISTIYANTI, S.Pd",X LPS 2,Ruang Seni Tari / Hall,Seni Budaya,Senin,9,10,Putaran 2
@@ -157,7 +157,7 @@ Dra.EKO MEI WULAN,X BR 2,Ruang 15,Matematika,Rabu,4,5,Putaran 2
 "RISA RESTI AFRIANI, S.Pd",X LPS 2,Ruang 31,Bahasa Indonesia,Rabu,5,7,Putaran 2
 "AGATHA CHRISTIYANTI MANULLANG, S.S",X LPS 2,Ruang 31,Bahasa Inggris,Rabu,8,10,Putaran 2
 "MUHAMMAD FURQON, S.Sos",X LPS 2,Ruang 17,Pendidikan Agama dan Budi Pekerti,Kamis,1,3,Putaran 2
-"SRI NUR ARAFAH, S.Pd",X LPS 2,Lapangan Olahraga 3,"Pendidikan Jasmani, Olahraga dan Kesehatan",Kamis,4,6,Putaran 2
+"SRI NUR ARAFAH, S.Pd",X LPS 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Kamis,4,6,Putaran 2
 "TATIK HERAWATI, S.Pd",X LPS 2,Ruang 30,Pendidikan Pancasila,Kamis,7,8,Putaran 2
 "RISA RESTI AFRIANI, S.Pd",X LPS 2,Ruang 30,Bahasa Indonesia,Kamis,9,10,Putaran 2
 "TATIK HERAWATI, S.Pd",X LPS 2,Ruang 16,Pendidikan Pancasila,Jumat,1,2,Putaran 2
@@ -189,11 +189,11 @@ Dra. SITI KHUSNUL KHOTIMAH,X MP 1,Ruang 7,DDPK MP,Kamis,1,4,Putaran 2
 "RISTIYANTI, S.Pd",X MP 2,Ruang Seni Tari / Hall,Seni Budaya,Rabu,3,4,Putaran 2
 "TENTREM YUNIATI LESTARI, S.Pd",X MP 2,Ruang 9,Matematika,Rabu,5,7,Putaran 2
 "DIAN AWALIATI, S.Pd",X MP 2,Ruang 9,Bahasa Inggris,Rabu,8,10,Putaran 2
-"SRI NUR ARAFAH, S.Pd",X MP 2,Lapangan Olahraga 3,"Pendidikan Jasmani, Olahraga dan Kesehatan",Kamis,1,3,Putaran 2
+"SRI NUR ARAFAH, S.Pd",X MP 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Kamis,1,3,Putaran 2
 "TENTREM YUNIATI LESTARI, S.Pd",X MP 2,Ruang 9,Matematika,Kamis,4,5,Putaran 2
 "ANASTYA RATNA SULISTIYANI, S.Pd",X MP 2,Ruang 9,Sejarah,Kamis,6,7,Putaran 2
 "DIAN AWALIATI, S.Pd",X MP 2,Ruang 9,Bahasa Inggris,Kamis,8,10,Putaran 2
-"SRI NUR ARAFAH, S.Pd",X MP 2,Lapangan Olahraga 3,"Pendidikan Jasmani, Olahraga dan Kesehatan",Jumat,1,3,Putaran 2
+"SRI NUR ARAFAH, S.Pd",X MP 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Jumat,1,3,Putaran 2
 "TATIK HERAWATI, S.Pd",X MP 2,Ruang 9,Pendidikan Pancasila,Jumat,4,5,Putaran 2
 "MURDIASIH KADARWATI, S.Pd",X MP 2,Ruang 9,Bahasa Indonesia,Jumat,6,8,Putaran 2
 "RUSDIYANTO, S.Pd",X RPL 1,Laboratorium Komputer 16,DDPK 1 RPL Dasar Profesi dan Budaya kerja,Senin,1,4,Putaran 2
@@ -222,10 +222,10 @@ Dra. SITI KHUSNUL KHOTIMAH,X MP 1,Ruang 7,DDPK MP,Kamis,1,4,Putaran 2
 "ANASTYA RATNA SULISTIYANI, S.Pd",X RPL 2,Ruang 12,Sejarah,Rabu,6,7,Putaran 2
 "SUJAR HARTONO, S.Pd",X RPL 2,Ruang 12,Bahasa Inggris,Rabu,8,10,Putaran 2
 "RAHMAWATI YOGA PAMUNGKAS, M.Pd",X RPL 2,Ruang 11,Bahasa Indonesia,Kamis,1,3,Putaran 2
-"TATIK WARDAYATI, S.Pd",X RPL 2,Lapangan Olahraga 1,"Pendidikan Jasmani, Olahraga dan Kesehatan",Kamis,4,6,Putaran 2
+"TATIK WARDAYATI, S.Pd",X RPL 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Kamis,4,6,Putaran 2
 "DWI LESMIYATI, S.Pd",X RPL 2,Ruang 12,Matematika,Kamis,7,8,Putaran 2
 "RISTIYANTI, S.Pd",X RPL 2,Ruang Seni Tari / Hall,Seni Budaya,Kamis,9,10,Putaran 2
-"TATIK WARDAYATI, S.Pd",X RPL 2,Lapangan Olahraga 1,"Pendidikan Jasmani, Olahraga dan Kesehatan",Jumat,1,3,Putaran 2
+"TATIK WARDAYATI, S.Pd",X RPL 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Jumat,1,3,Putaran 2
 "ANASTYA RATNA SULISTIYANI, S.Pd",X RPL 2,Ruang 12,Sejarah,Jumat,4,5,Putaran 2
 "RAHMAWATI YOGA PAMUNGKAS, M.Pd",X RPL 2,Ruang 12,Bahasa Indonesia,Jumat,6,8,Putaran 2
 "NURHIDAYAT SULISTIAWAN, S.Pd",X TKJ 1,Laboratorium Komputer 11,Bimbingan dan Konseling,Senin,1,1,Putaran 2
@@ -243,7 +243,7 @@ SUNARSIH S.Pd,X TKJ 1,Laboratorium IPA,Projek IPAS,Rabu,3,6,Putaran 2
 "DUWI RIANTO, S.Pd",X TKJ 1,Laboratorium Komputer 11,DDPK 3 TKJ Perkembangan Teknologi,Jumat,1,4,Putaran 2
 "ROHMAD DWIYANTO, S.Pd",X TKJ 1,Laboratorium Komputer 11,DDPK 2 TKJ Media & Jaringan Telekomunikasi,Jumat,5,8,Putaran 2
 "RAHMAWATI YOGA PAMUNGKAS, M.Pd",X TKJ 2,Ruang 22,Bahasa Indonesia,Senin,1,3,Putaran 2
-"TATIK WARDAYATI, S.Pd",X TKJ 2,Lapangan Olahraga 1,"Pendidikan Jasmani, Olahraga dan Kesehatan",Senin,4,6,Putaran 2
+"TATIK WARDAYATI, S.Pd",X TKJ 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Senin,4,6,Putaran 2
 "DWI LESMIYATI, S.Pd",X TKJ 2,Ruang 22,Matematika,Senin,7,8,Putaran 2
 "TATIK HERAWATI, S.Pd",X TKJ 2,Ruang 22,Pendidikan Pancasila,Senin,9,10,Putaran 2
 "ANASTYA RATNA SULISTIYANI, S.Pd",X TKJ 2,Ruang 22,Sejarah,Selasa,1,2,Putaran 2
@@ -251,7 +251,7 @@ SUNARSIH S.Pd,X TKJ 1,Laboratorium IPA,Projek IPAS,Rabu,3,6,Putaran 2
 "DWI LESMIYATI, S.Pd",X TKJ 2,Ruang 22,Matematika,Selasa,6,8,Putaran 2
 "RISTIYANTI, S.Pd",X TKJ 2,Ruang Seni Tari / Hall,Seni Budaya,Selasa,9,10,Putaran 2
 "AMAT SUKARDI, S.Pd",X TKJ 2,Ruang 22,Bahasa Inggris,Rabu,1,3,Putaran 2
-"TATIK WARDAYATI, S.Pd",X TKJ 2,Lapangan Olahraga 1,"Pendidikan Jasmani, Olahraga dan Kesehatan",Rabu,4,6,Putaran 2
+"TATIK WARDAYATI, S.Pd",X TKJ 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Rabu,4,6,Putaran 2
 "RAHMAWATI YOGA PAMUNGKAS, M.Pd",X TKJ 2,Ruang 22,Bahasa Indonesia,Rabu,7,8,Putaran 2
 "TATIK HERAWATI, S.Pd",X TKJ 2,Ruang 22,Pendidikan Pancasila,Rabu,9,10,Putaran 2
 "AMAT SUKARDI, S.Pd",X TKJ 2,Ruang 22,Bahasa Inggris,Kamis,1,2,Putaran 2
@@ -276,7 +276,7 @@ SUNARSIH S.Pd,X TKJ 1,Laboratorium IPA,Projek IPAS,Rabu,3,6,Putaran 2
 "RETNANINGSIH, S.Pd",XI AK 2,Ruang 5,Matematika,Senin,1,3,Putaran 2
 "ERIDHA DEWI SEPITASARI, S.Pd",XI AK 2,Ruang 5,Bahasa Inggris,Senin,4,6,Putaran 2
 "JUNIA SARI, S.Pd",XI AK 2,Ruang 5,Pendidikan Pancasila,Senin,7,8,Putaran 2
-"YANU ISWANTARA, S.Pd",XI AK 2,Lapangan Olahraga 2,"Pendidikan Jasmani, Olahraga dan Kesehatan",Senin,9,10,Putaran 2
+"YANU ISWANTARA, S.Pd",XI AK 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Senin,9,10,Putaran 2
 "KURNIA SAFITRI,S.Pd",XI AK 2,Ruang 5,Bahasa Indonesia,Selasa,1,3,Putaran 2
 "SRI WIDAYATI, S.Pd, M.Pd",XI AK 2,Ruang 5,"Kreatifitas, Inovasi dan kewirausahaan",Selasa,4,8,Putaran 2
 "ERIDHA DEWI SEPITASARI, S.Pd",XI AK 2,Ruang 5,Bahasa Inggris,Selasa,9,10,Putaran 2
@@ -285,7 +285,7 @@ SUNARSIH S.Pd,X TKJ 1,Laboratorium IPA,Projek IPAS,Rabu,3,6,Putaran 2
 "KURNIA SAFITRI,S.Pd",XI AK 2,Ruang 5,Bahasa Indonesia,Rabu,5,7,Putaran 2
 "AJENG FITRI SARASWATI, S.Pd",XI AK 2,Ruang 5,Bahasa Jawa,Rabu,8,9,Putaran 2
 "AISYAH WULANDARI, S.Pd",XI AK 2,Ruang 5,Bimbingan dan Konseling,Rabu,10,10,Putaran 2
-"YANU ISWANTARA, S.Pd",XI AK 2,Lapangan Olahraga 2,"Pendidikan Jasmani, Olahraga dan Kesehatan",Kamis,1,2,Putaran 2
+"YANU ISWANTARA, S.Pd",XI AK 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Kamis,1,2,Putaran 2
 "AJENG FITRI SARASWATI, S.Pd",XI AK 2,Ruang 5,Bahasa Jawa,Kamis,3,4,Putaran 2
 "WATI, S.Pd",XI AK 2,Ruang 5,Pendidikan Agama dan Budi Pekerti,Kamis,5,7,Putaran 2
 "ERIDHA DEWI SEPITASARI, S.Pd",XI AK 2,Ruang 5,Bahasa Inggris,Kamis,8,10,Putaran 2
@@ -310,7 +310,7 @@ SUNARSIH S.Pd,X TKJ 1,Laboratorium IPA,Projek IPAS,Rabu,3,6,Putaran 2
 "RINI BHINTARTI, S.Pd",XI BD,Ruang 25,Bahasa Inggris,Senin,8,10,Putaran 2
 "RETNANINGSIH, S.Pd",XI BD,Ruang 25,Matematika,Selasa,1,3,Putaran 2
 "BUDIYANTORO, S.Pd",XI BD,Ruang 25,"Kreatifitas, Inovasi dan kewirausahaan",Selasa,4,8,Putaran 2
-"YANU ISWANTARA, S.Pd",XI BD,Lapangan Olahraga 2,"Pendidikan Jasmani, Olahraga dan Kesehatan",Selasa,9,10,Putaran 2
+"YANU ISWANTARA, S.Pd",XI BD,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Selasa,9,10,Putaran 2
 "MURDIASIH KADARWATI, S.Pd",XI BD,Ruang 25,Bahasa Indonesia,Rabu,1,3,Putaran 2
 "JUNIA SARI, S.Pd",XI BD,Ruang 25,Pendidikan Pancasila,Rabu,4,5,Putaran 2
 "RETNANINGSIH, S.Pd",XI BD,Ruang 25,Matematika,Rabu,6,8,Putaran 2
@@ -320,7 +320,7 @@ SUNARSIH S.Pd,X TKJ 1,Laboratorium IPA,Projek IPAS,Rabu,3,6,Putaran 2
 "MURDIASIH KADARWATI, S.Pd",XI BD,Ruang 25,Bahasa Indonesia,Kamis,5,7,Putaran 2
 "WATI, S.Pd",XI BD,Ruang 25,Pendidikan Agama dan Budi Pekerti,Kamis,8,10,Putaran 2
 "RINI BHINTARTI, S.Pd",XI BD,Ruang 25,Bahasa Inggris,Jumat,1,2,Putaran 2
-"YANU ISWANTARA, S.Pd",XI BD,Lapangan Olahraga 2,"Pendidikan Jasmani, Olahraga dan Kesehatan",Jumat,3,4,Putaran 2
+"YANU ISWANTARA, S.Pd",XI BD,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Jumat,3,4,Putaran 2
 "JUNIA SARI, S.Pd",XI BD,Ruang 25,Pendidikan Pancasila,Jumat,5,6,Putaran 2
 "UMI KUNTARI, S.S",XI BD,Ruang 25,Bahasa Jawa,Jumat,7,8,Putaran 2
 "PUTRI WULANJARI, S.Pd",XI BR 1,Laboratorium Komputer 6,KK BR (Bisnis Retail),Senin,1,4,Putaran 2
@@ -335,7 +335,7 @@ SUNARSIH S.Pd,X TKJ 1,Laboratorium IPA,Projek IPAS,Rabu,3,6,Putaran 2
 "PUTRI WULANJARI, S.Pd",XI BR 1,Laboratorium Komputer 6,KK BR (Bisnis Retail),Jumat,1,4,Putaran 2
 "ARIS PURWANTINAH, S.Pd",XI BR 1,Laboratorium Komputer 6,KK BR (Bisnis Retail),Jumat,5,8,Putaran 2
 "JUNIA SARI, S.Pd",XI BR 2,Ruang 30,Pendidikan Pancasila,Senin,1,2,Putaran 2
-"YANU ISWANTARA, S.Pd",XI BR 2,Lapangan Olahraga 2,"Pendidikan Jasmani, Olahraga dan Kesehatan",Senin,3,4,Putaran 2
+"YANU ISWANTARA, S.Pd",XI BR 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Senin,3,4,Putaran 2
 "UMI KUNTARI, S.S",XI BR 2,Ruang 24,Bahasa Jawa,Senin,5,6,Putaran 2
 "NOVIA RAHMALINA, S.Pd",XI BR 2,Ruang 24,Pendidikan Agama dan Budi Pekerti,Senin,7,9,Putaran 2
 "ALIVI SAZKIA HAWIE, S.Pd",XI BR 2,Ruang 24,Bimbingan dan Konseling,Senin,10,10,Putaran 2
@@ -350,7 +350,7 @@ SUNARSIH S.Pd,X TKJ 1,Laboratorium IPA,Projek IPAS,Rabu,3,6,Putaran 2
 "WAHYUNI, S.Pd",XI BR 2,Ruang 24,Sejarah,Kamis,3,4,Putaran 2
 "RETNANINGSIH, S.Pd",XI BR 2,Ruang 24,Matematika,Kamis,5,7,Putaran 2
 "MURDIASIH KADARWATI, S.Pd",XI BR 2,Ruang 24,Bahasa Indonesia,Kamis,8,10,Putaran 2
-"YANU ISWANTARA, S.Pd",XI BR 2,Lapangan Olahraga 2,"Pendidikan Jasmani, Olahraga dan Kesehatan",Jumat,1,2,Putaran 2
+"YANU ISWANTARA, S.Pd",XI BR 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Jumat,1,2,Putaran 2
 "AGATHA CHRISTIYANTI MANULLANG, S.S",XI BR 2,Ruang 24,Bahasa Inggris,Jumat,3,5,Putaran 2
 "NOVIA RAHMALINA, S.Pd",XI BR 2,Ruang 24,Pendidikan Agama dan Budi Pekerti,Jumat,6,8,Putaran 2
 "FIANI NUR AJI PANGASTUTI, S.Pd",XI DKV 1,Laboratorium Komputer 3,KK 1 DKV Karya UI/UX,Senin,1,4,Putaran 2
@@ -371,7 +371,7 @@ SUNARSIH S.Pd,X TKJ 1,Laboratorium IPA,Projek IPAS,Rabu,3,6,Putaran 2
 "KURNIA SAFITRI,S.Pd",XI DKV 2,Ruang 14,Bahasa Indonesia,Senin,4,6,Putaran 2
 "YULITA EKA WINAJENG, S.Pd",XI DKV 2,Ruang 14,Bahasa Jawa,Senin,7,8,Putaran 2
 "WAHYUNI, S.Pd",XI DKV 2,Ruang 14,Sejarah,Senin,9,10,Putaran 2
-"TATIK WARDAYATI, S.Pd",XI DKV 2,Lapangan Olahraga 1,"Pendidikan Jasmani, Olahraga dan Kesehatan",Selasa,1,2,Putaran 2
+"TATIK WARDAYATI, S.Pd",XI DKV 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Selasa,1,2,Putaran 2
 "JUNIA SARI, S.Pd",XI DKV 2,Ruang 14,Pendidikan Pancasila,Selasa,3,4,Putaran 2
 "EVA YUNI ASTUTI, S.Pd",XI DKV 2,Ruang 14,Bahasa Inggris,Selasa,5,7,Putaran 2
 "HERMI CAHYAWATI, S.Pd.I",XI DKV 2,Ruang 14,Pendidikan Agama dan Budi Pekerti,Selasa,8,10,Putaran 2
@@ -384,7 +384,7 @@ SUNARSIH S.Pd,X TKJ 1,Laboratorium IPA,Projek IPAS,Rabu,3,6,Putaran 2
 "EVA YUNI ASTUTI, S.Pd",XI DKV 2,Ruang 14,Bahasa Inggris,Kamis,8,10,Putaran 2
 "WAHYUNI, S.Pd",XI DKV 2,Ruang 14,Sejarah,Jumat,1,2,Putaran 2
 "YULITA EKA WINAJENG, S.Pd",XI DKV 2,Ruang 14,Bahasa Jawa,Jumat,3,4,Putaran 2
-"TATIK WARDAYATI, S.Pd",XI DKV 2,Lapangan Olahraga 1,"Pendidikan Jasmani, Olahraga dan Kesehatan",Jumat,5,6,Putaran 2
+"TATIK WARDAYATI, S.Pd",XI DKV 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Jumat,5,6,Putaran 2
 "JUNIA SARI, S.Pd",XI DKV 2,Ruang 14,Pendidikan Pancasila,Jumat,7,8,Putaran 2
 "ISTI FITRIANA, S.Pd",XI LPS 1,Ruang 18,Mapel Pilihan LPS,Senin,1,4,Putaran 2
 "MARGIYATI, S.Pd",XI LPS 1,Ruang 18,KK LPS (Ekonomi Islam),Senin,5,7,Putaran 2
@@ -437,7 +437,7 @@ Dra. SITI KHUSNUL KHOTIMAH,XI MP 1,Ruang 9,KK 1 MP Administrasi Umum,Jumat,1,2,P
 "HERMI CAHYAWATI, S.Pd.I",XI MP 2,Ruang 8,Pendidikan Agama dan Budi Pekerti,Senin,4,6,Putaran 2
 "WAHYUNI, S.Pd",XI MP 2,Ruang 8,Sejarah,Senin,7,8,Putaran 2
 "JUNIA SARI, S.Pd",XI MP 2,Ruang 8,Pendidikan Pancasila,Senin,9,10,Putaran 2
-"YANU ISWANTARA, S.Pd",XI MP 2,Lapangan Olahraga 2,"Pendidikan Jasmani, Olahraga dan Kesehatan",Selasa,1,2,Putaran 2
+"YANU ISWANTARA, S.Pd",XI MP 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Selasa,1,2,Putaran 2
 "UMI KUNTARI, S.S",XI MP 2,Ruang 8,Bahasa Jawa,Selasa,3,4,Putaran 2
 "DIAN AWALIATI, S.Pd",XI MP 2,Ruang 8,Bahasa Inggris,Selasa,5,7,Putaran 2
 Dra. SITI KHUSNUL KHOTIMAH,XI MP 2,Ruang 8,"Kreatifitas, Inovasi dan kewirausahaan",Selasa,8,9,Putaran 2
@@ -445,7 +445,7 @@ Dra. SITI KHUSNUL KHOTIMAH,XI MP 2,Ruang 8,"Kreatifitas, Inovasi dan kewirausaha
 "DIAN AWALIATI, S.Pd",XI MP 2,Ruang 8,Bahasa Inggris,Rabu,1,3,Putaran 2
 "MURDIASIH KADARWATI, S.Pd",XI MP 2,Ruang 8,Bahasa Indonesia,Rabu,4,6,Putaran 2
 "WAHYUNI, S.Pd",XI MP 2,Ruang 8,Sejarah,Rabu,7,8,Putaran 2
-"YANU ISWANTARA, S.Pd",XI MP 2,Lapangan Olahraga 2,"Pendidikan Jasmani, Olahraga dan Kesehatan",Rabu,9,10,Putaran 2
+"YANU ISWANTARA, S.Pd",XI MP 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Rabu,9,10,Putaran 2
 "MURDIASIH KADARWATI, S.Pd",XI MP 2,Ruang 8,Bahasa Indonesia,Kamis,1,3,Putaran 2
 "UMI KUNTARI, S.S",XI MP 2,Ruang 8,Bahasa Jawa,Kamis,4,5,Putaran 2
 "DANUREJO, S.Pd",XI MP 2,Ruang 8,Matematika,Kamis,6,8,Putaran 2
@@ -471,13 +471,13 @@ Dra. SITI KHUSNUL KHOTIMAH,XI MP 2,Laboratorium Komputer 5,"Kreatifitas, Inovasi
 "WAHYUNI, S.Pd",XI RPL 2,Ruang 11,Sejarah,Selasa,4,5,Putaran 2
 "JUNIA SARI, S.Pd",XI RPL 2,Ruang 11,Pendidikan Pancasila,Selasa,6,7,Putaran 2
 "NOVIA RAHMALINA, S.Pd",XI RPL 2,Ruang 11,Pendidikan Agama dan Budi Pekerti,Selasa,8,10,Putaran 2
-"YANU ISWANTARA, S.Pd",XI RPL 2,Lapangan Olahraga 2,"Pendidikan Jasmani, Olahraga dan Kesehatan",Rabu,1,2,Putaran 2
+"YANU ISWANTARA, S.Pd",XI RPL 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Rabu,1,2,Putaran 2
 "SUJAR HARTONO, S.Pd",XI RPL 2,Ruang 11,Bahasa Inggris,Rabu,3,5,Putaran 2
 "YULITA EKA WINAJENG, S.Pd",XI RPL 2,Ruang 11,Bahasa Jawa,Rabu,6,7,Putaran 2
 "NOVIA RAHMALINA, S.Pd",XI RPL 2,Ruang 11,Pendidikan Agama dan Budi Pekerti,Rabu,8,10,Putaran 2
 "SELLYANA NURUL AZIZAH, S.Pd",XI RPL 2,Laboratorium Komputer 16,"Kreatifitas, Inovasi dan kewirausahaan",Kamis,1,5,Putaran 2
 "SUJAR HARTONO, S.Pd",XI RPL 2,Ruang 11,Bahasa Inggris,Kamis,6,8,Putaran 2
-"YANU ISWANTARA, S.Pd",XI RPL 2,Lapangan Olahraga 2,"Pendidikan Jasmani, Olahraga dan Kesehatan",Kamis,9,10,Putaran 2
+"YANU ISWANTARA, S.Pd",XI RPL 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Kamis,9,10,Putaran 2
 "RYAWIDYANINGTYAS, S.Pd",XI RPL 2,Ruang 11,Bimbingan dan Konseling,Jumat,1,1,Putaran 2
 "KURNIA SAFITRI,S.Pd",XI RPL 2,Ruang 11,Bahasa Indonesia,Jumat,2,4,Putaran 2
 "YULITA EKA WINAJENG, S.Pd",XI RPL 2,Ruang 11,Bahasa Jawa,Jumat,5,6,Putaran 2
@@ -493,7 +493,7 @@ Dra. SITI KHUSNUL KHOTIMAH,XI MP 2,Laboratorium Komputer 5,"Kreatifitas, Inovasi
 "DIANA ROHMANIAH, S.Kom",XI TKJ 1,Laboratorium Komputer 17,KK 4 TKJ Administrasi Sistem Jaringan,Kamis,5,10,Putaran 2
 "DIAH UTAMININGSIH, S.T",XI TKJ 1,Laboratorium Komputer 17,KK 3 TKJ Keamanan Jaringan,Jumat,1,4,Putaran 2
 "DIANA ROHMANIAH, S.Kom",XI TKJ 1,Laboratorium Komputer 17,KK 4 TKJ Administrasi Sistem Jaringan,Jumat,5,8,Putaran 2
-"YANU ISWANTARA, S.Pd",XI TKJ 2,Lapangan Olahraga 2,"Pendidikan Jasmani, Olahraga dan Kesehatan",Senin,1,2,Putaran 2
+"YANU ISWANTARA, S.Pd",XI TKJ 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Senin,1,2,Putaran 2
 "MURDIASIH KADARWATI, S.Pd",XI TKJ 2,Ruang 21,Bahasa Indonesia,Senin,3,5,Putaran 2
 "AMAT SUKARDI, S.Pd",XI TKJ 2,Ruang 21,Bahasa Inggris,Senin,6,7,Putaran 2
 "HERMI CAHYAWATI, S.Pd.I",XI TKJ 2,Ruang 21,Pendidikan Agama dan Budi Pekerti,Senin,8,10,Putaran 2
@@ -506,7 +506,7 @@ Dra. SITI KHUSNUL KHOTIMAH,XI MP 2,Laboratorium Komputer 5,"Kreatifitas, Inovasi
 "CANDRA RAHADIAN, S.Pd",XI TKJ 2,Ruang 21,Bimbingan dan Konseling,Rabu,8,8,Putaran 2
 "YULITA EKA WINAJENG, S.Pd",XI TKJ 2,Ruang 21,Bahasa Jawa,Rabu,9,10,Putaran 2
 "WAHYUNI, S.Pd",XI TKJ 2,Ruang 21,Sejarah,Kamis,1,2,Putaran 2
-"YANU ISWANTARA, S.Pd",XI TKJ 2,Lapangan Olahraga 2,"Pendidikan Jasmani, Olahraga dan Kesehatan",Kamis,3,4,Putaran 2
+"YANU ISWANTARA, S.Pd",XI TKJ 2,Lapangan Olahraga,"Pendidikan Jasmani, Olahraga dan Kesehatan",Kamis,3,4,Putaran 2
 "MULATI, S.Pd",XI TKJ 2,Ruang 21,Matematika,Kamis,5,7,Putaran 2
 "AMAT SUKARDI, S.Pd",XI TKJ 2,Ruang 21,Bahasa Inggris,Kamis,8,10,Putaran 2
 "JUNIA SARI, S.Pd",XI TKJ 2,Ruang 21,Pendidikan Pancasila,Jumat,1,2,Putaran 2

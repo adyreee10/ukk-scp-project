@@ -791,6 +791,8 @@ class FetTimetableParserService
             $imported++;
         }
 
+        $this->consolidateSportsRooms();
+
         return [
             'imported'         => $imported,
             'skipped'          => $skipped,
@@ -798,6 +800,30 @@ class FetTimetableParserService
             'created_classes'  => $createdClasses,
             'created_rooms'    => $createdRooms,
         ];
+    }
+
+    /**
+     * Menyatukan seluruh varian ruangan olahraga (OR1, OR2, OR3, Lapangan Olahraga 1/2/3) ke Lapangan Olahraga
+     */
+    public function consolidateSportsRooms(): void
+    {
+        try {
+            $mainSportRoom = Room::whereRaw('UPPER(TRIM(room_name)) = ?', ['LAPANGAN OLAHRAGA'])->first();
+            if ($mainSportRoom) {
+                $dupSportRooms = Room::whereIn('room_name', [
+                    'Lapangan Olahraga 1', 'Lapangan Olahraga 2', 'Lapangan Olahraga 3',
+                    'OR1', 'OR2', 'OR3', 'Lapangan 1', 'Lapangan 2', 'Lapangan 3'
+                ])->get();
+
+                foreach ($dupSportRooms as $dr) {
+                    Schedule::where('room_id', $dr->id)->update(['room_id' => $mainSportRoom->id]);
+                    $dr->delete();
+                }
+            }
+        } catch (\Throwable $e) {
+            // silent fallback
+        }
+    }
     }
 
     /**
@@ -899,7 +925,7 @@ class FetTimetableParserService
             return "Laboratorium Komputer " . (int)$m[1];
         }
         if (preg_match('/^(?:LAB\s*IPA|L\.\s*IPA|ABORATORIUM)/i', $c)) return 'Laboratorium IPA';
-        if (preg_match('/^(?:OR\d*|LAPANGAN|OLAHRAGA)$/i', $c)) return 'Lapangan Olahraga';
+        if (preg_match('/^(?:OR\d*|LAPANGAN(?:\s*OLAHRAGA)?(?:\s*\d+)?|OLAHRAGA)$/i', $c)) return 'Lapangan Olahraga';
         if ($c === 'HALL' || str_contains($c, 'MENARI') || str_contains($c, 'TARI')) return 'Ruang Seni Tari / Hall';
         if (preg_match('/^(?:RUANG|R\.?)\s*(\d+)$/i', $c, $m) || preg_match('/^(\d+)$/', $c, $m)) {
             return "Ruang " . (int)$m[1];

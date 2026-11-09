@@ -2304,7 +2304,7 @@ Putaran 1,Jumat,8,13:15,13:50,XII RPL 2,Kelas 12,RPL,Laboratorium Komputer 19,La
 Putaran 1,Jumat,8,13:15,13:50,XII TKJ 1,Kelas 12,TKJ,Ruang 20,Ruang Kelas / Teori
 Putaran 1,Jumat,8,13:15,13:50,XII TKJ 2,Kelas 12,TKJ,Laboratorium Komputer 2,Laboratorium
 Putaran 2,Senin,1,08:00,08:35,X AK 1,Kelas 10,AK,Laboratorium Komputer 7,Laboratorium
-Putaran 2,Senin,1,08:00,08:35,X AK 2,Kelas 10,AK,Lapangan Olahraga 1,Fasilitas Olahraga
+Putaran 2,Senin,1,08:00,08:35,X AK 2,Kelas 10,AK,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Senin,1,08:00,08:35,X AK 3,Kelas 10,AK,Laboratorium Komputer 10,Laboratorium
 Putaran 2,Senin,1,08:00,08:35,X BD,Kelas 10,BD,Ruang 23,Ruang Kelas / Teori
 Putaran 2,Senin,1,08:00,08:35,X BR 1,Kelas 10,BR,Ruang 24,Ruang Kelas / Teori
@@ -2312,7 +2312,7 @@ Putaran 2,Senin,1,08:00,08:35,X BR 2,Kelas 10,BR,Ruang 26,Ruang Kelas / Teori
 Putaran 2,Senin,1,08:00,08:35,X DKV 1,Kelas 10,DKV,Laboratorium Komputer 20,Laboratorium
 Putaran 2,Senin,1,08:00,08:35,X DKV 2,Kelas 10,DKV,Ruang 15,Ruang Kelas / Teori
 Putaran 2,Senin,1,08:00,08:35,X LPS 1,Kelas 10,LPS,Ruang 17,Ruang Kelas / Teori
-Putaran 2,Senin,1,08:00,08:35,X LPS 2,Kelas 10,LPS,Lapangan Olahraga 3,Fasilitas Olahraga
+Putaran 2,Senin,1,08:00,08:35,X LPS 2,Kelas 10,LPS,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Senin,1,08:00,08:35,X MP 1,Kelas 10,MP,Ruang 6,Ruang Kelas / Teori
 Putaran 2,Senin,1,08:00,08:35,X MP 2,Kelas 10,MP,Ruang 9,Ruang Kelas / Teori
 Putaran 2,Senin,1,08:00,08:35,X RPL 1,Kelas 10,RPL,Laboratorium Komputer 16,Laboratorium
@@ -2334,7 +2334,7 @@ Putaran 2,Senin,1,08:00,08:35,XI MP 2,Kelas 11,MP,Ruang 8,Ruang Kelas / Teori
 Putaran 2,Senin,1,08:00,08:35,XI RPL 1,Kelas 11,RPL,Laboratorium Komputer 18,Laboratorium
 Putaran 2,Senin,1,08:00,08:35,XI RPL 2,Kelas 11,RPL,Ruang 11,Ruang Kelas / Teori
 Putaran 2,Senin,1,08:00,08:35,XI TKJ 1,Kelas 11,TKJ,Laboratorium Komputer 17,Laboratorium
-Putaran 2,Senin,1,08:00,08:35,XI TKJ 2,Kelas 11,TKJ,Lapangan Olahraga 2,Fasilitas Olahraga
+Putaran 2,Senin,1,08:00,08:35,XI TKJ 2,Kelas 11,TKJ,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Senin,1,08:00,08:35,XII AK 1,Kelas 12,AK,Laboratorium Komputer 21,Laboratorium
 Putaran 2,Senin,1,08:00,08:35,XII AK 2,Kelas 12,AK,Ruang 1,Ruang Kelas / Teori
 Putaran 2,Senin,1,08:00,08:35,XII AK 3,Kelas 12,AK,Ruang 2,Ruang Kelas / Teori
@@ -2352,7 +2352,7 @@ Putaran 2,Senin,1,08:00,08:35,XII RPL 2,Kelas 12,RPL,Ruang 10,Ruang Kelas / Teor
 Putaran 2,Senin,1,08:00,08:35,XII TKJ 1,Kelas 12,TKJ,Laboratorium Komputer 2,Laboratorium
 Putaran 2,Senin,1,08:00,08:35,XII TKJ 2,Kelas 12,TKJ,Ruang 20,Ruang Kelas / Teori
 Putaran 2,Senin,2,08:35,09:10,X AK 1,Kelas 10,AK,Laboratorium Komputer 7,Laboratorium
-Putaran 2,Senin,2,08:35,09:10,X AK 2,Kelas 10,AK,Lapangan Olahraga 1,Fasilitas Olahraga
+Putaran 2,Senin,2,08:35,09:10,X AK 2,Kelas 10,AK,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Senin,2,08:35,09:10,X AK 3,Kelas 10,AK,Laboratorium Komputer 10,Laboratorium
 Putaran 2,Senin,2,08:35,09:10,X BD,Kelas 10,BD,Ruang 23,Ruang Kelas / Teori
 Putaran 2,Senin,2,08:35,09:10,X BR 1,Kelas 10,BR,Ruang 24,Ruang Kelas / Teori
@@ -2360,7 +2360,7 @@ Putaran 2,Senin,2,08:35,09:10,X BR 2,Kelas 10,BR,Ruang 26,Ruang Kelas / Teori
 Putaran 2,Senin,2,08:35,09:10,X DKV 1,Kelas 10,DKV,Laboratorium Komputer 20,Laboratorium
 Putaran 2,Senin,2,08:35,09:10,X DKV 2,Kelas 10,DKV,Ruang 15,Ruang Kelas / Teori
 Putaran 2,Senin,2,08:35,09:10,X LPS 1,Kelas 10,LPS,Ruang 17,Ruang Kelas / Teori
-Putaran 2,Senin,2,08:35,09:10,X LPS 2,Kelas 10,LPS,Lapangan Olahraga 3,Fasilitas Olahraga
+Putaran 2,Senin,2,08:35,09:10,X LPS 2,Kelas 10,LPS,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Senin,2,08:35,09:10,X MP 1,Kelas 10,MP,Ruang 6,Ruang Kelas / Teori
 Putaran 2,Senin,2,08:35,09:10,X MP 2,Kelas 10,MP,Ruang 9,Ruang Kelas / Teori
 Putaran 2,Senin,2,08:35,09:10,X RPL 1,Kelas 10,RPL,Laboratorium Komputer 16,Laboratorium
@@ -2382,7 +2382,7 @@ Putaran 2,Senin,2,08:35,09:10,XI MP 2,Kelas 11,MP,Ruang 8,Ruang Kelas / Teori
 Putaran 2,Senin,2,08:35,09:10,XI RPL 1,Kelas 11,RPL,Laboratorium Komputer 18,Laboratorium
 Putaran 2,Senin,2,08:35,09:10,XI RPL 2,Kelas 11,RPL,Ruang 11,Ruang Kelas / Teori
 Putaran 2,Senin,2,08:35,09:10,XI TKJ 1,Kelas 11,TKJ,Laboratorium Komputer 17,Laboratorium
-Putaran 2,Senin,2,08:35,09:10,XI TKJ 2,Kelas 11,TKJ,Lapangan Olahraga 2,Fasilitas Olahraga
+Putaran 2,Senin,2,08:35,09:10,XI TKJ 2,Kelas 11,TKJ,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Senin,2,08:35,09:10,XII AK 1,Kelas 12,AK,Laboratorium Komputer 21,Laboratorium
 Putaran 2,Senin,2,08:35,09:10,XII AK 2,Kelas 12,AK,Ruang 1,Ruang Kelas / Teori
 Putaran 2,Senin,2,08:35,09:10,XII AK 3,Kelas 12,AK,Ruang 2,Ruang Kelas / Teori
@@ -2400,7 +2400,7 @@ Putaran 2,Senin,2,08:35,09:10,XII RPL 2,Kelas 12,RPL,Ruang 10,Ruang Kelas / Teor
 Putaran 2,Senin,2,08:35,09:10,XII TKJ 1,Kelas 12,TKJ,Laboratorium Komputer 2,Laboratorium
 Putaran 2,Senin,2,08:35,09:10,XII TKJ 2,Kelas 12,TKJ,Ruang 20,Ruang Kelas / Teori
 Putaran 2,Senin,3,09:10,09:45,X AK 1,Kelas 10,AK,Laboratorium Komputer 7,Laboratorium
-Putaran 2,Senin,3,09:10,09:45,X AK 2,Kelas 10,AK,Lapangan Olahraga 1,Fasilitas Olahraga
+Putaran 2,Senin,3,09:10,09:45,X AK 2,Kelas 10,AK,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Senin,3,09:10,09:45,X AK 3,Kelas 10,AK,Laboratorium Komputer 10,Laboratorium
 Putaran 2,Senin,3,09:10,09:45,X BD,Kelas 10,BD,Ruang 23,Ruang Kelas / Teori
 Putaran 2,Senin,3,09:10,09:45,X BR 1,Kelas 10,BR,Ruang 24,Ruang Kelas / Teori
@@ -2408,7 +2408,7 @@ Putaran 2,Senin,3,09:10,09:45,X BR 2,Kelas 10,BR,Ruang 26,Ruang Kelas / Teori
 Putaran 2,Senin,3,09:10,09:45,X DKV 1,Kelas 10,DKV,Laboratorium Komputer 20,Laboratorium
 Putaran 2,Senin,3,09:10,09:45,X DKV 2,Kelas 10,DKV,Ruang 15,Ruang Kelas / Teori
 Putaran 2,Senin,3,09:10,09:45,X LPS 1,Kelas 10,LPS,Ruang 17,Ruang Kelas / Teori
-Putaran 2,Senin,3,09:10,09:45,X LPS 2,Kelas 10,LPS,Lapangan Olahraga 3,Fasilitas Olahraga
+Putaran 2,Senin,3,09:10,09:45,X LPS 2,Kelas 10,LPS,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Senin,3,09:10,09:45,X MP 1,Kelas 10,MP,Ruang 6,Ruang Kelas / Teori
 Putaran 2,Senin,3,09:10,09:45,X MP 2,Kelas 10,MP,Ruang 9,Ruang Kelas / Teori
 Putaran 2,Senin,3,09:10,09:45,X RPL 1,Kelas 10,RPL,Laboratorium Komputer 16,Laboratorium
@@ -2421,7 +2421,7 @@ Putaran 2,Senin,3,09:10,09:45,XI AK 3,Kelas 11,AK,Ruang 19,Ruang Kelas / Teori
 Putaran 2,Senin,3,09:10,09:45,XI AK 4,Kelas 11,AK,Laboratorium Komputer 1,Laboratorium
 Putaran 2,Senin,3,09:10,09:45,XI BD,Kelas 11,BD,Ruang 25,Ruang Kelas / Teori
 Putaran 2,Senin,3,09:10,09:45,XI BR 1,Kelas 11,BR,Laboratorium Komputer 6,Laboratorium
-Putaran 2,Senin,3,09:10,09:45,XI BR 2,Kelas 11,BR,Lapangan Olahraga 2,Fasilitas Olahraga
+Putaran 2,Senin,3,09:10,09:45,XI BR 2,Kelas 11,BR,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Senin,3,09:10,09:45,XI DKV 1,Kelas 11,DKV,Laboratorium Komputer 3,Laboratorium
 Putaran 2,Senin,3,09:10,09:45,XI DKV 2,Kelas 11,DKV,Ruang 14,Ruang Kelas / Teori
 Putaran 2,Senin,3,09:10,09:45,XI LPS,Kelas 11,LPS,Ruang 18,Ruang Kelas / Teori
@@ -2450,7 +2450,7 @@ Putaran 2,Senin,3,09:10,09:45,XII TKJ 2,Kelas 12,TKJ,Ruang 20,Ruang Kelas / Teor
 Putaran 2,Senin,4,10:00,10:35,X AK 1,Kelas 10,AK,Laboratorium Komputer 7,Laboratorium
 Putaran 2,Senin,4,10:00,10:35,X AK 2,Kelas 10,AK,Ruang 29,Ruang Kelas / Teori
 Putaran 2,Senin,4,10:00,10:35,X AK 3,Kelas 10,AK,Laboratorium Komputer 10,Laboratorium
-Putaran 2,Senin,4,10:00,10:35,X BD,Kelas 10,BD,Lapangan Olahraga 3,Fasilitas Olahraga
+Putaran 2,Senin,4,10:00,10:35,X BD,Kelas 10,BD,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Senin,4,10:00,10:35,X BR 1,Kelas 10,BR,Ruang 24,Ruang Kelas / Teori
 Putaran 2,Senin,4,10:00,10:35,X BR 2,Kelas 10,BR,Ruang 26,Ruang Kelas / Teori
 Putaran 2,Senin,4,10:00,10:35,X DKV 1,Kelas 10,DKV,Laboratorium Komputer 20,Laboratorium
@@ -2462,14 +2462,14 @@ Putaran 2,Senin,4,10:00,10:35,X MP 2,Kelas 10,MP,Ruang Seni Tari / Hall,Ruang Kh
 Putaran 2,Senin,4,10:00,10:35,X RPL 1,Kelas 10,RPL,Laboratorium Komputer 16,Laboratorium
 Putaran 2,Senin,4,10:00,10:35,X RPL 2,Kelas 10,RPL,Ruang 12,Ruang Kelas / Teori
 Putaran 2,Senin,4,10:00,10:35,X TKJ 1,Kelas 10,TKJ,Laboratorium Komputer 11,Laboratorium
-Putaran 2,Senin,4,10:00,10:35,X TKJ 2,Kelas 10,TKJ,Lapangan Olahraga 1,Fasilitas Olahraga
+Putaran 2,Senin,4,10:00,10:35,X TKJ 2,Kelas 10,TKJ,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Senin,4,10:00,10:35,XI AK 1,Kelas 11,AK,Laboratorium Komputer 13,Laboratorium
 Putaran 2,Senin,4,10:00,10:35,XI AK 2,Kelas 11,AK,Ruang 5,Ruang Kelas / Teori
 Putaran 2,Senin,4,10:00,10:35,XI AK 3,Kelas 11,AK,Ruang 19,Ruang Kelas / Teori
 Putaran 2,Senin,4,10:00,10:35,XI AK 4,Kelas 11,AK,Laboratorium Komputer 1,Laboratorium
 Putaran 2,Senin,4,10:00,10:35,XI BD,Kelas 11,BD,Ruang 25,Ruang Kelas / Teori
 Putaran 2,Senin,4,10:00,10:35,XI BR 1,Kelas 11,BR,Laboratorium Komputer 6,Laboratorium
-Putaran 2,Senin,4,10:00,10:35,XI BR 2,Kelas 11,BR,Lapangan Olahraga 2,Fasilitas Olahraga
+Putaran 2,Senin,4,10:00,10:35,XI BR 2,Kelas 11,BR,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Senin,4,10:00,10:35,XI DKV 1,Kelas 11,DKV,Laboratorium Komputer 3,Laboratorium
 Putaran 2,Senin,4,10:00,10:35,XI DKV 2,Kelas 11,DKV,Ruang 14,Ruang Kelas / Teori
 Putaran 2,Senin,4,10:00,10:35,XI LPS,Kelas 11,LPS,Ruang 18,Ruang Kelas / Teori
@@ -2498,7 +2498,7 @@ Putaran 2,Senin,4,10:00,10:35,XII TKJ 2,Kelas 12,TKJ,Ruang 20,Ruang Kelas / Teor
 Putaran 2,Senin,5,10:35,11:10,X AK 1,Kelas 10,AK,Ruang 19,Ruang Kelas / Teori
 Putaran 2,Senin,5,10:35,11:10,X AK 2,Kelas 10,AK,Ruang 29,Ruang Kelas / Teori
 Putaran 2,Senin,5,10:35,11:10,X AK 3,Kelas 10,AK,Ruang 30,Ruang Kelas / Teori
-Putaran 2,Senin,5,10:35,11:10,X BD,Kelas 10,BD,Lapangan Olahraga 3,Fasilitas Olahraga
+Putaran 2,Senin,5,10:35,11:10,X BD,Kelas 10,BD,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Senin,5,10:35,11:10,X BR 1,Kelas 10,BR,Laboratorium Komputer 10,Laboratorium
 Putaran 2,Senin,5,10:35,11:10,X BR 2,Kelas 10,BR,Ruang 26,Ruang Kelas / Teori
 Putaran 2,Senin,5,10:35,11:10,X DKV 1,Kelas 10,DKV,Laboratorium Komputer 20,Laboratorium
@@ -2510,7 +2510,7 @@ Putaran 2,Senin,5,10:35,11:10,X MP 2,Kelas 10,MP,Ruang Seni Tari / Hall,Ruang Kh
 Putaran 2,Senin,5,10:35,11:10,X RPL 1,Kelas 10,RPL,Ruang 22,Ruang Kelas / Teori
 Putaran 2,Senin,5,10:35,11:10,X RPL 2,Kelas 10,RPL,Ruang 12,Ruang Kelas / Teori
 Putaran 2,Senin,5,10:35,11:10,X TKJ 1,Kelas 10,TKJ,Laboratorium Komputer 11,Laboratorium
-Putaran 2,Senin,5,10:35,11:10,X TKJ 2,Kelas 10,TKJ,Lapangan Olahraga 1,Fasilitas Olahraga
+Putaran 2,Senin,5,10:35,11:10,X TKJ 2,Kelas 10,TKJ,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Senin,5,10:35,11:10,XI AK 1,Kelas 11,AK,Ruang 2,Ruang Kelas / Teori
 Putaran 2,Senin,5,10:35,11:10,XI AK 2,Kelas 11,AK,Ruang 5,Ruang Kelas / Teori
 Putaran 2,Senin,5,10:35,11:10,XI AK 3,Kelas 11,AK,Laboratorium Komputer 13,Laboratorium
@@ -2546,7 +2546,7 @@ Putaran 2,Senin,5,10:35,11:10,XII TKJ 2,Kelas 12,TKJ,Ruang 20,Ruang Kelas / Teor
 Putaran 2,Senin,6,11:10,11:45,X AK 1,Kelas 10,AK,Ruang 19,Ruang Kelas / Teori
 Putaran 2,Senin,6,11:10,11:45,X AK 2,Kelas 10,AK,Ruang 29,Ruang Kelas / Teori
 Putaran 2,Senin,6,11:10,11:45,X AK 3,Kelas 10,AK,Ruang 30,Ruang Kelas / Teori
-Putaran 2,Senin,6,11:10,11:45,X BD,Kelas 10,BD,Lapangan Olahraga 3,Fasilitas Olahraga
+Putaran 2,Senin,6,11:10,11:45,X BD,Kelas 10,BD,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Senin,6,11:10,11:45,X BR 1,Kelas 10,BR,Laboratorium Komputer 10,Laboratorium
 Putaran 2,Senin,6,11:10,11:45,X BR 2,Kelas 10,BR,Ruang 26,Ruang Kelas / Teori
 Putaran 2,Senin,6,11:10,11:45,X DKV 1,Kelas 10,DKV,Ruang 31,Ruang Kelas / Teori
@@ -2558,7 +2558,7 @@ Putaran 2,Senin,6,11:10,11:45,X MP 2,Kelas 10,MP,Ruang 9,Ruang Kelas / Teori
 Putaran 2,Senin,6,11:10,11:45,X RPL 1,Kelas 10,RPL,Ruang 22,Ruang Kelas / Teori
 Putaran 2,Senin,6,11:10,11:45,X RPL 2,Kelas 10,RPL,Ruang 12,Ruang Kelas / Teori
 Putaran 2,Senin,6,11:10,11:45,X TKJ 1,Kelas 10,TKJ,Laboratorium Komputer 11,Laboratorium
-Putaran 2,Senin,6,11:10,11:45,X TKJ 2,Kelas 10,TKJ,Lapangan Olahraga 1,Fasilitas Olahraga
+Putaran 2,Senin,6,11:10,11:45,X TKJ 2,Kelas 10,TKJ,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Senin,6,11:10,11:45,XI AK 1,Kelas 11,AK,Ruang 2,Ruang Kelas / Teori
 Putaran 2,Senin,6,11:10,11:45,XI AK 2,Kelas 11,AK,Ruang 5,Ruang Kelas / Teori
 Putaran 2,Senin,6,11:10,11:45,XI AK 3,Kelas 11,AK,Laboratorium Komputer 13,Laboratorium
@@ -2704,7 +2704,7 @@ Putaran 2,Senin,9,14:00,14:35,X RPL 2,Kelas 10,RPL,Ruang 12,Ruang Kelas / Teori
 Putaran 2,Senin,9,14:00,14:35,X TKJ 1,Kelas 10,TKJ,Laboratorium Komputer 11,Laboratorium
 Putaran 2,Senin,9,14:00,14:35,X TKJ 2,Kelas 10,TKJ,Ruang 22,Ruang Kelas / Teori
 Putaran 2,Senin,9,14:00,14:35,XI AK 1,Kelas 11,AK,Ruang 2,Ruang Kelas / Teori
-Putaran 2,Senin,9,14:00,14:35,XI AK 2,Kelas 11,AK,Lapangan Olahraga 2,Fasilitas Olahraga
+Putaran 2,Senin,9,14:00,14:35,XI AK 2,Kelas 11,AK,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Senin,9,14:00,14:35,XI AK 3,Kelas 11,AK,Laboratorium Komputer 13,Laboratorium
 Putaran 2,Senin,9,14:00,14:35,XI AK 4,Kelas 11,AK,Ruang 17,Ruang Kelas / Teori
 Putaran 2,Senin,9,14:00,14:35,XI BD,Kelas 11,BD,Ruang 25,Ruang Kelas / Teori
@@ -2752,7 +2752,7 @@ Putaran 2,Senin,10,14:35,15:10,X RPL 2,Kelas 10,RPL,Ruang 12,Ruang Kelas / Teori
 Putaran 2,Senin,10,14:35,15:10,X TKJ 1,Kelas 10,TKJ,Laboratorium Komputer 11,Laboratorium
 Putaran 2,Senin,10,14:35,15:10,X TKJ 2,Kelas 10,TKJ,Ruang 22,Ruang Kelas / Teori
 Putaran 2,Senin,10,14:35,15:10,XI AK 1,Kelas 11,AK,Ruang 2,Ruang Kelas / Teori
-Putaran 2,Senin,10,14:35,15:10,XI AK 2,Kelas 11,AK,Lapangan Olahraga 2,Fasilitas Olahraga
+Putaran 2,Senin,10,14:35,15:10,XI AK 2,Kelas 11,AK,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Senin,10,14:35,15:10,XI AK 3,Kelas 11,AK,Laboratorium Komputer 13,Laboratorium
 Putaran 2,Senin,10,14:35,15:10,XI AK 4,Kelas 11,AK,Ruang 17,Ruang Kelas / Teori
 Putaran 2,Senin,10,14:35,15:10,XI BD,Kelas 11,BD,Ruang 25,Ruang Kelas / Teori
@@ -2786,7 +2786,7 @@ Putaran 2,Senin,10,14:35,15:10,XII TKJ 2,Kelas 12,TKJ,Laboratorium Komputer 2,La
 Putaran 2,Selasa,1,07:30,08:10,X AK 1,Kelas 10,AK,Ruang 19,Ruang Kelas / Teori
 Putaran 2,Selasa,1,07:30,08:10,X AK 2,Kelas 10,AK,Ruang 29,Ruang Kelas / Teori
 Putaran 2,Selasa,1,07:30,08:10,X AK 3,Kelas 10,AK,Laboratorium Komputer 14,Laboratorium
-Putaran 2,Selasa,1,07:30,08:10,X BD,Kelas 10,BD,Lapangan Olahraga 3,Fasilitas Olahraga
+Putaran 2,Selasa,1,07:30,08:10,X BD,Kelas 10,BD,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Selasa,1,07:30,08:10,X BR 1,Kelas 10,BR,Ruang 26,Ruang Kelas / Teori
 Putaran 2,Selasa,1,07:30,08:10,X BR 2,Kelas 10,BR,Ruang 7,Ruang Kelas / Teori
 Putaran 2,Selasa,1,07:30,08:10,X DKV 1,Kelas 10,DKV,Laboratorium Komputer 9,Laboratorium
@@ -2807,10 +2807,10 @@ Putaran 2,Selasa,1,07:30,08:10,XI BD,Kelas 11,BD,Ruang 25,Ruang Kelas / Teori
 Putaran 2,Selasa,1,07:30,08:10,XI BR 1,Kelas 11,BR,Laboratorium Komputer 8,Laboratorium
 Putaran 2,Selasa,1,07:30,08:10,XI BR 2,Kelas 11,BR,Ruang 24,Ruang Kelas / Teori
 Putaran 2,Selasa,1,07:30,08:10,XI DKV 1,Kelas 11,DKV,Laboratorium Komputer 3,Laboratorium
-Putaran 2,Selasa,1,07:30,08:10,XI DKV 2,Kelas 11,DKV,Lapangan Olahraga 1,Fasilitas Olahraga
+Putaran 2,Selasa,1,07:30,08:10,XI DKV 2,Kelas 11,DKV,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Selasa,1,07:30,08:10,XI LPS,Kelas 11,LPS,Ruang 18,Ruang Kelas / Teori
 Putaran 2,Selasa,1,07:30,08:10,XI MP 1,Kelas 11,MP,Laboratorium Komputer 5,Laboratorium
-Putaran 2,Selasa,1,07:30,08:10,XI MP 2,Kelas 11,MP,Lapangan Olahraga 2,Fasilitas Olahraga
+Putaran 2,Selasa,1,07:30,08:10,XI MP 2,Kelas 11,MP,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Selasa,1,07:30,08:10,XI RPL 1,Kelas 11,RPL,Laboratorium Komputer 18,Laboratorium
 Putaran 2,Selasa,1,07:30,08:10,XI RPL 2,Kelas 11,RPL,Ruang 11,Ruang Kelas / Teori
 Putaran 2,Selasa,1,07:30,08:10,XI TKJ 1,Kelas 11,TKJ,Laboratorium Komputer 2,Laboratorium
@@ -2834,7 +2834,7 @@ Putaran 2,Selasa,1,07:30,08:10,XII TKJ 2,Kelas 12,TKJ,Laboratorium Komputer 11,L
 Putaran 2,Selasa,2,08:10,08:50,X AK 1,Kelas 10,AK,Ruang 19,Ruang Kelas / Teori
 Putaran 2,Selasa,2,08:10,08:50,X AK 2,Kelas 10,AK,Ruang 29,Ruang Kelas / Teori
 Putaran 2,Selasa,2,08:10,08:50,X AK 3,Kelas 10,AK,Laboratorium Komputer 14,Laboratorium
-Putaran 2,Selasa,2,08:10,08:50,X BD,Kelas 10,BD,Lapangan Olahraga 3,Fasilitas Olahraga
+Putaran 2,Selasa,2,08:10,08:50,X BD,Kelas 10,BD,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Selasa,2,08:10,08:50,X BR 1,Kelas 10,BR,Ruang 26,Ruang Kelas / Teori
 Putaran 2,Selasa,2,08:10,08:50,X BR 2,Kelas 10,BR,Ruang 7,Ruang Kelas / Teori
 Putaran 2,Selasa,2,08:10,08:50,X DKV 1,Kelas 10,DKV,Laboratorium Komputer 9,Laboratorium
@@ -2855,10 +2855,10 @@ Putaran 2,Selasa,2,08:10,08:50,XI BD,Kelas 11,BD,Ruang 25,Ruang Kelas / Teori
 Putaran 2,Selasa,2,08:10,08:50,XI BR 1,Kelas 11,BR,Laboratorium Komputer 8,Laboratorium
 Putaran 2,Selasa,2,08:10,08:50,XI BR 2,Kelas 11,BR,Ruang 24,Ruang Kelas / Teori
 Putaran 2,Selasa,2,08:10,08:50,XI DKV 1,Kelas 11,DKV,Laboratorium Komputer 3,Laboratorium
-Putaran 2,Selasa,2,08:10,08:50,XI DKV 2,Kelas 11,DKV,Lapangan Olahraga 1,Fasilitas Olahraga
+Putaran 2,Selasa,2,08:10,08:50,XI DKV 2,Kelas 11,DKV,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Selasa,2,08:10,08:50,XI LPS,Kelas 11,LPS,Ruang 18,Ruang Kelas / Teori
 Putaran 2,Selasa,2,08:10,08:50,XI MP 1,Kelas 11,MP,Laboratorium Komputer 5,Laboratorium
-Putaran 2,Selasa,2,08:10,08:50,XI MP 2,Kelas 11,MP,Lapangan Olahraga 2,Fasilitas Olahraga
+Putaran 2,Selasa,2,08:10,08:50,XI MP 2,Kelas 11,MP,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Selasa,2,08:10,08:50,XI RPL 1,Kelas 11,RPL,Laboratorium Komputer 18,Laboratorium
 Putaran 2,Selasa,2,08:10,08:50,XI RPL 2,Kelas 11,RPL,Ruang 11,Ruang Kelas / Teori
 Putaran 2,Selasa,2,08:10,08:50,XI TKJ 1,Kelas 11,TKJ,Laboratorium Komputer 2,Laboratorium
@@ -2882,7 +2882,7 @@ Putaran 2,Selasa,2,08:10,08:50,XII TKJ 2,Kelas 12,TKJ,Laboratorium Komputer 11,L
 Putaran 2,Selasa,3,08:50,09:30,X AK 1,Kelas 10,AK,Ruang 19,Ruang Kelas / Teori
 Putaran 2,Selasa,3,08:50,09:30,X AK 2,Kelas 10,AK,Ruang 29,Ruang Kelas / Teori
 Putaran 2,Selasa,3,08:50,09:30,X AK 3,Kelas 10,AK,Laboratorium Komputer 14,Laboratorium
-Putaran 2,Selasa,3,08:50,09:30,X BD,Kelas 10,BD,Lapangan Olahraga 3,Fasilitas Olahraga
+Putaran 2,Selasa,3,08:50,09:30,X BD,Kelas 10,BD,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Selasa,3,08:50,09:30,X BR 1,Kelas 10,BR,Ruang 26,Ruang Kelas / Teori
 Putaran 2,Selasa,3,08:50,09:30,X BR 2,Kelas 10,BR,Ruang 7,Ruang Kelas / Teori
 Putaran 2,Selasa,3,08:50,09:30,X DKV 1,Kelas 10,DKV,Laboratorium Komputer 9,Laboratorium
@@ -2934,7 +2934,7 @@ Putaran 2,Selasa,4,09:45,10:25,X BD,Kelas 10,BD,Laboratorium Komputer 22,Laborat
 Putaran 2,Selasa,4,09:45,10:25,X BR 1,Kelas 10,BR,Ruang 26,Ruang Kelas / Teori
 Putaran 2,Selasa,4,09:45,10:25,X BR 2,Kelas 10,BR,Ruang 7,Ruang Kelas / Teori
 Putaran 2,Selasa,4,09:45,10:25,X DKV 1,Kelas 10,DKV,Laboratorium Komputer 9,Laboratorium
-Putaran 2,Selasa,4,09:45,10:25,X DKV 2,Kelas 10,DKV,Lapangan Olahraga 3,Fasilitas Olahraga
+Putaran 2,Selasa,4,09:45,10:25,X DKV 2,Kelas 10,DKV,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Selasa,4,09:45,10:25,X LPS 1,Kelas 10,LPS,Laboratorium Komputer 7,Laboratorium
 Putaran 2,Selasa,4,09:45,10:25,X LPS 2,Kelas 10,LPS,Ruang Seni Tari / Hall,Ruang Khusus
 Putaran 2,Selasa,4,09:45,10:25,X MP 1,Kelas 10,MP,Laboratorium Komputer 10,Laboratorium
@@ -2982,7 +2982,7 @@ Putaran 2,Selasa,5,10:25,11:05,X BD,Kelas 10,BD,Laboratorium Komputer 22,Laborat
 Putaran 2,Selasa,5,10:25,11:05,X BR 1,Kelas 10,BR,Ruang 26,Ruang Kelas / Teori
 Putaran 2,Selasa,5,10:25,11:05,X BR 2,Kelas 10,BR,Ruang 7,Ruang Kelas / Teori
 Putaran 2,Selasa,5,10:25,11:05,X DKV 1,Kelas 10,DKV,Laboratorium Komputer 9,Laboratorium
-Putaran 2,Selasa,5,10:25,11:05,X DKV 2,Kelas 10,DKV,Lapangan Olahraga 3,Fasilitas Olahraga
+Putaran 2,Selasa,5,10:25,11:05,X DKV 2,Kelas 10,DKV,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Selasa,5,10:25,11:05,X LPS 1,Kelas 10,LPS,Laboratorium Komputer 7,Laboratorium
 Putaran 2,Selasa,5,10:25,11:05,X LPS 2,Kelas 10,LPS,Ruang Seni Tari / Hall,Ruang Khusus
 Putaran 2,Selasa,5,10:25,11:05,X MP 1,Kelas 10,MP,Laboratorium Komputer 10,Laboratorium
@@ -3030,7 +3030,7 @@ Putaran 2,Selasa,6,11:05,11:45,X BD,Kelas 10,BD,Laboratorium Komputer 22,Laborat
 Putaran 2,Selasa,6,11:05,11:45,X BR 1,Kelas 10,BR,Ruang 26,Ruang Kelas / Teori
 Putaran 2,Selasa,6,11:05,11:45,X BR 2,Kelas 10,BR,Ruang 7,Ruang Kelas / Teori
 Putaran 2,Selasa,6,11:05,11:45,X DKV 1,Kelas 10,DKV,Laboratorium Komputer 9,Laboratorium
-Putaran 2,Selasa,6,11:05,11:45,X DKV 2,Kelas 10,DKV,Lapangan Olahraga 3,Fasilitas Olahraga
+Putaran 2,Selasa,6,11:05,11:45,X DKV 2,Kelas 10,DKV,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Selasa,6,11:05,11:45,X LPS 1,Kelas 10,LPS,Laboratorium Komputer 7,Laboratorium
 Putaran 2,Selasa,6,11:05,11:45,X LPS 2,Kelas 10,LPS,Ruang 30,Ruang Kelas / Teori
 Putaran 2,Selasa,6,11:05,11:45,X MP 1,Kelas 10,MP,Laboratorium Komputer 10,Laboratorium
@@ -3187,12 +3187,12 @@ Putaran 2,Selasa,9,14:00,14:35,XI AK 1,Kelas 11,AK,Laboratorium Komputer 13,Labo
 Putaran 2,Selasa,9,14:00,14:35,XI AK 2,Kelas 11,AK,Ruang 5,Ruang Kelas / Teori
 Putaran 2,Selasa,9,14:00,14:35,XI AK 3,Kelas 11,AK,Ruang 16,Ruang Kelas / Teori
 Putaran 2,Selasa,9,14:00,14:35,XI AK 4,Kelas 11,AK,Ruang 17,Ruang Kelas / Teori
-Putaran 2,Selasa,9,14:00,14:35,XI BD,Kelas 11,BD,Lapangan Olahraga 2,Fasilitas Olahraga
+Putaran 2,Selasa,9,14:00,14:35,XI BD,Kelas 11,BD,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Selasa,9,14:00,14:35,XI BR 1,Kelas 11,BR,Ruang 31,Ruang Kelas / Teori
 Putaran 2,Selasa,9,14:00,14:35,XI BR 2,Kelas 11,BR,Ruang 24,Ruang Kelas / Teori
 Putaran 2,Selasa,9,14:00,14:35,XI DKV 1,Kelas 11,DKV,Laboratorium Komputer 9,Laboratorium
 Putaran 2,Selasa,9,14:00,14:35,XI DKV 2,Kelas 11,DKV,Ruang 14,Ruang Kelas / Teori
-Putaran 2,Selasa,9,14:00,14:35,XI LPS,Kelas 11,LPS,Lapangan Olahraga 1,Fasilitas Olahraga
+Putaran 2,Selasa,9,14:00,14:35,XI LPS,Kelas 11,LPS,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Selasa,9,14:00,14:35,XI MP 1,Kelas 11,MP,Ruang 7,Ruang Kelas / Teori
 Putaran 2,Selasa,9,14:00,14:35,XI MP 2,Kelas 11,MP,Ruang 8,Ruang Kelas / Teori
 Putaran 2,Selasa,9,14:00,14:35,XI RPL 1,Kelas 11,RPL,Laboratorium Komputer 18,Laboratorium
@@ -3235,12 +3235,12 @@ Putaran 2,Selasa,10,14:45,15:10,XI AK 1,Kelas 11,AK,Laboratorium Komputer 13,Lab
 Putaran 2,Selasa,10,14:45,15:10,XI AK 2,Kelas 11,AK,Ruang 5,Ruang Kelas / Teori
 Putaran 2,Selasa,10,14:45,15:10,XI AK 3,Kelas 11,AK,Ruang 16,Ruang Kelas / Teori
 Putaran 2,Selasa,10,14:45,15:10,XI AK 4,Kelas 11,AK,Ruang 17,Ruang Kelas / Teori
-Putaran 2,Selasa,10,14:45,15:10,XI BD,Kelas 11,BD,Lapangan Olahraga 2,Fasilitas Olahraga
+Putaran 2,Selasa,10,14:45,15:10,XI BD,Kelas 11,BD,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Selasa,10,14:45,15:10,XI BR 1,Kelas 11,BR,Ruang 31,Ruang Kelas / Teori
 Putaran 2,Selasa,10,14:45,15:10,XI BR 2,Kelas 11,BR,Ruang 24,Ruang Kelas / Teori
 Putaran 2,Selasa,10,14:45,15:10,XI DKV 1,Kelas 11,DKV,Laboratorium Komputer 9,Laboratorium
 Putaran 2,Selasa,10,14:45,15:10,XI DKV 2,Kelas 11,DKV,Ruang 14,Ruang Kelas / Teori
-Putaran 2,Selasa,10,14:45,15:10,XI LPS,Kelas 11,LPS,Lapangan Olahraga 1,Fasilitas Olahraga
+Putaran 2,Selasa,10,14:45,15:10,XI LPS,Kelas 11,LPS,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Selasa,10,14:45,15:10,XI MP 1,Kelas 11,MP,Ruang 7,Ruang Kelas / Teori
 Putaran 2,Selasa,10,14:45,15:10,XI MP 2,Kelas 11,MP,Ruang 8,Ruang Kelas / Teori
 Putaran 2,Selasa,10,14:45,15:10,XI RPL 1,Kelas 11,RPL,Laboratorium Komputer 18,Laboratorium
@@ -3264,11 +3264,11 @@ Putaran 2,Selasa,10,14:45,15:10,XII RPL 2,Kelas 12,RPL,Ruang 10,Ruang Kelas / Te
 Putaran 2,Selasa,10,14:45,15:10,XII TKJ 1,Kelas 12,TKJ,Laboratorium Komputer 17,Laboratorium
 Putaran 2,Selasa,10,14:45,15:10,XII TKJ 2,Kelas 12,TKJ,Ruang 20,Ruang Kelas / Teori
 Putaran 2,Rabu,1,07:15,07:55,X AK 1,Kelas 10,AK,Ruang 19,Ruang Kelas / Teori
-Putaran 2,Rabu,1,07:15,07:55,X AK 2,Kelas 10,AK,Lapangan Olahraga 1,Fasilitas Olahraga
+Putaran 2,Rabu,1,07:15,07:55,X AK 2,Kelas 10,AK,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Rabu,1,07:15,07:55,X AK 3,Kelas 10,AK,Ruang 30,Ruang Kelas / Teori
 Putaran 2,Rabu,1,07:15,07:55,X BD,Kelas 10,BD,Ruang Seni Tari / Hall,Ruang Khusus
 Putaran 2,Rabu,1,07:15,07:55,X BR 1,Kelas 10,BR,Laboratorium Komputer 6,Laboratorium
-Putaran 2,Rabu,1,07:15,07:55,X BR 2,Kelas 10,BR,Lapangan Olahraga 3,Fasilitas Olahraga
+Putaran 2,Rabu,1,07:15,07:55,X BR 2,Kelas 10,BR,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Rabu,1,07:15,07:55,X DKV 1,Kelas 10,DKV,Laboratorium Komputer 10,Laboratorium
 Putaran 2,Rabu,1,07:15,07:55,X DKV 2,Kelas 10,DKV,Ruang 15,Ruang Kelas / Teori
 Putaran 2,Rabu,1,07:15,07:55,X LPS 1,Kelas 10,LPS,Ruang 32,Ruang Kelas / Teori
@@ -3292,7 +3292,7 @@ Putaran 2,Rabu,1,07:15,07:55,XI LPS,Kelas 11,LPS,Ruang 18,Ruang Kelas / Teori
 Putaran 2,Rabu,1,07:15,07:55,XI MP 1,Kelas 11,MP,Ruang 7,Ruang Kelas / Teori
 Putaran 2,Rabu,1,07:15,07:55,XI MP 2,Kelas 11,MP,Ruang 8,Ruang Kelas / Teori
 Putaran 2,Rabu,1,07:15,07:55,XI RPL 1,Kelas 11,RPL,Laboratorium Komputer 18,Laboratorium
-Putaran 2,Rabu,1,07:15,07:55,XI RPL 2,Kelas 11,RPL,Lapangan Olahraga 2,Fasilitas Olahraga
+Putaran 2,Rabu,1,07:15,07:55,XI RPL 2,Kelas 11,RPL,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Rabu,1,07:15,07:55,XI TKJ 1,Kelas 11,TKJ,Laboratorium Komputer 17,Laboratorium
 Putaran 2,Rabu,1,07:15,07:55,XI TKJ 2,Kelas 11,TKJ,Laboratorium Komputer 14,Laboratorium
 Putaran 2,Rabu,1,07:15,07:55,XII AK 1,Kelas 12,AK,Laboratorium Komputer 1,Laboratorium
@@ -3312,11 +3312,11 @@ Putaran 2,Rabu,1,07:15,07:55,XII RPL 2,Kelas 12,RPL,Ruang 10,Ruang Kelas / Teori
 Putaran 2,Rabu,1,07:15,07:55,XII TKJ 1,Kelas 12,TKJ,Laboratorium Komputer 2,Laboratorium
 Putaran 2,Rabu,1,07:15,07:55,XII TKJ 2,Kelas 12,TKJ,Ruang 20,Ruang Kelas / Teori
 Putaran 2,Rabu,2,07:55,08:35,X AK 1,Kelas 10,AK,Ruang 19,Ruang Kelas / Teori
-Putaran 2,Rabu,2,07:55,08:35,X AK 2,Kelas 10,AK,Lapangan Olahraga 1,Fasilitas Olahraga
+Putaran 2,Rabu,2,07:55,08:35,X AK 2,Kelas 10,AK,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Rabu,2,07:55,08:35,X AK 3,Kelas 10,AK,Ruang 30,Ruang Kelas / Teori
 Putaran 2,Rabu,2,07:55,08:35,X BD,Kelas 10,BD,Ruang Seni Tari / Hall,Ruang Khusus
 Putaran 2,Rabu,2,07:55,08:35,X BR 1,Kelas 10,BR,Laboratorium Komputer 6,Laboratorium
-Putaran 2,Rabu,2,07:55,08:35,X BR 2,Kelas 10,BR,Lapangan Olahraga 3,Fasilitas Olahraga
+Putaran 2,Rabu,2,07:55,08:35,X BR 2,Kelas 10,BR,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Rabu,2,07:55,08:35,X DKV 1,Kelas 10,DKV,Laboratorium Komputer 10,Laboratorium
 Putaran 2,Rabu,2,07:55,08:35,X DKV 2,Kelas 10,DKV,Ruang 15,Ruang Kelas / Teori
 Putaran 2,Rabu,2,07:55,08:35,X LPS 1,Kelas 10,LPS,Ruang 32,Ruang Kelas / Teori
@@ -3340,7 +3340,7 @@ Putaran 2,Rabu,2,07:55,08:35,XI LPS,Kelas 11,LPS,Ruang 18,Ruang Kelas / Teori
 Putaran 2,Rabu,2,07:55,08:35,XI MP 1,Kelas 11,MP,Ruang 7,Ruang Kelas / Teori
 Putaran 2,Rabu,2,07:55,08:35,XI MP 2,Kelas 11,MP,Ruang 8,Ruang Kelas / Teori
 Putaran 2,Rabu,2,07:55,08:35,XI RPL 1,Kelas 11,RPL,Laboratorium Komputer 18,Laboratorium
-Putaran 2,Rabu,2,07:55,08:35,XI RPL 2,Kelas 11,RPL,Lapangan Olahraga 2,Fasilitas Olahraga
+Putaran 2,Rabu,2,07:55,08:35,XI RPL 2,Kelas 11,RPL,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Rabu,2,07:55,08:35,XI TKJ 1,Kelas 11,TKJ,Laboratorium Komputer 17,Laboratorium
 Putaran 2,Rabu,2,07:55,08:35,XI TKJ 2,Kelas 11,TKJ,Laboratorium Komputer 14,Laboratorium
 Putaran 2,Rabu,2,07:55,08:35,XII AK 1,Kelas 12,AK,Laboratorium Komputer 1,Laboratorium
@@ -3360,11 +3360,11 @@ Putaran 2,Rabu,2,07:55,08:35,XII RPL 2,Kelas 12,RPL,Ruang 10,Ruang Kelas / Teori
 Putaran 2,Rabu,2,07:55,08:35,XII TKJ 1,Kelas 12,TKJ,Laboratorium Komputer 2,Laboratorium
 Putaran 2,Rabu,2,07:55,08:35,XII TKJ 2,Kelas 12,TKJ,Ruang 20,Ruang Kelas / Teori
 Putaran 2,Rabu,3,08:35,09:15,X AK 1,Kelas 10,AK,Ruang 19,Ruang Kelas / Teori
-Putaran 2,Rabu,3,08:35,09:15,X AK 2,Kelas 10,AK,Lapangan Olahraga 1,Fasilitas Olahraga
+Putaran 2,Rabu,3,08:35,09:15,X AK 2,Kelas 10,AK,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Rabu,3,08:35,09:15,X AK 3,Kelas 10,AK,Laboratorium IPA,Laboratorium
 Putaran 2,Rabu,3,08:35,09:15,X BD,Kelas 10,BD,Ruang 14,Ruang Kelas / Teori
 Putaran 2,Rabu,3,08:35,09:15,X BR 1,Kelas 10,BR,Laboratorium Komputer 6,Laboratorium
-Putaran 2,Rabu,3,08:35,09:15,X BR 2,Kelas 10,BR,Lapangan Olahraga 3,Fasilitas Olahraga
+Putaran 2,Rabu,3,08:35,09:15,X BR 2,Kelas 10,BR,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Rabu,3,08:35,09:15,X DKV 1,Kelas 10,DKV,Laboratorium Komputer 10,Laboratorium
 Putaran 2,Rabu,3,08:35,09:15,X DKV 2,Kelas 10,DKV,Ruang 15,Ruang Kelas / Teori
 Putaran 2,Rabu,3,08:35,09:15,X LPS 1,Kelas 10,LPS,Ruang 32,Ruang Kelas / Teori
@@ -3414,7 +3414,7 @@ Putaran 2,Rabu,4,09:30,10:10,X BD,Kelas 10,BD,Ruang 14,Ruang Kelas / Teori
 Putaran 2,Rabu,4,09:30,10:10,X BR 1,Kelas 10,BR,Laboratorium Komputer 6,Laboratorium
 Putaran 2,Rabu,4,09:30,10:10,X BR 2,Kelas 10,BR,Ruang 15,Ruang Kelas / Teori
 Putaran 2,Rabu,4,09:30,10:10,X DKV 1,Kelas 10,DKV,Laboratorium Komputer 10,Laboratorium
-Putaran 2,Rabu,4,09:30,10:10,X DKV 2,Kelas 10,DKV,Lapangan Olahraga 3,Fasilitas Olahraga
+Putaran 2,Rabu,4,09:30,10:10,X DKV 2,Kelas 10,DKV,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Rabu,4,09:30,10:10,X LPS 1,Kelas 10,LPS,Ruang 32,Ruang Kelas / Teori
 Putaran 2,Rabu,4,09:30,10:10,X LPS 2,Kelas 10,LPS,Ruang 31,Ruang Kelas / Teori
 Putaran 2,Rabu,4,09:30,10:10,X MP 1,Kelas 10,MP,Laboratorium Komputer 5,Laboratorium
@@ -3422,7 +3422,7 @@ Putaran 2,Rabu,4,09:30,10:10,X MP 2,Kelas 10,MP,Ruang Seni Tari / Hall,Ruang Khu
 Putaran 2,Rabu,4,09:30,10:10,X RPL 1,Kelas 10,RPL,Laboratorium Komputer 16,Laboratorium
 Putaran 2,Rabu,4,09:30,10:10,X RPL 2,Kelas 10,RPL,Ruang 12,Ruang Kelas / Teori
 Putaran 2,Rabu,4,09:30,10:10,X TKJ 1,Kelas 10,TKJ,Laboratorium IPA,Laboratorium
-Putaran 2,Rabu,4,09:30,10:10,X TKJ 2,Kelas 10,TKJ,Lapangan Olahraga 1,Fasilitas Olahraga
+Putaran 2,Rabu,4,09:30,10:10,X TKJ 2,Kelas 10,TKJ,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Rabu,4,09:30,10:10,XI AK 1,Kelas 11,AK,Ruang 1,Ruang Kelas / Teori
 Putaran 2,Rabu,4,09:30,10:10,XI AK 2,Kelas 11,AK,Ruang 5,Ruang Kelas / Teori
 Putaran 2,Rabu,4,09:30,10:10,XI AK 3,Kelas 11,AK,Ruang 16,Ruang Kelas / Teori
@@ -3462,7 +3462,7 @@ Putaran 2,Rabu,5,10:10,10:50,X BD,Kelas 10,BD,Ruang 14,Ruang Kelas / Teori
 Putaran 2,Rabu,5,10:10,10:50,X BR 1,Kelas 10,BR,Laboratorium Komputer 6,Laboratorium
 Putaran 2,Rabu,5,10:10,10:50,X BR 2,Kelas 10,BR,Ruang 15,Ruang Kelas / Teori
 Putaran 2,Rabu,5,10:10,10:50,X DKV 1,Kelas 10,DKV,Ruang 30,Ruang Kelas / Teori
-Putaran 2,Rabu,5,10:10,10:50,X DKV 2,Kelas 10,DKV,Lapangan Olahraga 3,Fasilitas Olahraga
+Putaran 2,Rabu,5,10:10,10:50,X DKV 2,Kelas 10,DKV,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Rabu,5,10:10,10:50,X LPS 1,Kelas 10,LPS,Ruang 32,Ruang Kelas / Teori
 Putaran 2,Rabu,5,10:10,10:50,X LPS 2,Kelas 10,LPS,Ruang 31,Ruang Kelas / Teori
 Putaran 2,Rabu,5,10:10,10:50,X MP 1,Kelas 10,MP,Laboratorium Komputer 5,Laboratorium
@@ -3470,7 +3470,7 @@ Putaran 2,Rabu,5,10:10,10:50,X MP 2,Kelas 10,MP,Ruang 9,Ruang Kelas / Teori
 Putaran 2,Rabu,5,10:10,10:50,X RPL 1,Kelas 10,RPL,Laboratorium Komputer 16,Laboratorium
 Putaran 2,Rabu,5,10:10,10:50,X RPL 2,Kelas 10,RPL,Ruang 12,Ruang Kelas / Teori
 Putaran 2,Rabu,5,10:10,10:50,X TKJ 1,Kelas 10,TKJ,Laboratorium IPA,Laboratorium
-Putaran 2,Rabu,5,10:10,10:50,X TKJ 2,Kelas 10,TKJ,Lapangan Olahraga 1,Fasilitas Olahraga
+Putaran 2,Rabu,5,10:10,10:50,X TKJ 2,Kelas 10,TKJ,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Rabu,5,10:10,10:50,XI AK 1,Kelas 11,AK,Laboratorium Komputer 21,Laboratorium
 Putaran 2,Rabu,5,10:10,10:50,XI AK 2,Kelas 11,AK,Ruang 5,Ruang Kelas / Teori
 Putaran 2,Rabu,5,10:10,10:50,XI AK 3,Kelas 11,AK,Ruang 16,Ruang Kelas / Teori
@@ -3510,7 +3510,7 @@ Putaran 2,Rabu,6,10:50,11:30,X BD,Kelas 10,BD,Ruang 19,Ruang Kelas / Teori
 Putaran 2,Rabu,6,10:50,11:30,X BR 1,Kelas 10,BR,Laboratorium Komputer 6,Laboratorium
 Putaran 2,Rabu,6,10:50,11:30,X BR 2,Kelas 10,BR,Ruang Seni Tari / Hall,Ruang Khusus
 Putaran 2,Rabu,6,10:50,11:30,X DKV 1,Kelas 10,DKV,Ruang 30,Ruang Kelas / Teori
-Putaran 2,Rabu,6,10:50,11:30,X DKV 2,Kelas 10,DKV,Lapangan Olahraga 3,Fasilitas Olahraga
+Putaran 2,Rabu,6,10:50,11:30,X DKV 2,Kelas 10,DKV,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Rabu,6,10:50,11:30,X LPS 1,Kelas 10,LPS,Ruang 32,Ruang Kelas / Teori
 Putaran 2,Rabu,6,10:50,11:30,X LPS 2,Kelas 10,LPS,Ruang 31,Ruang Kelas / Teori
 Putaran 2,Rabu,6,10:50,11:30,X MP 1,Kelas 10,MP,Laboratorium Komputer 5,Laboratorium
@@ -3518,7 +3518,7 @@ Putaran 2,Rabu,6,10:50,11:30,X MP 2,Kelas 10,MP,Ruang 9,Ruang Kelas / Teori
 Putaran 2,Rabu,6,10:50,11:30,X RPL 1,Kelas 10,RPL,Laboratorium Komputer 16,Laboratorium
 Putaran 2,Rabu,6,10:50,11:30,X RPL 2,Kelas 10,RPL,Ruang 12,Ruang Kelas / Teori
 Putaran 2,Rabu,6,10:50,11:30,X TKJ 1,Kelas 10,TKJ,Laboratorium IPA,Laboratorium
-Putaran 2,Rabu,6,10:50,11:30,X TKJ 2,Kelas 10,TKJ,Lapangan Olahraga 1,Fasilitas Olahraga
+Putaran 2,Rabu,6,10:50,11:30,X TKJ 2,Kelas 10,TKJ,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Rabu,6,10:50,11:30,XI AK 1,Kelas 11,AK,Laboratorium Komputer 21,Laboratorium
 Putaran 2,Rabu,6,10:50,11:30,XI AK 2,Kelas 11,AK,Ruang 5,Ruang Kelas / Teori
 Putaran 2,Rabu,6,10:50,11:30,XI AK 3,Kelas 11,AK,Ruang 16,Ruang Kelas / Teori
@@ -3672,9 +3672,9 @@ Putaran 2,Rabu,9,13:50,14:30,XI BR 1,Kelas 11,BR,Laboratorium Komputer 6,Laborat
 Putaran 2,Rabu,9,13:50,14:30,XI BR 2,Kelas 11,BR,Ruang 24,Ruang Kelas / Teori
 Putaran 2,Rabu,9,13:50,14:30,XI DKV 1,Kelas 11,DKV,Laboratorium Komputer 9,Laboratorium
 Putaran 2,Rabu,9,13:50,14:30,XI DKV 2,Kelas 11,DKV,Ruang 14,Ruang Kelas / Teori
-Putaran 2,Rabu,9,13:50,14:30,XI LPS,Kelas 11,LPS,Lapangan Olahraga 1,Fasilitas Olahraga
+Putaran 2,Rabu,9,13:50,14:30,XI LPS,Kelas 11,LPS,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Rabu,9,13:50,14:30,XI MP 1,Kelas 11,MP,Laboratorium Komputer 5,Laboratorium
-Putaran 2,Rabu,9,13:50,14:30,XI MP 2,Kelas 11,MP,Lapangan Olahraga 2,Fasilitas Olahraga
+Putaran 2,Rabu,9,13:50,14:30,XI MP 2,Kelas 11,MP,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Rabu,9,13:50,14:30,XI RPL 1,Kelas 11,RPL,Laboratorium Komputer 18,Laboratorium
 Putaran 2,Rabu,9,13:50,14:30,XI RPL 2,Kelas 11,RPL,Ruang 11,Ruang Kelas / Teori
 Putaran 2,Rabu,9,13:50,14:30,XI TKJ 1,Kelas 11,TKJ,Laboratorium Komputer 2,Laboratorium
@@ -3720,9 +3720,9 @@ Putaran 2,Rabu,10,14:30,15:10,XI BR 1,Kelas 11,BR,Laboratorium Komputer 6,Labora
 Putaran 2,Rabu,10,14:30,15:10,XI BR 2,Kelas 11,BR,Ruang 24,Ruang Kelas / Teori
 Putaran 2,Rabu,10,14:30,15:10,XI DKV 1,Kelas 11,DKV,Laboratorium Komputer 9,Laboratorium
 Putaran 2,Rabu,10,14:30,15:10,XI DKV 2,Kelas 11,DKV,Ruang 14,Ruang Kelas / Teori
-Putaran 2,Rabu,10,14:30,15:10,XI LPS,Kelas 11,LPS,Lapangan Olahraga 1,Fasilitas Olahraga
+Putaran 2,Rabu,10,14:30,15:10,XI LPS,Kelas 11,LPS,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Rabu,10,14:30,15:10,XI MP 1,Kelas 11,MP,Laboratorium Komputer 5,Laboratorium
-Putaran 2,Rabu,10,14:30,15:10,XI MP 2,Kelas 11,MP,Lapangan Olahraga 2,Fasilitas Olahraga
+Putaran 2,Rabu,10,14:30,15:10,XI MP 2,Kelas 11,MP,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Rabu,10,14:30,15:10,XI RPL 1,Kelas 11,RPL,Laboratorium Komputer 18,Laboratorium
 Putaran 2,Rabu,10,14:30,15:10,XI RPL 2,Kelas 11,RPL,Ruang 11,Ruang Kelas / Teori
 Putaran 2,Rabu,10,14:30,15:10,XI TKJ 1,Kelas 11,TKJ,Laboratorium Komputer 2,Laboratorium
@@ -3754,13 +3754,13 @@ Putaran 2,Kamis,1,07:15,07:55,X DKV 2,Kelas 10,DKV,Ruang 15,Ruang Kelas / Teori
 Putaran 2,Kamis,1,07:15,07:55,X LPS 1,Kelas 10,LPS,Ruang 31,Ruang Kelas / Teori
 Putaran 2,Kamis,1,07:15,07:55,X LPS 2,Kelas 10,LPS,Ruang 17,Ruang Kelas / Teori
 Putaran 2,Kamis,1,07:15,07:55,X MP 1,Kelas 10,MP,Ruang 7,Ruang Kelas / Teori
-Putaran 2,Kamis,1,07:15,07:55,X MP 2,Kelas 10,MP,Lapangan Olahraga 3,Fasilitas Olahraga
+Putaran 2,Kamis,1,07:15,07:55,X MP 2,Kelas 10,MP,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Kamis,1,07:15,07:55,X RPL 1,Kelas 10,RPL,Ruang 12,Ruang Kelas / Teori
 Putaran 2,Kamis,1,07:15,07:55,X RPL 2,Kelas 10,RPL,Ruang 11,Ruang Kelas / Teori
 Putaran 2,Kamis,1,07:15,07:55,X TKJ 1,Kelas 10,TKJ,Laboratorium Komputer 10,Laboratorium
 Putaran 2,Kamis,1,07:15,07:55,X TKJ 2,Kelas 10,TKJ,Ruang 22,Ruang Kelas / Teori
 Putaran 2,Kamis,1,07:15,07:55,XI AK 1,Kelas 11,AK,Laboratorium Komputer 13,Laboratorium
-Putaran 2,Kamis,1,07:15,07:55,XI AK 2,Kelas 11,AK,Lapangan Olahraga 2,Fasilitas Olahraga
+Putaran 2,Kamis,1,07:15,07:55,XI AK 2,Kelas 11,AK,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Kamis,1,07:15,07:55,XI AK 3,Kelas 11,AK,Ruang 16,Ruang Kelas / Teori
 Putaran 2,Kamis,1,07:15,07:55,XI AK 4,Kelas 11,AK,Laboratorium Komputer 7,Laboratorium
 Putaran 2,Kamis,1,07:15,07:55,XI BD,Kelas 11,BD,Ruang 25,Ruang Kelas / Teori
@@ -3802,13 +3802,13 @@ Putaran 2,Kamis,2,07:55,08:35,X DKV 2,Kelas 10,DKV,Ruang 15,Ruang Kelas / Teori
 Putaran 2,Kamis,2,07:55,08:35,X LPS 1,Kelas 10,LPS,Ruang 31,Ruang Kelas / Teori
 Putaran 2,Kamis,2,07:55,08:35,X LPS 2,Kelas 10,LPS,Ruang 17,Ruang Kelas / Teori
 Putaran 2,Kamis,2,07:55,08:35,X MP 1,Kelas 10,MP,Ruang 7,Ruang Kelas / Teori
-Putaran 2,Kamis,2,07:55,08:35,X MP 2,Kelas 10,MP,Lapangan Olahraga 3,Fasilitas Olahraga
+Putaran 2,Kamis,2,07:55,08:35,X MP 2,Kelas 10,MP,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Kamis,2,07:55,08:35,X RPL 1,Kelas 10,RPL,Ruang 12,Ruang Kelas / Teori
 Putaran 2,Kamis,2,07:55,08:35,X RPL 2,Kelas 10,RPL,Ruang 11,Ruang Kelas / Teori
 Putaran 2,Kamis,2,07:55,08:35,X TKJ 1,Kelas 10,TKJ,Laboratorium Komputer 10,Laboratorium
 Putaran 2,Kamis,2,07:55,08:35,X TKJ 2,Kelas 10,TKJ,Ruang 22,Ruang Kelas / Teori
 Putaran 2,Kamis,2,07:55,08:35,XI AK 1,Kelas 11,AK,Laboratorium Komputer 13,Laboratorium
-Putaran 2,Kamis,2,07:55,08:35,XI AK 2,Kelas 11,AK,Lapangan Olahraga 2,Fasilitas Olahraga
+Putaran 2,Kamis,2,07:55,08:35,XI AK 2,Kelas 11,AK,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Kamis,2,07:55,08:35,XI AK 3,Kelas 11,AK,Ruang 16,Ruang Kelas / Teori
 Putaran 2,Kamis,2,07:55,08:35,XI AK 4,Kelas 11,AK,Laboratorium Komputer 7,Laboratorium
 Putaran 2,Kamis,2,07:55,08:35,XI BD,Kelas 11,BD,Ruang 25,Ruang Kelas / Teori
@@ -3850,7 +3850,7 @@ Putaran 2,Kamis,3,08:35,09:15,X DKV 2,Kelas 10,DKV,Ruang Seni Tari / Hall,Ruang 
 Putaran 2,Kamis,3,08:35,09:15,X LPS 1,Kelas 10,LPS,Ruang 31,Ruang Kelas / Teori
 Putaran 2,Kamis,3,08:35,09:15,X LPS 2,Kelas 10,LPS,Ruang 17,Ruang Kelas / Teori
 Putaran 2,Kamis,3,08:35,09:15,X MP 1,Kelas 10,MP,Ruang 7,Ruang Kelas / Teori
-Putaran 2,Kamis,3,08:35,09:15,X MP 2,Kelas 10,MP,Lapangan Olahraga 3,Fasilitas Olahraga
+Putaran 2,Kamis,3,08:35,09:15,X MP 2,Kelas 10,MP,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Kamis,3,08:35,09:15,X RPL 1,Kelas 10,RPL,Ruang 12,Ruang Kelas / Teori
 Putaran 2,Kamis,3,08:35,09:15,X RPL 2,Kelas 10,RPL,Ruang 11,Ruang Kelas / Teori
 Putaran 2,Kamis,3,08:35,09:15,X TKJ 1,Kelas 10,TKJ,Laboratorium Komputer 10,Laboratorium
@@ -3870,7 +3870,7 @@ Putaran 2,Kamis,3,08:35,09:15,XI MP 2,Kelas 11,MP,Ruang 8,Ruang Kelas / Teori
 Putaran 2,Kamis,3,08:35,09:15,XI RPL 1,Kelas 11,RPL,Laboratorium Komputer 18,Laboratorium
 Putaran 2,Kamis,3,08:35,09:15,XI RPL 2,Kelas 11,RPL,Laboratorium Komputer 16,Laboratorium
 Putaran 2,Kamis,3,08:35,09:15,XI TKJ 1,Kelas 11,TKJ,Laboratorium Komputer 2,Laboratorium
-Putaran 2,Kamis,3,08:35,09:15,XI TKJ 2,Kelas 11,TKJ,Lapangan Olahraga 2,Fasilitas Olahraga
+Putaran 2,Kamis,3,08:35,09:15,XI TKJ 2,Kelas 11,TKJ,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Kamis,3,08:35,09:15,XII AK 1,Kelas 12,AK,Ruang 2,Ruang Kelas / Teori
 Putaran 2,Kamis,3,08:35,09:15,XII AK 2,Kelas 12,AK,Ruang 1,Ruang Kelas / Teori
 Putaran 2,Kamis,3,08:35,09:15,XII AK 3,Kelas 12,AK,Laboratorium Komputer 1,Laboratorium
@@ -3896,11 +3896,11 @@ Putaran 2,Kamis,4,09:30,10:10,X BR 2,Kelas 10,BR,Laboratorium Komputer 22,Labora
 Putaran 2,Kamis,4,09:30,10:10,X DKV 1,Kelas 10,DKV,Laboratorium Komputer 20,Laboratorium
 Putaran 2,Kamis,4,09:30,10:10,X DKV 2,Kelas 10,DKV,Ruang Seni Tari / Hall,Ruang Khusus
 Putaran 2,Kamis,4,09:30,10:10,X LPS 1,Kelas 10,LPS,Ruang 31,Ruang Kelas / Teori
-Putaran 2,Kamis,4,09:30,10:10,X LPS 2,Kelas 10,LPS,Lapangan Olahraga 3,Fasilitas Olahraga
+Putaran 2,Kamis,4,09:30,10:10,X LPS 2,Kelas 10,LPS,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Kamis,4,09:30,10:10,X MP 1,Kelas 10,MP,Ruang 7,Ruang Kelas / Teori
 Putaran 2,Kamis,4,09:30,10:10,X MP 2,Kelas 10,MP,Ruang 9,Ruang Kelas / Teori
 Putaran 2,Kamis,4,09:30,10:10,X RPL 1,Kelas 10,RPL,Ruang 12,Ruang Kelas / Teori
-Putaran 2,Kamis,4,09:30,10:10,X RPL 2,Kelas 10,RPL,Lapangan Olahraga 1,Fasilitas Olahraga
+Putaran 2,Kamis,4,09:30,10:10,X RPL 2,Kelas 10,RPL,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Kamis,4,09:30,10:10,X TKJ 1,Kelas 10,TKJ,Laboratorium Komputer 10,Laboratorium
 Putaran 2,Kamis,4,09:30,10:10,X TKJ 2,Kelas 10,TKJ,Ruang 22,Ruang Kelas / Teori
 Putaran 2,Kamis,4,09:30,10:10,XI AK 1,Kelas 11,AK,Laboratorium Komputer 13,Laboratorium
@@ -3918,7 +3918,7 @@ Putaran 2,Kamis,4,09:30,10:10,XI MP 2,Kelas 11,MP,Ruang 8,Ruang Kelas / Teori
 Putaran 2,Kamis,4,09:30,10:10,XI RPL 1,Kelas 11,RPL,Laboratorium Komputer 18,Laboratorium
 Putaran 2,Kamis,4,09:30,10:10,XI RPL 2,Kelas 11,RPL,Laboratorium Komputer 16,Laboratorium
 Putaran 2,Kamis,4,09:30,10:10,XI TKJ 1,Kelas 11,TKJ,Laboratorium Komputer 2,Laboratorium
-Putaran 2,Kamis,4,09:30,10:10,XI TKJ 2,Kelas 11,TKJ,Lapangan Olahraga 2,Fasilitas Olahraga
+Putaran 2,Kamis,4,09:30,10:10,XI TKJ 2,Kelas 11,TKJ,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Kamis,4,09:30,10:10,XII AK 1,Kelas 12,AK,Ruang 2,Ruang Kelas / Teori
 Putaran 2,Kamis,4,09:30,10:10,XII AK 2,Kelas 12,AK,Ruang 1,Ruang Kelas / Teori
 Putaran 2,Kamis,4,09:30,10:10,XII AK 3,Kelas 12,AK,Laboratorium Komputer 1,Laboratorium
@@ -3944,11 +3944,11 @@ Putaran 2,Kamis,5,10:10,10:50,X BR 2,Kelas 10,BR,Laboratorium Komputer 22,Labora
 Putaran 2,Kamis,5,10:10,10:50,X DKV 1,Kelas 10,DKV,Laboratorium Komputer 3,Laboratorium
 Putaran 2,Kamis,5,10:10,10:50,X DKV 2,Kelas 10,DKV,Ruang 15,Ruang Kelas / Teori
 Putaran 2,Kamis,5,10:10,10:50,X LPS 1,Kelas 10,LPS,Ruang 31,Ruang Kelas / Teori
-Putaran 2,Kamis,5,10:10,10:50,X LPS 2,Kelas 10,LPS,Lapangan Olahraga 3,Fasilitas Olahraga
+Putaran 2,Kamis,5,10:10,10:50,X LPS 2,Kelas 10,LPS,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Kamis,5,10:10,10:50,X MP 1,Kelas 10,MP,Laboratorium Komputer 10,Laboratorium
 Putaran 2,Kamis,5,10:10,10:50,X MP 2,Kelas 10,MP,Ruang 9,Ruang Kelas / Teori
 Putaran 2,Kamis,5,10:10,10:50,X RPL 1,Kelas 10,RPL,Ruang 12,Ruang Kelas / Teori
-Putaran 2,Kamis,5,10:10,10:50,X RPL 2,Kelas 10,RPL,Lapangan Olahraga 1,Fasilitas Olahraga
+Putaran 2,Kamis,5,10:10,10:50,X RPL 2,Kelas 10,RPL,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Kamis,5,10:10,10:50,X TKJ 1,Kelas 10,TKJ,Laboratorium Komputer 11,Laboratorium
 Putaran 2,Kamis,5,10:10,10:50,X TKJ 2,Kelas 10,TKJ,Ruang 22,Ruang Kelas / Teori
 Putaran 2,Kamis,5,10:10,10:50,XI AK 1,Kelas 11,AK,Ruang 16,Ruang Kelas / Teori
@@ -3992,11 +3992,11 @@ Putaran 2,Kamis,6,10:50,11:30,X BR 2,Kelas 10,BR,Laboratorium Komputer 22,Labora
 Putaran 2,Kamis,6,10:50,11:30,X DKV 1,Kelas 10,DKV,Laboratorium Komputer 3,Laboratorium
 Putaran 2,Kamis,6,10:50,11:30,X DKV 2,Kelas 10,DKV,Ruang 15,Ruang Kelas / Teori
 Putaran 2,Kamis,6,10:50,11:30,X LPS 1,Kelas 10,LPS,Ruang 31,Ruang Kelas / Teori
-Putaran 2,Kamis,6,10:50,11:30,X LPS 2,Kelas 10,LPS,Lapangan Olahraga 3,Fasilitas Olahraga
+Putaran 2,Kamis,6,10:50,11:30,X LPS 2,Kelas 10,LPS,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Kamis,6,10:50,11:30,X MP 1,Kelas 10,MP,Laboratorium Komputer 10,Laboratorium
 Putaran 2,Kamis,6,10:50,11:30,X MP 2,Kelas 10,MP,Ruang 9,Ruang Kelas / Teori
 Putaran 2,Kamis,6,10:50,11:30,X RPL 1,Kelas 10,RPL,Ruang 12,Ruang Kelas / Teori
-Putaran 2,Kamis,6,10:50,11:30,X RPL 2,Kelas 10,RPL,Lapangan Olahraga 1,Fasilitas Olahraga
+Putaran 2,Kamis,6,10:50,11:30,X RPL 2,Kelas 10,RPL,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Kamis,6,10:50,11:30,X TKJ 1,Kelas 10,TKJ,Laboratorium Komputer 11,Laboratorium
 Putaran 2,Kamis,6,10:50,11:30,X TKJ 2,Kelas 10,TKJ,Ruang 22,Ruang Kelas / Teori
 Putaran 2,Kamis,6,10:50,11:30,XI AK 1,Kelas 11,AK,Ruang 16,Ruang Kelas / Teori
@@ -4156,7 +4156,7 @@ Putaran 2,Kamis,9,13:50,14:30,XI LPS,Kelas 11,LPS,Ruang 18,Ruang Kelas / Teori
 Putaran 2,Kamis,9,13:50,14:30,XI MP 1,Kelas 11,MP,Laboratorium Komputer 5,Laboratorium
 Putaran 2,Kamis,9,13:50,14:30,XI MP 2,Kelas 11,MP,Ruang 8,Ruang Kelas / Teori
 Putaran 2,Kamis,9,13:50,14:30,XI RPL 1,Kelas 11,RPL,Laboratorium Komputer 18,Laboratorium
-Putaran 2,Kamis,9,13:50,14:30,XI RPL 2,Kelas 11,RPL,Lapangan Olahraga 2,Fasilitas Olahraga
+Putaran 2,Kamis,9,13:50,14:30,XI RPL 2,Kelas 11,RPL,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Kamis,9,13:50,14:30,XI TKJ 1,Kelas 11,TKJ,Laboratorium Komputer 17,Laboratorium
 Putaran 2,Kamis,9,13:50,14:30,XI TKJ 2,Kelas 11,TKJ,Ruang 21,Ruang Kelas / Teori
 Putaran 2,Kamis,9,13:50,14:30,XII AK 1,Kelas 12,AK,Ruang 2,Ruang Kelas / Teori
@@ -4204,7 +4204,7 @@ Putaran 2,Kamis,10,14:30,15:10,XI LPS,Kelas 11,LPS,Ruang 18,Ruang Kelas / Teori
 Putaran 2,Kamis,10,14:30,15:10,XI MP 1,Kelas 11,MP,Laboratorium Komputer 5,Laboratorium
 Putaran 2,Kamis,10,14:30,15:10,XI MP 2,Kelas 11,MP,Ruang 8,Ruang Kelas / Teori
 Putaran 2,Kamis,10,14:30,15:10,XI RPL 1,Kelas 11,RPL,Laboratorium Komputer 18,Laboratorium
-Putaran 2,Kamis,10,14:30,15:10,XI RPL 2,Kelas 11,RPL,Lapangan Olahraga 2,Fasilitas Olahraga
+Putaran 2,Kamis,10,14:30,15:10,XI RPL 2,Kelas 11,RPL,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Kamis,10,14:30,15:10,XI TKJ 1,Kelas 11,TKJ,Laboratorium Komputer 17,Laboratorium
 Putaran 2,Kamis,10,14:30,15:10,XI TKJ 2,Kelas 11,TKJ,Ruang 21,Ruang Kelas / Teori
 Putaran 2,Kamis,10,14:30,15:10,XII AK 1,Kelas 12,AK,Ruang 2,Ruang Kelas / Teori
@@ -4234,9 +4234,9 @@ Putaran 2,Jumat,1,07:15,07:55,X DKV 2,Kelas 10,DKV,Ruang 15,Ruang Kelas / Teori
 Putaran 2,Jumat,1,07:15,07:55,X LPS 1,Kelas 10,LPS,Laboratorium Komputer 7,Laboratorium
 Putaran 2,Jumat,1,07:15,07:55,X LPS 2,Kelas 10,LPS,Ruang 16,Ruang Kelas / Teori
 Putaran 2,Jumat,1,07:15,07:55,X MP 1,Kelas 10,MP,Ruang 7,Ruang Kelas / Teori
-Putaran 2,Jumat,1,07:15,07:55,X MP 2,Kelas 10,MP,Lapangan Olahraga 3,Fasilitas Olahraga
+Putaran 2,Jumat,1,07:15,07:55,X MP 2,Kelas 10,MP,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Jumat,1,07:15,07:55,X RPL 1,Kelas 10,RPL,Laboratorium Komputer 14,Laboratorium
-Putaran 2,Jumat,1,07:15,07:55,X RPL 2,Kelas 10,RPL,Lapangan Olahraga 1,Fasilitas Olahraga
+Putaran 2,Jumat,1,07:15,07:55,X RPL 2,Kelas 10,RPL,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Jumat,1,07:15,07:55,X TKJ 1,Kelas 10,TKJ,Laboratorium Komputer 11,Laboratorium
 Putaran 2,Jumat,1,07:15,07:55,X TKJ 2,Kelas 10,TKJ,Ruang Seni Tari / Hall,Ruang Khusus
 Putaran 2,Jumat,1,07:15,07:55,XI AK 1,Kelas 11,AK,Laboratorium Komputer 1,Laboratorium
@@ -4245,7 +4245,7 @@ Putaran 2,Jumat,1,07:15,07:55,XI AK 3,Kelas 11,AK,Laboratorium Komputer 13,Labor
 Putaran 2,Jumat,1,07:15,07:55,XI AK 4,Kelas 11,AK,Ruang 17,Ruang Kelas / Teori
 Putaran 2,Jumat,1,07:15,07:55,XI BD,Kelas 11,BD,Ruang 25,Ruang Kelas / Teori
 Putaran 2,Jumat,1,07:15,07:55,XI BR 1,Kelas 11,BR,Laboratorium Komputer 6,Laboratorium
-Putaran 2,Jumat,1,07:15,07:55,XI BR 2,Kelas 11,BR,Lapangan Olahraga 2,Fasilitas Olahraga
+Putaran 2,Jumat,1,07:15,07:55,XI BR 2,Kelas 11,BR,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Jumat,1,07:15,07:55,XI DKV 1,Kelas 11,DKV,Laboratorium Komputer 20,Laboratorium
 Putaran 2,Jumat,1,07:15,07:55,XI DKV 2,Kelas 11,DKV,Ruang 14,Ruang Kelas / Teori
 Putaran 2,Jumat,1,07:15,07:55,XI LPS,Kelas 11,LPS,Ruang 18,Ruang Kelas / Teori
@@ -4282,9 +4282,9 @@ Putaran 2,Jumat,2,07:55,08:35,X DKV 2,Kelas 10,DKV,Ruang 15,Ruang Kelas / Teori
 Putaran 2,Jumat,2,07:55,08:35,X LPS 1,Kelas 10,LPS,Laboratorium Komputer 7,Laboratorium
 Putaran 2,Jumat,2,07:55,08:35,X LPS 2,Kelas 10,LPS,Ruang 16,Ruang Kelas / Teori
 Putaran 2,Jumat,2,07:55,08:35,X MP 1,Kelas 10,MP,Ruang 7,Ruang Kelas / Teori
-Putaran 2,Jumat,2,07:55,08:35,X MP 2,Kelas 10,MP,Lapangan Olahraga 3,Fasilitas Olahraga
+Putaran 2,Jumat,2,07:55,08:35,X MP 2,Kelas 10,MP,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Jumat,2,07:55,08:35,X RPL 1,Kelas 10,RPL,Laboratorium Komputer 14,Laboratorium
-Putaran 2,Jumat,2,07:55,08:35,X RPL 2,Kelas 10,RPL,Lapangan Olahraga 1,Fasilitas Olahraga
+Putaran 2,Jumat,2,07:55,08:35,X RPL 2,Kelas 10,RPL,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Jumat,2,07:55,08:35,X TKJ 1,Kelas 10,TKJ,Laboratorium Komputer 11,Laboratorium
 Putaran 2,Jumat,2,07:55,08:35,X TKJ 2,Kelas 10,TKJ,Ruang Seni Tari / Hall,Ruang Khusus
 Putaran 2,Jumat,2,07:55,08:35,XI AK 1,Kelas 11,AK,Laboratorium Komputer 1,Laboratorium
@@ -4293,7 +4293,7 @@ Putaran 2,Jumat,2,07:55,08:35,XI AK 3,Kelas 11,AK,Laboratorium Komputer 13,Labor
 Putaran 2,Jumat,2,07:55,08:35,XI AK 4,Kelas 11,AK,Ruang 17,Ruang Kelas / Teori
 Putaran 2,Jumat,2,07:55,08:35,XI BD,Kelas 11,BD,Ruang 25,Ruang Kelas / Teori
 Putaran 2,Jumat,2,07:55,08:35,XI BR 1,Kelas 11,BR,Laboratorium Komputer 6,Laboratorium
-Putaran 2,Jumat,2,07:55,08:35,XI BR 2,Kelas 11,BR,Lapangan Olahraga 2,Fasilitas Olahraga
+Putaran 2,Jumat,2,07:55,08:35,XI BR 2,Kelas 11,BR,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Jumat,2,07:55,08:35,XI DKV 1,Kelas 11,DKV,Laboratorium Komputer 20,Laboratorium
 Putaran 2,Jumat,2,07:55,08:35,XI DKV 2,Kelas 11,DKV,Ruang 14,Ruang Kelas / Teori
 Putaran 2,Jumat,2,07:55,08:35,XI LPS,Kelas 11,LPS,Ruang 18,Ruang Kelas / Teori
@@ -4330,16 +4330,16 @@ Putaran 2,Jumat,3,08:35,09:15,X DKV 2,Kelas 10,DKV,Ruang 15,Ruang Kelas / Teori
 Putaran 2,Jumat,3,08:35,09:15,X LPS 1,Kelas 10,LPS,Laboratorium Komputer 7,Laboratorium
 Putaran 2,Jumat,3,08:35,09:15,X LPS 2,Kelas 10,LPS,Ruang 16,Ruang Kelas / Teori
 Putaran 2,Jumat,3,08:35,09:15,X MP 1,Kelas 10,MP,Ruang 7,Ruang Kelas / Teori
-Putaran 2,Jumat,3,08:35,09:15,X MP 2,Kelas 10,MP,Lapangan Olahraga 3,Fasilitas Olahraga
+Putaran 2,Jumat,3,08:35,09:15,X MP 2,Kelas 10,MP,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Jumat,3,08:35,09:15,X RPL 1,Kelas 10,RPL,Laboratorium Komputer 14,Laboratorium
-Putaran 2,Jumat,3,08:35,09:15,X RPL 2,Kelas 10,RPL,Lapangan Olahraga 1,Fasilitas Olahraga
+Putaran 2,Jumat,3,08:35,09:15,X RPL 2,Kelas 10,RPL,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Jumat,3,08:35,09:15,X TKJ 1,Kelas 10,TKJ,Laboratorium Komputer 11,Laboratorium
 Putaran 2,Jumat,3,08:35,09:15,X TKJ 2,Kelas 10,TKJ,Ruang 22,Ruang Kelas / Teori
 Putaran 2,Jumat,3,08:35,09:15,XI AK 1,Kelas 11,AK,Laboratorium Komputer 1,Laboratorium
 Putaran 2,Jumat,3,08:35,09:15,XI AK 2,Kelas 11,AK,Ruang 5,Ruang Kelas / Teori
 Putaran 2,Jumat,3,08:35,09:15,XI AK 3,Kelas 11,AK,Laboratorium Komputer 13,Laboratorium
 Putaran 2,Jumat,3,08:35,09:15,XI AK 4,Kelas 11,AK,Ruang 17,Ruang Kelas / Teori
-Putaran 2,Jumat,3,08:35,09:15,XI BD,Kelas 11,BD,Lapangan Olahraga 2,Fasilitas Olahraga
+Putaran 2,Jumat,3,08:35,09:15,XI BD,Kelas 11,BD,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Jumat,3,08:35,09:15,XI BR 1,Kelas 11,BR,Laboratorium Komputer 6,Laboratorium
 Putaran 2,Jumat,3,08:35,09:15,XI BR 2,Kelas 11,BR,Ruang 24,Ruang Kelas / Teori
 Putaran 2,Jumat,3,08:35,09:15,XI DKV 1,Kelas 11,DKV,Laboratorium Komputer 20,Laboratorium
@@ -4372,7 +4372,7 @@ Putaran 2,Jumat,4,09:30,10:10,X AK 2,Kelas 10,AK,Ruang 29,Ruang Kelas / Teori
 Putaran 2,Jumat,4,09:30,10:10,X AK 3,Kelas 10,AK,Ruang 30,Ruang Kelas / Teori
 Putaran 2,Jumat,4,09:30,10:10,X BD,Kelas 10,BD,Ruang 31,Ruang Kelas / Teori
 Putaran 2,Jumat,4,09:30,10:10,X BR 1,Kelas 10,BR,Ruang 13,Ruang Kelas / Teori
-Putaran 2,Jumat,4,09:30,10:10,X BR 2,Kelas 10,BR,Lapangan Olahraga 3,Fasilitas Olahraga
+Putaran 2,Jumat,4,09:30,10:10,X BR 2,Kelas 10,BR,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Jumat,4,09:30,10:10,X DKV 1,Kelas 10,DKV,Laboratorium Komputer 10,Laboratorium
 Putaran 2,Jumat,4,09:30,10:10,X DKV 2,Kelas 10,DKV,Ruang Seni Tari / Hall,Ruang Khusus
 Putaran 2,Jumat,4,09:30,10:10,X LPS 1,Kelas 10,LPS,Laboratorium Komputer 7,Laboratorium
@@ -4387,7 +4387,7 @@ Putaran 2,Jumat,4,09:30,10:10,XI AK 1,Kelas 11,AK,Laboratorium Komputer 1,Labora
 Putaran 2,Jumat,4,09:30,10:10,XI AK 2,Kelas 11,AK,Ruang 5,Ruang Kelas / Teori
 Putaran 2,Jumat,4,09:30,10:10,XI AK 3,Kelas 11,AK,Laboratorium Komputer 13,Laboratorium
 Putaran 2,Jumat,4,09:30,10:10,XI AK 4,Kelas 11,AK,Ruang 17,Ruang Kelas / Teori
-Putaran 2,Jumat,4,09:30,10:10,XI BD,Kelas 11,BD,Lapangan Olahraga 2,Fasilitas Olahraga
+Putaran 2,Jumat,4,09:30,10:10,XI BD,Kelas 11,BD,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Jumat,4,09:30,10:10,XI BR 1,Kelas 11,BR,Laboratorium Komputer 6,Laboratorium
 Putaran 2,Jumat,4,09:30,10:10,XI BR 2,Kelas 11,BR,Ruang 24,Ruang Kelas / Teori
 Putaran 2,Jumat,4,09:30,10:10,XI DKV 1,Kelas 11,DKV,Laboratorium Komputer 20,Laboratorium
@@ -4420,7 +4420,7 @@ Putaran 2,Jumat,5,10:10,10:50,X AK 2,Kelas 10,AK,Ruang 29,Ruang Kelas / Teori
 Putaran 2,Jumat,5,10:10,10:50,X AK 3,Kelas 10,AK,Ruang 30,Ruang Kelas / Teori
 Putaran 2,Jumat,5,10:10,10:50,X BD,Kelas 10,BD,Ruang 31,Ruang Kelas / Teori
 Putaran 2,Jumat,5,10:10,10:50,X BR 1,Kelas 10,BR,Laboratorium Komputer 10,Laboratorium
-Putaran 2,Jumat,5,10:10,10:50,X BR 2,Kelas 10,BR,Lapangan Olahraga 3,Fasilitas Olahraga
+Putaran 2,Jumat,5,10:10,10:50,X BR 2,Kelas 10,BR,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Jumat,5,10:10,10:50,X DKV 1,Kelas 10,DKV,Ruang 23,Ruang Kelas / Teori
 Putaran 2,Jumat,5,10:10,10:50,X DKV 2,Kelas 10,DKV,Ruang Seni Tari / Hall,Ruang Khusus
 Putaran 2,Jumat,5,10:10,10:50,X LPS 1,Kelas 10,LPS,Ruang 17,Ruang Kelas / Teori
@@ -4439,7 +4439,7 @@ Putaran 2,Jumat,5,10:10,10:50,XI BD,Kelas 11,BD,Ruang 25,Ruang Kelas / Teori
 Putaran 2,Jumat,5,10:10,10:50,XI BR 1,Kelas 11,BR,Laboratorium Komputer 6,Laboratorium
 Putaran 2,Jumat,5,10:10,10:50,XI BR 2,Kelas 11,BR,Ruang 24,Ruang Kelas / Teori
 Putaran 2,Jumat,5,10:10,10:50,XI DKV 1,Kelas 11,DKV,Laboratorium Komputer 20,Laboratorium
-Putaran 2,Jumat,5,10:10,10:50,XI DKV 2,Kelas 11,DKV,Lapangan Olahraga 1,Fasilitas Olahraga
+Putaran 2,Jumat,5,10:10,10:50,XI DKV 2,Kelas 11,DKV,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Jumat,5,10:10,10:50,XI LPS,Kelas 11,LPS,Ruang 18,Ruang Kelas / Teori
 Putaran 2,Jumat,5,10:10,10:50,XI MP 1,Kelas 11,MP,Laboratorium Komputer 5,Laboratorium
 Putaran 2,Jumat,5,10:10,10:50,XI MP 2,Kelas 11,MP,Ruang 8,Ruang Kelas / Teori
@@ -4468,7 +4468,7 @@ Putaran 2,Jumat,6,10:50,11:25,X AK 2,Kelas 10,AK,Ruang 29,Ruang Kelas / Teori
 Putaran 2,Jumat,6,10:50,11:25,X AK 3,Kelas 10,AK,Ruang 30,Ruang Kelas / Teori
 Putaran 2,Jumat,6,10:50,11:25,X BD,Kelas 10,BD,Ruang 31,Ruang Kelas / Teori
 Putaran 2,Jumat,6,10:50,11:25,X BR 1,Kelas 10,BR,Laboratorium Komputer 10,Laboratorium
-Putaran 2,Jumat,6,10:50,11:25,X BR 2,Kelas 10,BR,Lapangan Olahraga 3,Fasilitas Olahraga
+Putaran 2,Jumat,6,10:50,11:25,X BR 2,Kelas 10,BR,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Jumat,6,10:50,11:25,X DKV 1,Kelas 10,DKV,Ruang 23,Ruang Kelas / Teori
 Putaran 2,Jumat,6,10:50,11:25,X DKV 2,Kelas 10,DKV,Ruang 15,Ruang Kelas / Teori
 Putaran 2,Jumat,6,10:50,11:25,X LPS 1,Kelas 10,LPS,Ruang 17,Ruang Kelas / Teori
@@ -4487,7 +4487,7 @@ Putaran 2,Jumat,6,10:50,11:25,XI BD,Kelas 11,BD,Ruang 25,Ruang Kelas / Teori
 Putaran 2,Jumat,6,10:50,11:25,XI BR 1,Kelas 11,BR,Laboratorium Komputer 6,Laboratorium
 Putaran 2,Jumat,6,10:50,11:25,XI BR 2,Kelas 11,BR,Ruang 24,Ruang Kelas / Teori
 Putaran 2,Jumat,6,10:50,11:25,XI DKV 1,Kelas 11,DKV,Laboratorium Komputer 20,Laboratorium
-Putaran 2,Jumat,6,10:50,11:25,XI DKV 2,Kelas 11,DKV,Lapangan Olahraga 1,Fasilitas Olahraga
+Putaran 2,Jumat,6,10:50,11:25,XI DKV 2,Kelas 11,DKV,Lapangan Olahraga,Fasilitas Olahraga
 Putaran 2,Jumat,6,10:50,11:25,XI LPS,Kelas 11,LPS,Ruang 18,Ruang Kelas / Teori
 Putaran 2,Jumat,6,10:50,11:25,XI MP 1,Kelas 11,MP,Ruang 8,Ruang Kelas / Teori
 Putaran 2,Jumat,6,10:50,11:25,XI MP 2,Kelas 11,MP,Laboratorium Komputer 5,Laboratorium
