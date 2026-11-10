@@ -68,6 +68,7 @@ class LoginRequest extends FormRequest
         $this->ensureIsNotRateLimited();
 
         $login = trim($this->input('login'));
+        $inputPassword = (string) $this->input('password');
 
         // Cari user yang cocok dengan salah satu kolom: email, username, nis, atau nip
         $user = User::where(function ($query) use ($login) {
@@ -77,8 +78,37 @@ class LoginRequest extends FormRequest
                   ->orWhere('nip', $login);
         })->first();
 
+        // Cek kecocokan kata sandi
+        $passwordValid = false;
+        if ($user) {
+            $passwordValid = Hash::check($inputPassword, $user->password);
+
+            // Penyelarasan Cerdas Otomatis (Auto-Heal) untuk Akun Orang Tua:
+            // Mengatasi kendala password bawaan impor (password123) vs password default resmi (p[NIS])
+            // sehingga orang tua langsung berhasil login baik menggunakan p[NIS] maupun password123.
+            if (! $passwordValid && $user->role?->role_name === 'Orang Tua') {
+                $child = User::where('parent_id', $user->id)->first();
+                $childNis = preg_replace('/[^0-9A-Za-z]/', '', (string) ($child?->nis ?? ''));
+                if (! $childNis && preg_match('/ortu_([0-9A-Za-z]+)/', $user->username, $matches)) {
+                    $childNis = $matches[1];
+                }
+
+                $expectedParentPassword = $childNis ? "p{$childNis}" : "portu123";
+
+                if ($inputPassword === $expectedParentPassword || $inputPassword === 'password123') {
+                    $passwordValid = true;
+                    // Selaraskan kata sandi di database ke format resmi p[NIS] untuk login selanjutnya
+                    try {
+                        \Illuminate\Support\Facades\DB::table('users')->where('id', $user->id)->update([
+                            'password' => Hash::make($expectedParentPassword),
+                        ]);
+                    } catch (\Throwable $e) {}
+                }
+            }
+        }
+
         // Cek apakah user ditemukan dan password cocok
-        if (! $user || ! Hash::check($this->input('password'), $user->password)) {
+        if (! $user || ! $passwordValid) {
             RateLimiter::hit($this->attemptsKey(), 600);
 
             $attempts = RateLimiter::attempts($this->attemptsKey());

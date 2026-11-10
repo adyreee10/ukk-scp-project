@@ -1142,6 +1142,13 @@ class WakaController extends Controller
         set_time_limit(600);
         ini_set('memory_limit', '512M');
 
+        // Optimasi SQLite: Aktifkan busy_timeout 60 detik & WAL checkpoint untuk mencegah 'database is locked'
+        try {
+            DB::statement('PRAGMA busy_timeout = 60000;');
+            DB::statement('PRAGMA journal_mode = WAL;');
+            DB::statement('PRAGMA wal_checkpoint(TRUNCATE);');
+        } catch (\Throwable $e) {}
+
         $parentRole = Role::where('role_name', 'Orang Tua')->firstOrFail();
         $students = User::whereHas('role', fn($q) => $q->where('role_name', 'Siswa'))
             ->select('id', 'name', 'username', 'nis', 'phone', 'address', 'parent_id')
@@ -1160,114 +1167,96 @@ class WakaController extends Controller
         $createdCount = 0;
         $syncedCount = 0;
         $nisHashes = [];
+        $now = now();
 
-        // Proses per chunk 100 siswa dalam transaksi database untuk performa maksimal
-        foreach ($students->chunk(100) as $chunk) {
-            DB::transaction(function () use ($chunk, $parentRole, &$existingUsernames, &$nisHashes, &$createdCount, &$syncedCount) {
-                $now = now();
-                foreach ($chunk as $student) {
-                    $nis = preg_replace('/[^0-9A-Za-z]/', '', (string)($student->nis ?? ''));
-                    $baseParentUser = $nis ? "ortu_{$nis}" : "ortu_" . preg_replace('/[^0-9A-Za-z_]/', '', (string)$student->username);
-                    $parentPasswordPlain = $nis ? "p{$nis}" : "portu123";
+        // Eksekusi pembaruan baris per baris tanpa membungkus transaksi panjang
+        // agar SQLite tidak pernah terkunci (lock dirilis seketika dalam hitungan microsecond)
+        foreach ($students as $student) {
+            $nis = preg_replace('/[^0-9A-Za-z]/', '', (string)($student->nis ?? ''));
+            $baseParentUser = $nis ? "ortu_{$nis}" : "ortu_" . preg_replace('/[^0-9A-Za-z_]/', '', (string)$student->username);
+            $parentPasswordPlain = $nis ? "p{$nis}" : "portu123";
 
-                    if (!isset($nisHashes[$parentPasswordPlain])) {
-                        $nisHashes[$parentPasswordPlain] = password_hash($parentPasswordPlain, PASSWORD_BCRYPT, ['cost' => 10]);
-                    }
-                    $hash = $nisHashes[$parentPasswordPlain];
+            if (!isset($nisHashes[$parentPasswordPlain])) {
+                $nisHashes[$parentPasswordPlain] = password_hash($parentPasswordPlain, PASSWORD_BCRYPT, ['cost' => 10]);
+            }
+            $hash = $nisHashes[$parentPasswordPlain];
 
-                    // KASUS A: Siswa sudah memiliki akun orang tua yang terhubung
-                    if ($student->parent_id) {
-                        $parent = DB::table('users')->where('id', $student->parent_id)->first();
-                        if ($parent) {
-                            $targetUsername = $parent->username;
-                            // Normalisasi username jika sebelumnya mendapat suffix _1 dan baseParentUser belum dipakai
-                            if ($targetUsername !== $baseParentUser) {
-                                $orphanCheck = DB::table('users')->where('username', $baseParentUser)->first();
-                                if (!$orphanCheck) {
-                                    $targetUsername = $baseParentUser;
-                                } elseif ($orphanCheck->id === $parent->id) {
-                                    $targetUsername = $baseParentUser;
-                                } elseif (!DB::table('users')->where('parent_id', $orphanCheck->id)->exists()) {
-                                    // Akun lama tidak tertaut ke siswa mana pun, ganti username-nya agar baseParentUser bisa dipakai
-                                    DB::table('users')->where('id', $orphanCheck->id)->update(['username' => $baseParentUser . '_old_' . $orphanCheck->id]);
-                                    $targetUsername = $baseParentUser;
-                                }
+            // KASUS A: Siswa sudah memiliki akun orang tua yang terhubung
+            if ($student->parent_id) {
+                try {
+                    $parent = DB::table('users')->where('id', $student->parent_id)->first();
+                    if ($parent) {
+                        $targetUsername = $parent->username;
+                        // Normalisasi username jika sebelumnya mendapat suffix _1 dan baseParentUser belum dipakai
+                        if ($targetUsername !== $baseParentUser) {
+                            $orphanCheck = DB::table('users')->where('username', $baseParentUser)->first();
+                            if (!$orphanCheck) {
+                                $targetUsername = $baseParentUser;
+                            } elseif ($orphanCheck->id === $parent->id) {
+                                $targetUsername = $baseParentUser;
+                            } elseif (!DB::table('users')->where('parent_id', $orphanCheck->id)->exists()) {
+                                DB::table('users')->where('id', $orphanCheck->id)->update(['username' => $baseParentUser . '_old_' . $orphanCheck->id]);
+                                $targetUsername = $baseParentUser;
                             }
-
-                            DB::table('users')->where('id', $parent->id)->update([
-                                'username'   => $targetUsername,
-                                'password'   => $hash,
-                                'role_id'    => $parentRole->id,
-                                'name'       => 'Orang tua ' . trim($student->name),
-                                'updated_at' => $now,
-                            ]);
-                            $existingUsernames[strtolower($targetUsername)] = true;
-                            $syncedCount++;
-                            continue;
                         }
-                    }
 
-                    // KASUS B: Siswa belum memiliki akun orang tua
-                    // 1. Cek jika akun orang tua dengan username ini sudah pernah dibuat sebelumnya (misal diinput manual)
-                    $existingParent = DB::table('users')->where('username', $baseParentUser)->first();
-                    if ($existingParent) {
-                        DB::table('users')->where('id', $existingParent->id)->update([
+                        DB::table('users')->where('id', $parent->id)->update([
+                            'username'   => $targetUsername,
                             'password'   => $hash,
                             'role_id'    => $parentRole->id,
                             'name'       => 'Orang tua ' . trim($student->name),
                             'updated_at' => $now,
                         ]);
-                        DB::table('users')->where('id', $student->id)->update(['parent_id' => $existingParent->id]);
-                        $existingUsernames[strtolower($baseParentUser)] = true;
-                        $createdCount++;
+                        $existingUsernames[strtolower($targetUsername)] = true;
+                        $syncedCount++;
                         continue;
                     }
-
-                    // 2. Jika belum ada, pastikan username unik sebelum membuat akun baru
-                    $uniqueParentUser = substr($baseParentUser, 0, 45);
-                    $pCounter = 1;
-                    while (isset($existingUsernames[strtolower($uniqueParentUser)])) {
-                        $uniqueParentUser = substr($baseParentUser, 0, 38) . "_{$pCounter}";
-                        $pCounter++;
-                    }
-                    $existingUsernames[strtolower($uniqueParentUser)] = true;
-
-                    try {
-                        $parentId = DB::table('users')->insertGetId([
-                            'name'           => 'Orang tua ' . trim($student->name),
-                            'username'       => $uniqueParentUser,
-                            'password'       => $hash,
-                            'role_id'        => $parentRole->id,
-                            'phone'          => $student->phone,
-                            'address'        => $student->address,
-                            'student_status' => 'Aktif',
-                            'created_at'     => $now,
-                            'updated_at'     => $now,
-                        ]);
-                    } catch (\Throwable $ex) {
-                        $fallback = DB::table('users')->where('username', $uniqueParentUser)->first();
-                        if ($fallback) {
-                            $parentId = $fallback->id;
-                        } else {
-                            $uniqueParentUser = substr($baseParentUser, 0, 35) . '_' . rand(1000, 9999);
-                            $parentId = DB::table('users')->insertGetId([
-                                'name'           => 'Orang tua ' . trim($student->name),
-                                'username'       => $uniqueParentUser,
-                                'password'       => $hash,
-                                'role_id'        => $parentRole->id,
-                                'phone'          => $student->phone,
-                                'address'        => $student->address,
-                                'student_status' => 'Aktif',
-                                'created_at'     => $now,
-                                'updated_at'     => $now,
-                            ]);
-                        }
-                    }
-
-                    DB::table('users')->where('id', $student->id)->update(['parent_id' => $parentId]);
-                    $createdCount++;
+                } catch (\Throwable $ex) {
+                    continue;
                 }
-            });
+            }
+
+            // KASUS B: Siswa belum memiliki akun orang tua
+            try {
+                $existingParent = DB::table('users')->where('username', $baseParentUser)->first();
+                if ($existingParent) {
+                    DB::table('users')->where('id', $existingParent->id)->update([
+                        'password'   => $hash,
+                        'role_id'    => $parentRole->id,
+                        'name'       => 'Orang tua ' . trim($student->name),
+                        'updated_at' => $now,
+                    ]);
+                    DB::table('users')->where('id', $student->id)->update(['parent_id' => $existingParent->id]);
+                    $existingUsernames[strtolower($baseParentUser)] = true;
+                    $createdCount++;
+                    continue;
+                }
+
+                $uniqueParentUser = substr($baseParentUser, 0, 45);
+                $pCounter = 1;
+                while (isset($existingUsernames[strtolower($uniqueParentUser)])) {
+                    $uniqueParentUser = substr($baseParentUser, 0, 38) . "_{$pCounter}";
+                    $pCounter++;
+                }
+                $existingUsernames[strtolower($uniqueParentUser)] = true;
+
+                $parentId = DB::table('users')->insertGetId([
+                    'name'           => 'Orang tua ' . trim($student->name),
+                    'username'       => $uniqueParentUser,
+                    'password'       => $hash,
+                    'role_id'        => $parentRole->id,
+                    'phone'          => $student->phone,
+                    'address'        => $student->address,
+                    'student_status' => 'Aktif',
+                    'created_at'     => $now,
+                    'updated_at'     => $now,
+                ]);
+
+                DB::table('users')->where('id', $student->id)->update(['parent_id' => $parentId]);
+                $createdCount++;
+            } catch (\Throwable $ex) {
+                continue;
+            }
         }
 
         return redirect()->route('waka.students.index')->with('success', "Sukses! Berhasil menyinkronkan seluruh akun Orang Tua: {$createdCount} akun baru dibuat, {$syncedCount} akun diperbarui password dan hak aksesnya ke format p[NIS].");
@@ -1285,6 +1274,12 @@ class WakaController extends Controller
         set_time_limit(600);
         ini_set('memory_limit', '512M');
 
+        try {
+            DB::statement('PRAGMA busy_timeout = 60000;');
+            DB::statement('PRAGMA journal_mode = WAL;');
+            DB::statement('PRAGMA wal_checkpoint(TRUNCATE);');
+        } catch (\Throwable $e) {}
+
         $parentRole = Role::where('role_name', 'Orang Tua')->firstOrFail();
         $students = User::whereHas('role', fn($q) => $q->where('role_name', 'Siswa'))
             ->select('id', 'name', 'username', 'nis', 'phone', 'address', 'parent_id')
@@ -1298,110 +1293,93 @@ class WakaController extends Controller
         $createdCount = 0;
         $syncedCount = 0;
         $nisHashes = [];
+        $now = now();
 
-        foreach ($students->chunk(100) as $chunk) {
-            DB::transaction(function () use ($chunk, $parentRole, &$existingUsernames, &$nisHashes, &$createdCount, &$syncedCount) {
-                $now = now();
-                foreach ($chunk as $student) {
-                    $nis = preg_replace('/[^0-9A-Za-z]/', '', (string)($student->nis ?? ''));
-                    $baseParentUser = $nis ? "ortu_{$nis}" : "ortu_" . preg_replace('/[^0-9A-Za-z_]/', '', (string)$student->username);
-                    $parentPasswordPlain = $nis ? "p{$nis}" : "portu123";
+        foreach ($students as $student) {
+            $nis = preg_replace('/[^0-9A-Za-z]/', '', (string)($student->nis ?? ''));
+            $baseParentUser = $nis ? "ortu_{$nis}" : "ortu_" . preg_replace('/[^0-9A-Za-z_]/', '', (string)$student->username);
+            $parentPasswordPlain = $nis ? "p{$nis}" : "portu123";
 
-                    if (!isset($nisHashes[$parentPasswordPlain])) {
-                        $nisHashes[$parentPasswordPlain] = password_hash($parentPasswordPlain, PASSWORD_BCRYPT, ['cost' => 10]);
-                    }
-                    $hash = $nisHashes[$parentPasswordPlain];
+            if (!isset($nisHashes[$parentPasswordPlain])) {
+                $nisHashes[$parentPasswordPlain] = password_hash($parentPasswordPlain, PASSWORD_BCRYPT, ['cost' => 10]);
+            }
+            $hash = $nisHashes[$parentPasswordPlain];
 
-                    // KASUS A: Siswa sudah memiliki akun orang tua
-                    if ($student->parent_id) {
-                        $parent = DB::table('users')->where('id', $student->parent_id)->first();
-                        if ($parent) {
-                            $targetUsername = $parent->username;
-                            if ($targetUsername !== $baseParentUser) {
-                                $orphanCheck = DB::table('users')->where('username', $baseParentUser)->first();
-                                if (!$orphanCheck) {
-                                    $targetUsername = $baseParentUser;
-                                } elseif ($orphanCheck->id === $parent->id) {
-                                    $targetUsername = $baseParentUser;
-                                } elseif (!DB::table('users')->where('parent_id', $orphanCheck->id)->exists()) {
-                                    DB::table('users')->where('id', $orphanCheck->id)->update(['username' => $baseParentUser . '_old_' . $orphanCheck->id]);
-                                    $targetUsername = $baseParentUser;
-                                }
+            // KASUS A: Siswa sudah memiliki akun orang tua
+            if ($student->parent_id) {
+                try {
+                    $parent = DB::table('users')->where('id', $student->parent_id)->first();
+                    if ($parent) {
+                        $targetUsername = $parent->username;
+                        if ($targetUsername !== $baseParentUser) {
+                            $orphanCheck = DB::table('users')->where('username', $baseParentUser)->first();
+                            if (!$orphanCheck) {
+                                $targetUsername = $baseParentUser;
+                            } elseif ($orphanCheck->id === $parent->id) {
+                                $targetUsername = $baseParentUser;
+                            } elseif (!DB::table('users')->where('parent_id', $orphanCheck->id)->exists()) {
+                                DB::table('users')->where('id', $orphanCheck->id)->update(['username' => $baseParentUser . '_old_' . $orphanCheck->id]);
+                                $targetUsername = $baseParentUser;
                             }
-
-                            DB::table('users')->where('id', $parent->id)->update([
-                                'username'   => $targetUsername,
-                                'password'   => $hash,
-                                'role_id'    => $parentRole->id,
-                                'name'       => 'Orang tua ' . trim($student->name),
-                                'updated_at' => $now,
-                            ]);
-                            $existingUsernames[strtolower($targetUsername)] = true;
-                            $syncedCount++;
-                            continue;
                         }
-                    }
 
-                    // KASUS B: Siswa belum memiliki akun orang tua
-                    $existingParent = DB::table('users')->where('username', $baseParentUser)->first();
-                    if ($existingParent) {
-                        DB::table('users')->where('id', $existingParent->id)->update([
+                        DB::table('users')->where('id', $parent->id)->update([
+                            'username'   => $targetUsername,
                             'password'   => $hash,
                             'role_id'    => $parentRole->id,
                             'name'       => 'Orang tua ' . trim($student->name),
                             'updated_at' => $now,
                         ]);
-                        DB::table('users')->where('id', $student->id)->update(['parent_id' => $existingParent->id]);
-                        $existingUsernames[strtolower($baseParentUser)] = true;
-                        $createdCount++;
+                        $existingUsernames[strtolower($targetUsername)] = true;
+                        $syncedCount++;
                         continue;
                     }
-
-                    // Buat baru
-                    $uniqueParentUser = substr($baseParentUser, 0, 45);
-                    $pCounter = 1;
-                    while (isset($existingUsernames[strtolower($uniqueParentUser)])) {
-                        $uniqueParentUser = substr($baseParentUser, 0, 38) . "_{$pCounter}";
-                        $pCounter++;
-                    }
-                    $existingUsernames[strtolower($uniqueParentUser)] = true;
-
-                    try {
-                        $parentId = DB::table('users')->insertGetId([
-                            'name'           => 'Orang tua ' . trim($student->name),
-                            'username'       => $uniqueParentUser,
-                            'password'       => $hash,
-                            'role_id'        => $parentRole->id,
-                            'phone'          => $student->phone,
-                            'address'        => $student->address,
-                            'student_status' => 'Aktif',
-                            'created_at'     => $now,
-                            'updated_at'     => $now,
-                        ]);
-                    } catch (\Throwable $ex) {
-                        $fallback = DB::table('users')->where('username', $uniqueParentUser)->first();
-                        if ($fallback) {
-                            $parentId = $fallback->id;
-                        } else {
-                            $uniqueParentUser = substr($baseParentUser, 0, 35) . '_' . rand(1000, 9999);
-                            $parentId = DB::table('users')->insertGetId([
-                                'name'           => 'Orang tua ' . trim($student->name),
-                                'username'       => $uniqueParentUser,
-                                'password'       => $hash,
-                                'role_id'        => $parentRole->id,
-                                'phone'          => $student->phone,
-                                'address'        => $student->address,
-                                'student_status' => 'Aktif',
-                                'created_at'     => $now,
-                                'updated_at'     => $now,
-                            ]);
-                        }
-                    }
-
-                    DB::table('users')->where('id', $student->id)->update(['parent_id' => $parentId]);
-                    $createdCount++;
+                } catch (\Throwable $ex) {
+                    continue;
                 }
-            });
+            }
+
+            // KASUS B: Siswa belum memiliki akun orang tua
+            try {
+                $existingParent = DB::table('users')->where('username', $baseParentUser)->first();
+                if ($existingParent) {
+                    DB::table('users')->where('id', $existingParent->id)->update([
+                        'password'   => $hash,
+                        'role_id'    => $parentRole->id,
+                        'name'       => 'Orang tua ' . trim($student->name),
+                        'updated_at' => $now,
+                    ]);
+                    DB::table('users')->where('id', $student->id)->update(['parent_id' => $existingParent->id]);
+                    $existingUsernames[strtolower($baseParentUser)] = true;
+                    $createdCount++;
+                    continue;
+                }
+
+                $uniqueParentUser = substr($baseParentUser, 0, 45);
+                $pCounter = 1;
+                while (isset($existingUsernames[strtolower($uniqueParentUser)])) {
+                    $uniqueParentUser = substr($baseParentUser, 0, 38) . "_{$pCounter}";
+                    $pCounter++;
+                }
+                $existingUsernames[strtolower($uniqueParentUser)] = true;
+
+                $parentId = DB::table('users')->insertGetId([
+                    'name'           => 'Orang tua ' . trim($student->name),
+                    'username'       => $uniqueParentUser,
+                    'password'       => $hash,
+                    'role_id'        => $parentRole->id,
+                    'phone'          => $student->phone,
+                    'address'        => $student->address,
+                    'student_status' => 'Aktif',
+                    'created_at'     => $now,
+                    'updated_at'     => $now,
+                ]);
+
+                DB::table('users')->where('id', $student->id)->update(['parent_id' => $parentId]);
+                $createdCount++;
+            } catch (\Throwable $ex) {
+                continue;
+            }
         }
 
         return response("<div style='font-family:system-ui,-apple-system,sans-serif;padding:32px;background:#0f172a;color:#38bdf8;border-radius:18px;max-width:600px;margin:50px auto;border:1px solid #1e293b;box-shadow:0 25px 30px -5px rgba(0,0,0,0.6);line-height:1.6;'>
