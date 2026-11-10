@@ -30,12 +30,29 @@ class AttendanceService
         ->get()
         ->unique('student_id');
 
-        foreach ($leaves as $leave) {
-            Attendance::updateOrCreate(
-                ['journal_id' => $journal->id, 'student_id' => $leave->student_id],
-                ['status' => $leave->leave_type, 'date' => $date],
-            );
+        if ($leaves->isEmpty()) {
+            return;
         }
+
+        $now = now();
+        $records = [];
+        foreach ($leaves as $leave) {
+            $records[] = [
+                'journal_id' => $journal->id,
+                'student_id' => $leave->student_id,
+                'status'     => $leave->leave_type,
+                'note'       => null,
+                'date'       => $date,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ];
+        }
+
+        Attendance::upsert(
+            $records,
+            ['journal_id', 'student_id'],
+            ['status', 'date', 'updated_at']
+        );
     }
 
     public function saveBatch (Journal $journal, array $rows): Collection
@@ -66,20 +83,30 @@ class AttendanceService
             ->unique('student_id')
             ->keyBy('student_id');
 
+            $now = now();
+            $records = [];
             foreach($rows as $row) {
                 $forcedStatus = $approved->get($row['student_id'])?->leave_type;
 
-                Attendance::updateOrCreate(
-                    ['journal_id' => $journal->id, 'student_id' => $row['student_id']],
-                    [
-                        'status' => $forcedStatus ?? $row['status'],
-                        'note'   => $row['note'] ?? null,
-                        'date'   => $date,
-                    ], 
+                $records[] = [
+                    'journal_id' => $journal->id,
+                    'student_id' => (int) $row['student_id'],
+                    'status'     => $forcedStatus ?? $row['status'],
+                    'note'       => !empty($row['note']) ? trim($row['note']) : null,
+                    'date'       => $date,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ];
+            }
+
+            if (!empty($records)) {
+                Attendance::upsert(
+                    $records,
+                    ['journal_id', 'student_id'],
+                    ['status', 'note', 'date', 'updated_at']
                 );
             }
 
-        
             return $journal->attendances()->with('student:id,name')->get();
         });
     }

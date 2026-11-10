@@ -591,7 +591,7 @@
 
                     <!-- Catatan Info Password Awal -->
                     <div class="p-3 rounded-xl bg-indigo-950/60 border border-indigo-500/30 text-xs text-indigo-200">
-                        <span class="font-bold text-white">Catatan:</span> Kata sandi awal siswa otomatis disetel <code class="px-1.5 py-0.5 rounded bg-indigo-900 text-amber-300 font-mono font-bold">password123</code>. Data pribadi seperti email & HP dapat dilengkapi mandiri oleh siswa melalui menu profil masing-masing.
+                        <span class="font-bold text-white">Catatan:</span> Kata sandi awal siswa otomatis disetel <code class="student-default-password px-2 py-0.5 rounded-md bg-indigo-900 text-amber-300 font-mono font-bold" style="color: #fde047 !important;">password123</code>. Data pribadi seperti email & HP dapat dilengkapi mandiri oleh siswa melalui menu profil masing-masing.
                     </div>
 
                     <div class="flex justify-end gap-2 pt-3">

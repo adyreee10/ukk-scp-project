@@ -407,7 +407,7 @@
                                                     nip: '{{ addslashes($teacher->nip ?? '-') }}',
                                                     email: '{{ addslashes($teacher->email ?? '-') }}',
                                                     phone: '{{ addslashes($teacher->phone ?? '-') }}',
-                                                    address: '{{ addslashes($teacher->address ?? '-') }}',
+                                                    address: '{{ addslashes(str_replace(["\r", "\n"], ' ', $teacher->address ?? '-')) }}',
                                                     role_name: '{{ addslashes($teacher->role?->role_name ?? 'Guru') }}',
                                                     homeroom_class_name: '{{ addslashes($teacher->homeroomClass?->class_name ?? '-') }}',
                                                     schedules_count: '{{ $teacher->schedules_count }}'
@@ -426,7 +426,7 @@
                                                     nip: '{{ addslashes($teacher->nip ?? '') }}',
                                                     email: '{{ addslashes($teacher->email ?? '') }}',
                                                     phone: '{{ addslashes($teacher->phone ?? '') }}',
-                                                    address: '{{ addslashes($teacher->address ?? '') }}',
+                                                    address: '{{ addslashes(str_replace(["\r", "\n"], ' ', $teacher->address ?? '')) }}',
                                                     role_id: '{{ $teacher->role_id }}',
                                                     homeroom_class_id: '{{ $teacher->homeroom_class_id }}'
                                                 }, '{{ addslashes(json_encode($teacher->counselorClasses->map(fn($c) => ['id' => $c->id, 'class_name' => $c->class_name]))) }}')"
@@ -590,7 +590,6 @@
                     </button>
                 </div>
             </div>
-        </div>
         </div>
 
         <!-- ============================================================= -->
@@ -830,7 +829,7 @@
                         <svg class="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         <div>
                             <span class="font-bold text-white block mb-0.5">Catatan Kata Sandi Akun:</span>
-                            Setiap akun guru yang baru diinput akan otomatis dibuatkan kata sandi awal: <code class="px-1.5 py-0.5 rounded bg-indigo-900 text-amber-300 font-mono font-bold">password123</code> (guru dapat mengubah kata sandi mandiri di menu profil).
+                            Setiap akun guru yang baru diinput akan otomatis dibuatkan kata sandi awal: <code class="student-default-password px-2 py-0.5 rounded-md bg-indigo-900 text-amber-300 font-mono font-bold" style="color: #fde047 !important;">password123</code> (guru dapat mengubah kata sandi mandiri di menu profil).
                         </div>
                     </div>
 
@@ -1101,7 +1100,7 @@
         </div>
 
         <!-- MODAL KONFIRMASI: HAPUS GURU TERPILIH -->
-        <div x-show="deleteSelectedModalOpen" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div x-show="deleteSelectedModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
             <div @click="deleteSelectedModalOpen = false" class="fixed inset-0 bg-black/70 backdrop-blur-sm"></div>
             <div class="relative w-full max-w-md bg-[#0f172a] p-6 shadow-2xl border border-rose-500/30 space-y-4 my-auto max-h-[90vh] overflow-y-auto" style="border-radius: 20px;">
                 <div class="flex items-center gap-3 border-b border-slate-800 pb-3">
@@ -1139,7 +1138,7 @@
         </div>
 
         <!-- MODAL KONFIRMASI: HAPUS SEMUA DATA GURU -->
-        <div x-show="deleteAllModalOpen" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div x-show="deleteAllModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
             <div @click="deleteAllModalOpen = false" class="fixed inset-0 bg-black/70 backdrop-blur-sm"></div>
             <div class="relative w-full max-w-md bg-[#0f172a] p-6 shadow-2xl border border-rose-500/40 space-y-4 my-auto max-h-[90vh] overflow-y-auto" style="border-radius: 20px;">
                 <div class="flex items-center gap-3 border-b border-slate-800 pb-3">

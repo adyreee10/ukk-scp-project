@@ -1200,6 +1200,15 @@
                 font-weight: 700 !important;
             }
 
+            /* Badge Password Default Siswa & Guru agar teks tetap cerah & kontras di Mode Terang */
+            .student-default-password,
+            html.theme-light .student-default-password,
+            html.theme-light [x-show="addModalOpen"] .student-default-password {
+                background-color: #1e1b4b !important;
+                color: #fde047 !important; /* Kuning terang cerah di atas latar gelap */
+                border: 1px solid #4338ca !important;
+            }
+
             html.theme-light .bg-amber-500\/20,
             html.theme-light .bg-amber-500\/10,
             html.theme-light .bg-yellow-500\/20,
