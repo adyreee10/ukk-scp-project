@@ -223,9 +223,10 @@
             html.theme-light main .text-white:not(.scp-btn-gradient):not(.scp-btn-gradient *):not(button):not(button *):not(.table-page-active):not(.table-page-active *):not(.room-count-badge):not(.room-count-badge *):not(input[type="radio"]:checked + span) {
                 color: #0f172a !important;
             }
+            html.theme-light main .text-slate-100,
             html.theme-light main .text-slate-200,
             html.theme-light main .text-slate-300 {
-                color: #334155 !important;
+                color: #0f172a !important;
             }
             html.theme-light main .text-slate-400,
             html.theme-light main .text-slate-500 {

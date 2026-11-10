@@ -103,11 +103,11 @@
                                     </span>
                                 </td>
                                 <td class="p-4 text-xs font-mono text-slate-300 whitespace-nowrap min-w-[220px]">
-                                    <div class="font-bold text-slate-100">
+                                    <div class="font-bold text-slate-900 dark:text-slate-100">
                                         {{ \Illuminate\Support\Str::before($schedule->period_label, '(') }}
                                     </div>
                                     @if(\Illuminate\Support\Str::contains($schedule->period_label, '('))
-                                        <div class="text-[11px] text-slate-400 font-sans mt-0.5 font-normal">
+                                        <div class="text-[11px] text-slate-500 dark:text-slate-400 font-sans mt-0.5 font-normal">
                                             ({{ \Illuminate\Support\Str::between($schedule->period_label, '(', ')') }})
                                         </div>
                                     @endif
