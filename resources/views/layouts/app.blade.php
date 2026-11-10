@@ -220,7 +220,7 @@
             html.theme-light main h1,
             html.theme-light main h2,
             html.theme-light main h3,
-            html.theme-light main .text-white:not(.scp-btn-gradient):not(.scp-btn-gradient *):not(button):not(button *):not(.table-page-active):not(.table-page-active *):not(.room-count-badge):not(.room-count-badge *):not(input[type="radio"]:checked + span) {
+            html.theme-light main .text-white:not(.scp-btn-gradient):not(.scp-btn-gradient *):not(button):not(button *):not(.table-page-active):not(.table-page-active *):not(.room-count-badge):not(.room-count-badge *):not(input[type="radio"]:checked + span):not(.btn-fill-now):not(.btn-fill-now *) {
                 color: #0f172a !important;
             }
             html.theme-light main .text-slate-100,
@@ -249,7 +249,25 @@
             html.theme-light button.bg-red-600,
             html.theme-light button.bg-red-600 *,
             html.theme-light a.bg-indigo-600,
-            html.theme-light a.bg-indigo-600 * {
+            html.theme-light a.bg-indigo-600 *,
+            .btn-fill-now,
+            .btn-fill-now *,
+            html.theme-light .btn-fill-now,
+            html.theme-light .btn-fill-now *,
+            html.dark .btn-fill-now,
+            html.dark .btn-fill-now *,
+            button.bg-rose-600,
+            button.bg-rose-600 *,
+            html.theme-light button.bg-rose-600,
+            html.theme-light button.bg-rose-600 *,
+            html.dark button.bg-rose-600,
+            html.dark button.bg-rose-600 *,
+            .btn-camera-snap,
+            .btn-camera-snap *,
+            html.theme-light .btn-camera-snap,
+            html.theme-light .btn-camera-snap *,
+            html.dark .btn-camera-snap,
+            html.dark .btn-camera-snap * {
                 color: #ffffff !important;
             }
 
@@ -646,6 +664,189 @@
                 color: #0f172a !important;
             }
 
+            /* Pastikan seluruh elemen select memiliki padding kanan dan posisi arrow yang presisi agar tidak bertabrakan dengan teks */
+            select,
+            html.theme-light select,
+            html.dark select,
+            html.theme-light main select,
+            html.dark main select {
+                padding-right: 2.25rem !important;
+                background-position: right 0.6rem center !important;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            /* ===================================================
+               ALERT JURNAL BELUM DIISI (MODE TERANG & GELAP KONTRAS)
+               =================================================== */
+            /* Default Dark Mode */
+            .scp-overdue-alert {
+                background-color: rgba(69, 26, 3, 0.6) !important;
+                border: 1.5px solid #d97706 !important;
+                box-shadow: 0 4px 20px -2px rgba(217, 119, 6, 0.25) !important;
+            }
+            .scp-overdue-card {
+                background-color: #0f172a !important;
+                border: 1px solid rgba(245, 158, 11, 0.35) !important;
+            }
+            .scp-overdue-card .title-subject {
+                color: #ffffff !important;
+            }
+            .scp-overdue-card .text-desc {
+                color: #94a3b8 !important;
+            }
+
+            /* Light Mode */
+            html.theme-light .scp-overdue-alert {
+                background-color: #fef3c7 !important; /* Amber 100 yang hangat & jelas terlihat */
+                border: 1.5px solid #f59e0b !important; /* Amber 500 tegas */
+                box-shadow: 0 4px 15px -2px rgba(245, 158, 11, 0.2) !important;
+            }
+            html.theme-light .scp-overdue-alert span,
+            html.theme-light .scp-overdue-alert .text-amber-800,
+            html.theme-light .scp-overdue-alert .text-amber-300 {
+                color: #92400e !important;            /* Amber 900 kontras tinggi */
+                font-weight: 800 !important;
+            }
+            html.theme-light .scp-overdue-card {
+                background-color: #ffffff !important; /* Kartu putih bersih */
+                border: 1px solid #fcd34d !important; /* Border kuning amber lembut */
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+            }
+            html.theme-light .scp-overdue-card .title-subject {
+                color: #0f172a !important;            /* Teks judul hitam pekat */
+            }
+            html.theme-light .scp-overdue-card .text-desc {
+                color: #475569 !important;            /* Teks abu-abu tegas */
+            }
+
+            /* ===================================================
+               BADGE HARI INI & HARI AKTIF DI JADWAL SISWA / ORTU
+               =================================================== */
+            /* Mode Gelap (Dark Mode) */
+            html.dark .badge-day-today,
+            .badge-day-today {
+                background-color: #059669 !important; /* Emerald 600 tajam */
+                color: #ffffff !important;            /* Teks putih bersih sangat kontras */
+                border: 1px solid #10b981 !important;
+                font-weight: 800 !important;
+            }
+            html.dark .badge-today-tab-active,
+            .badge-today-tab-active {
+                background-color: rgba(255, 255, 255, 0.25) !important;
+                color: #ffffff !important;
+                border: 1px solid rgba(255, 255, 255, 0.4) !important;
+                font-weight: 800 !important;
+            }
+            html.dark .badge-today-tab-inactive,
+            .badge-today-tab-inactive {
+                background-color: #064e3b !important; /* Emerald 900 pekat */
+                color: #6ee7b7 !important;            /* Mint terang sangat terbaca */
+                border: 1px solid #059669 !important;
+                font-weight: 800 !important;
+            }
+
+            /* Mode Terang (Light Mode) */
+            html.theme-light .badge-day-today {
+                background-color: #dcfce7 !important; /* Emerald 100 lembut */
+                color: #14532d !important;            /* Emerald 900 gelap tegas */
+                border: 1.5px solid #22c55e !important;
+                font-weight: 800 !important;
+            }
+            html.theme-light .badge-today-tab-active {
+                background-color: rgba(255, 255, 255, 0.35) !important;
+                color: #ffffff !important;
+                border: 1px solid rgba(255, 255, 255, 0.6) !important;
+                font-weight: 800 !important;
+            }
+            html.theme-light .badge-today-tab-inactive {
+                background-color: #dcfce7 !important;
+                color: #166534 !important;
+                border: 1px solid #86efac !important;
+                font-weight: 800 !important;
+            }
+
+            /* ===================================================
+               INDIKATOR PIL PRESENSI H, S, I, A (MODE TERANG & GELAP)
+               =================================================== */
+            /* Status Terpilih (Checked) - Wajib Teks Putih Bersih & Kontras */
+            input[type="radio"]:checked + span.attendance-pill-h,
+            html.theme-light input[type="radio"]:checked + span.attendance-pill-h,
+            html.dark input[type="radio"]:checked + span.attendance-pill-h {
+                background-color: #059669 !important;
+                border-color: #059669 !important;
+                color: #ffffff !important;
+                box-shadow: 0 2px 6px rgba(5, 150, 105, 0.4) !important;
+                font-weight: 800 !important;
+            }
+
+            input[type="radio"]:checked + span.attendance-pill-s,
+            html.theme-light input[type="radio"]:checked + span.attendance-pill-s,
+            html.dark input[type="radio"]:checked + span.attendance-pill-s {
+                background-color: #d97706 !important;
+                border-color: #d97706 !important;
+                color: #ffffff !important;
+                box-shadow: 0 2px 6px rgba(217, 119, 6, 0.4) !important;
+                font-weight: 800 !important;
+            }
+
+            input[type="radio"]:checked + span.attendance-pill-i,
+            html.theme-light input[type="radio"]:checked + span.attendance-pill-i,
+            html.dark input[type="radio"]:checked + span.attendance-pill-i {
+                background-color: #2563eb !important;
+                border-color: #2563eb !important;
+                color: #ffffff !important;
+                box-shadow: 0 2px 6px rgba(37, 99, 235, 0.4) !important;
+                font-weight: 800 !important;
+            }
+
+            input[type="radio"]:checked + span.attendance-pill-a,
+            html.theme-light input[type="radio"]:checked + span.attendance-pill-a,
+            html.dark input[type="radio"]:checked + span.attendance-pill-a {
+                background-color: #dc2626 !important;
+                border-color: #dc2626 !important;
+                color: #ffffff !important;
+                box-shadow: 0 2px 6px rgba(220, 38, 38, 0.4) !important;
+                font-weight: 800 !important;
+            }
+
+            /* Status Belum Dipilih (Unchecked) di Mode Terang (Light Mode) */
+            html.theme-light input[type="radio"]:not(:checked) + span.attendance-pill-h {
+                background-color: #ffffff !important;
+                border: 1.5px solid #a7f3d0 !important;
+                color: #047857 !important; /* Hijau pekat */
+                font-weight: 800 !important;
+            }
+            html.theme-light input[type="radio"]:not(:checked) + span.attendance-pill-s {
+                background-color: #ffffff !important;
+                border: 1.5px solid #fde68a !important;
+                color: #b45309 !important; /* Amber pekat */
+                font-weight: 800 !important;
+            }
+            html.theme-light input[type="radio"]:not(:checked) + span.attendance-pill-i {
+                background-color: #ffffff !important;
+                border: 1.5px solid #bfdbfe !important;
+                color: #1d4ed8 !important; /* Biru pekat */
+                font-weight: 800 !important;
+            }
+            html.theme-light input[type="radio"]:not(:checked) + span.attendance-pill-a {
+                background-color: #ffffff !important;
+                border: 1.5px solid #fecaca !important;
+                color: #b91c1c !important; /* Merah pekat */
+                font-weight: 800 !important;
+            }
+
+            /* Status Belum Dipilih (Unchecked) di Mode Gelap (Dark Mode) */
+            html.dark input[type="radio"]:not(:checked) + span.attendance-pill-h,
+            html.dark input[type="radio"]:not(:checked) + span.attendance-pill-s,
+            html.dark input[type="radio"]:not(:checked) + span.attendance-pill-i,
+            html.dark input[type="radio"]:not(:checked) + span.attendance-pill-a {
+                background-color: #0f172a !important;
+                border: 1.5px solid #334155 !important;
+                color: #94a3b8 !important;
+                font-weight: 800 !important;
+            }
+
             /* Kotak Info Internal / Kotak Alasan / Sub-kartu di Light Mode */
             html.theme-light [class*="bg-slate-950"],
             html.theme-light [class*="bg-slate-900"],
@@ -658,8 +859,8 @@
                 border-color: #e2e8f0 !important;
                 color: #1e293b !important;
             }
-            html.theme-light [class*="bg-slate-950"] span,
-            html.theme-light [class*="bg-slate-900"] span {
+            html.theme-light [class*="bg-slate-950"] span:not(button span):not(button *):not(a.btn *):not(.btn-fill-now *):not(.scp-btn-gradient *):not(.btn-camera-snap *):not(.badge-day-today):not(.badge-today-tab-active):not(.badge-today-tab-inactive),
+            html.theme-light [class*="bg-slate-900"] span:not(button span):not(button *):not(a.btn *):not(.btn-fill-now *):not(.scp-btn-gradient *):not(.btn-camera-snap *):not(.badge-day-today):not(.badge-today-tab-active):not(.badge-today-tab-inactive) {
                 color: #64748b !important;
             }
             html.theme-light [class*="bg-slate-950"] p.font-bold,

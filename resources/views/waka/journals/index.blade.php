@@ -35,7 +35,7 @@
 
             <!-- Filter Bar Lengkap (Tanggal, Status Jurnal, Tingkat, Jurusan, Rombel, Guru) -->
             <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800/80">
-                <form method="GET" action="{{ route('waka.journals.index') }}" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-2.5 sm:gap-3 items-end">
+                <form method="GET" action="{{ route('waka.journals.index') }}" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-7 gap-2.5 sm:gap-3 items-end">
                     @if(request('per_page'))
                         <input type="hidden" name="per_page" value="{{ request('per_page') }}">
                     @endif
@@ -51,8 +51,8 @@
                     <div>
                         <label class="block text-[11px] font-bold text-slate-400 mb-1">Status Jurnal</label>
                         <select name="status" onchange="this.form.submit()" 
-                                class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-xs font-bold text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 cursor-pointer">
-                            <option value="all" {{ ($statusFilter ?? 'all') === 'all' ? 'selected' : '' }}>Semua Status</option>
+                                class="w-full rounded-xl border border-slate-700 bg-slate-900 pl-3 pr-8 py-2 text-xs font-bold text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 cursor-pointer truncate">
+                            <option value="all" {{ ($statusFilter ?? 'all') === 'all' ? 'selected' : '' }}>Semua</option>
                             <option value="sudah" {{ ($statusFilter ?? '') === 'sudah' ? 'selected' : '' }}>Sudah Diisi</option>
                             <option value="belum" {{ ($statusFilter ?? '') === 'belum' ? 'selected' : '' }}>Belum Diisi</option>
                         </select>
@@ -62,8 +62,8 @@
                     <div>
                         <label class="block text-[11px] font-bold text-slate-400 mb-1">Tingkat</label>
                         <select name="grade" onchange="this.form.submit()" 
-                                class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-xs font-bold text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 cursor-pointer">
-                            <option value="all" {{ ($grade ?? 'all') === 'all' ? 'selected' : '' }}>Semua Tingkat</option>
+                                class="w-full rounded-xl border border-slate-700 bg-slate-900 pl-3 pr-8 py-2 text-xs font-bold text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 cursor-pointer truncate">
+                            <option value="all" {{ ($grade ?? 'all') === 'all' ? 'selected' : '' }}>Semua</option>
                             @foreach($availableGrades as $g)
                                 <option value="{{ $g }}" {{ ($grade ?? '') === $g ? 'selected' : '' }}>Kelas {{ $g }}</option>
                             @endforeach
@@ -74,8 +74,8 @@
                     <div>
                         <label class="block text-[11px] font-bold text-slate-400 mb-1">Jurusan</label>
                         <select name="major" onchange="this.form.submit()" 
-                                class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-xs font-bold text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 cursor-pointer">
-                            <option value="all" {{ ($major ?? 'all') === 'all' ? 'selected' : '' }}>Semua Jurusan</option>
+                                class="w-full rounded-xl border border-slate-700 bg-slate-900 pl-3 pr-8 py-2 text-xs font-bold text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 cursor-pointer truncate">
+                            <option value="all" {{ ($major ?? 'all') === 'all' ? 'selected' : '' }}>Semua</option>
                             @foreach($availableMajors as $m)
                                 <option value="{{ $m }}" {{ ($major ?? '') === $m ? 'selected' : '' }}>{{ $m }}</option>
                             @endforeach
@@ -86,8 +86,8 @@
                     <div>
                         <label class="block text-[11px] font-bold text-slate-400 mb-1">Rombel</label>
                         <select name="rombel" onchange="this.form.submit()" 
-                                class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-xs font-bold text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 cursor-pointer">
-                            <option value="all" {{ ($rombel ?? 'all') === 'all' ? 'selected' : '' }}>Semua Rombel</option>
+                                class="w-full rounded-xl border border-slate-700 bg-slate-900 pl-3 pr-8 py-2 text-xs font-bold text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 cursor-pointer truncate">
+                            <option value="all" {{ ($rombel ?? 'all') === 'all' ? 'selected' : '' }}>Semua</option>
                             @foreach($availableRombels as $r)
                                 <option value="{{ $r }}" {{ ($rombel ?? '') === (string)$r ? 'selected' : '' }}>Rombel {{ $r }}</option>
                             @endforeach
@@ -98,7 +98,7 @@
                     <div>
                         <label class="block text-[11px] font-bold text-slate-400 mb-1">Guru</label>
                         <select name="teacher_id" onchange="this.form.submit()" 
-                                class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-xs text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 cursor-pointer">
+                                class="w-full rounded-xl border border-slate-700 bg-slate-900 pl-3 pr-8 py-2 text-xs text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 cursor-pointer truncate">
                             <option value="">Semua Guru</option>
                             @foreach($teachers as $t)
                                 <option value="{{ $t->id }}" {{ ($teacherId ?? '') == $t->id ? 'selected' : '' }}>{{ $t->name }}</option>

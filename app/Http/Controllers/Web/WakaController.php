@@ -95,7 +95,9 @@ class WakaController extends Controller
     }
 
     /**
-     * Toggle lock jadwal
+     * [FITUR UKK: TC-SCH-04 & TC-SCH-05 - KUNCI JADWAL / LOCK SCHEDULE]
+     * Mengunci atau membuka gembok seluruh jadwal mengajar KBM.
+     * Saat status terkunci, tombol aksi di frontend non-aktif dan backend menolak request tambah/edit/hapus.
      */
     public function toggleLock()
     {
@@ -113,7 +115,8 @@ class WakaController extends Controller
     }
 
     /**
-     * Toggle putaran aktif
+     * [FITUR UKK: TC-SCH-03 - PERGANTIAN SIKLUS BLOK KBM (PUTARAN 1 <-> PUTARAN 2)]
+     * Mengubah siklus dua mingguan aktif yang menyaring jadwal mengajar seluruh sekolah secara global.
      */
     public function toggleCycle()
     {
@@ -138,6 +141,10 @@ class WakaController extends Controller
 
     /**
      * Jadwal Pelajaran (Input Jadwal Mandiri)
+     */
+    /**
+     * [FITUR UKK: TC-SEC-02 - MASTER JADWAL KBM SELURUH SEKOLAH]
+     * Menampilkan daftar seluruh jadwal pelajaran KBM lengkap dengan filter Putaran, Tingkat, Jurusan, Rombel, Hari, dan Guru.
      */
     public function schedulesIndex(Request $request)
     {
@@ -213,6 +220,10 @@ class WakaController extends Controller
         ));
     }
 
+    /**
+     * [FITUR UKK: TC-SCH-01 & TC-SCH-02 - TAMBAH JADWAL MENGAJAR & VALIDASI BENTROK]
+     * Menyimpan jadwal baru ke database dengan proteksi Lock Schedule dan validasi anti-bentrok.
+     */
     public function schedulesStore(Request $request)
     {
         $config = SystemConfiguration::current();
@@ -243,6 +254,10 @@ class WakaController extends Controller
         return redirect()->route('waka.schedules.index')->with('success', 'Jadwal pelajaran berhasil ditambahkan.');
     }
 
+    /**
+     * [FITUR UKK: TC-SCH-02 - EDIT / PERBARUI JADWAL MENGAJAR]
+     * Memperbarui jadwal pelajaran dengan proteksi status Lock Schedule.
+     */
     public function schedulesUpdate(Request $request, Schedule $schedule)
     {
         $config = SystemConfiguration::current();
@@ -273,6 +288,10 @@ class WakaController extends Controller
         return redirect()->route('waka.schedules.index')->with('success', 'Jadwal pelajaran berhasil diperbarui.');
     }
 
+    /**
+     * [FITUR UKK: HAPUS SATU JADWAL MENGAJAR]
+     * Menghapus 1 data jadwal KBM dengan verifikasi proteksi gembok jadwal.
+     */
     public function schedulesDestroy(Schedule $schedule)
     {
         $config = SystemConfiguration::current();
@@ -611,6 +630,10 @@ class WakaController extends Controller
         });
     }
 
+    /**
+     * [FITUR UKK: TAMBAH GURU BARU & PEMETAAN PERAN (WALI KELAS / GURU BK)]
+     * Menyimpan guru baru, otomatis membuat akun login terenkripsi, dan menetapkan kelas perwalian / binaan.
+     */
     public function teachersStore(Request $request)
     {
         $validated = $request->validate([
@@ -651,7 +674,10 @@ class WakaController extends Controller
         return redirect()->route('waka.teachers.index')->with('success', 'Data guru berhasil ditambahkan.');
     }
 
-
+    /**
+     * [FITUR UKK: EDIT DATA GURU & PERUBAHAN PERAN / KELAS BINAAN]
+     * Memperbarui profil guru, sinkronisasi relasi perwalian kelas, dan kelas binaan BK.
+     */
     public function teachersUpdate(Request $request, User $teacher)
     {
         $validated = $request->validate([
@@ -694,6 +720,10 @@ class WakaController extends Controller
         return redirect()->route('waka.teachers.index')->with('success', 'Data guru berhasil diperbarui.');
     }
 
+    /**
+     * [FITUR UKK: HAPUS SATU DATA GURU & CLEANUP PENUGASAN]
+     * Menghapus guru, melepaskan relasi kelas binaan BK/wali kelas, dan membersihkan jadwal terkait.
+     */
     public function teachersDestroy(User $teacher)
     {
         if ($teacher->id === auth()->id()) {
@@ -985,7 +1015,11 @@ class WakaController extends Controller
         ));
     }
 
-        public function studentsStore(Request $request)
+    /**
+     * [FITUR UKK: TAMBAH DATA SISWA BARU & AUTO-CREATE AKUN ORANG TUA]
+     * Mendaftarkan siswa baru ke kelas terkait serta otomatis membuat akun orang tua dengan password p[NIS].
+     */
+    public function studentsStore(Request $request)
     {
         $studentRole = Role::where('role_name', 'Siswa')->firstOrFail();
 
@@ -1061,6 +1095,10 @@ class WakaController extends Controller
         return redirect()->route('waka.students.index')->with('success', 'Data siswa berhasil ditambahkan dan otomatis dibuatkan akun Orang Tua (Password siswa: password123, Password orang tua: p[NIS]).');
     }
 
+    /**
+     * [FITUR UKK: EDIT DATA SISWA & PEMETAAN KELAS]
+     * Memperbarui identitas siswa, kelas rombel, dan sinkronisasi nama akun orang tua terkait.
+     */
     public function studentsUpdate(Request $request, User $student)
     {
         // Otomatis gabungkan Tingkat, Jurusan, dan Rombel jika dikirim dari 3 kolom pemilih
@@ -1724,8 +1762,9 @@ public function classesDestroy(SchoolClass $schoolClass)
         return redirect()->route('waka.rooms.index')->with('success', $msg);
     }
     
-        /**
-     * Halaman Monitoring Kepatuhan & Riwayat Jurnal KBM Guru
+    /**
+     * [FITUR UKK: TC-REP-01 - MONITORING & ARSIP JURNAL KBM SELURUH GURU]
+     * Memantau kepatuhan pengisian jurnal KBM harian guru, melihat ringkasan materi, presensi, dan arsip riwayat KBM.
      */
     public function journalsIndex(Request $request, JournalReminderService $service)
     {
@@ -2594,7 +2633,8 @@ public function classesDestroy(SchoolClass $schoolClass)
     }
 
     /**
-     * Kenaikan Kelas MASSAL (Seluruh Siswa Sekaligus)
+     * [FITUR UKK: KENAIKAN KELAS MASSAL (X -> XI & XI -> XII)]
+     * Memproses kenaikan kelas otomatis seluruh siswa aktif ke tingkat kelas berikutnya.
      */
     public function gradesPromoteMass(Request $request)
     {
@@ -2638,7 +2678,8 @@ public function classesDestroy(SchoolClass $schoolClass)
     }
 
     /**
-     * Kelulusan MASSAL Siswa Kelas 12 Menjadi Alumni
+     * [FITUR UKK: KELULUSAN SISWA TINGKAT XII MASSAL (MENJADI ALUMNI)]
+     * Mengubah status seluruh siswa tingkat XII menjadi Alumni dan mencabut hak akses login.
      */
     public function gradesGraduateMass(Request $request)
     {

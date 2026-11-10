@@ -72,13 +72,13 @@
                 </div>
             </div>
 
-            <form method="POST" action="{{ route('waka.lesson-hours.preset') }}" class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs pt-1">
+            <form method="POST" action="{{ route('waka.lesson-hours.preset') }}" class="grid grid-cols-1 md:grid-cols-12 gap-3 text-xs pt-1">
                 @csrf
                 <!-- Pilih Target Hari -->
-                <div>
+                <div class="md:col-span-5">
                     <label class="block font-bold text-slate-300 mb-1">Terapkan Pada Hari</label>
-                    <select name="target_day" class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2.5 text-white font-semibold focus:border-indigo-500">
-                        <option value="all">Seluruh Hari Sekaligus (Universal)</option>
+                    <select name="target_day" class="w-full rounded-xl border border-slate-700 bg-slate-900 pl-3.5 pr-10 py-2.5 text-white font-semibold focus:border-indigo-500 truncate cursor-pointer">
+                        <option value="all">Semua Hari (Universal)</option>
                         <option value="Senin">Hari Senin Saja</option>
                         <option value="Selasa">Hari Selasa Saja</option>
                         <option value="Rabu">Hari Rabu Saja</option>
@@ -88,20 +88,20 @@
                 </div>
 
                 <!-- Pilih Durasi Menit -->
-                <div>
+                <div class="md:col-span-4">
                     <label class="block font-bold text-slate-300 mb-1">Durasi Menit Per Sesi</label>
-                    <select name="duration_minutes" class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2.5 text-white font-semibold focus:border-indigo-500">
+                    <select name="duration_minutes" class="w-full rounded-xl border border-slate-700 bg-slate-900 pl-3.5 pr-10 py-2.5 text-white font-semibold focus:border-indigo-500 truncate cursor-pointer">
                         <option value="20">20 Menit</option>
                         <option value="25">25 Menit</option>
-                        <option value="30">30 Menit (Durasi Ujian / Khusus)</option>
-                        <option value="35">35 Menit (Durasi Singkat / Khusus)</option>
-                        <option value="40" selected>40 Menit (Default Standar Sekolah)</option>
+                        <option value="30">30 Menit (Ujian / Khusus)</option>
+                        <option value="35">35 Menit (Singkat / Khusus)</option>
+                        <option value="40" selected>40 Menit (Standar Default)</option>
                         <option value="45">45 Menit (Durasi Panjang)</option>
                     </select>
                 </div>
 
                 <!-- Tombol Submit -->
-                <div class="flex items-end">
+                <div class="md:col-span-3 flex items-end">
                     <button type="submit" class="w-full py-2.5 rounded-xl scp-btn-gradient text-xs font-bold text-white shadow-md cursor-pointer transition">
                         Terapkan Durasi
                     </button>
@@ -241,7 +241,7 @@
                     <!-- Pilihan Durasi Menit -->
                     <div>
                         <label class="block font-bold text-slate-300 mb-1">Pilih Durasi Menit Sesi Ini</label>
-                        <select name="duration_minutes" x-model="activeHour.duration_minutes" class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-white font-semibold focus:border-indigo-500">
+                        <select name="duration_minutes" x-model="activeHour.duration_minutes" class="w-full rounded-xl border border-slate-700 bg-slate-900 pl-3.5 pr-10 py-2 text-white font-semibold focus:border-indigo-500">
                             <option value="20">20 Menit</option>
                             <option value="25">25 Menit</option>
                             <option value="30">30 Menit</option>

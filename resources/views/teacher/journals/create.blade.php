@@ -270,28 +270,28 @@
                                                                data-has-approved-leave="{{ $approvedLeave ? '1' : '' }}"
                                                                class="sr-only peer" 
                                                                {{ $currentStatus === 'Hadir' ? 'checked' : '' }}>
-                                                        <span class="px-2.5 py-1 rounded-md text-[11px] font-bold border border-slate-300 text-slate-600 bg-white dark:border-slate-700 dark:text-slate-400 dark:bg-slate-900 peer-checked:bg-emerald-600 peer-checked:!text-white peer-checked:border-emerald-600 transition inline-block">H</span>
+                                                        <span class="attendance-pill attendance-pill-h px-2.5 py-1 rounded-md text-[11px] font-bold border transition inline-block">H</span>
                                                     </label>
                                                     <label class="cursor-pointer relative">
                                                         <input type="radio" name="attendances[{{ $student->id }}]" value="Sakit" 
                                                                data-has-approved-leave="{{ $approvedLeave ? '1' : '' }}"
                                                                class="sr-only peer" 
                                                                {{ $currentStatus === 'Sakit' ? 'checked' : '' }}>
-                                                        <span class="px-2.5 py-1 rounded-md text-[11px] font-bold border border-slate-300 text-slate-600 bg-white dark:border-slate-700 dark:text-slate-400 dark:bg-slate-900 peer-checked:bg-amber-500 peer-checked:!text-white peer-checked:border-amber-500 transition inline-block">S</span>
+                                                        <span class="attendance-pill attendance-pill-s px-2.5 py-1 rounded-md text-[11px] font-bold border transition inline-block">S</span>
                                                     </label>
                                                     <label class="cursor-pointer relative">
                                                         <input type="radio" name="attendances[{{ $student->id }}]" value="Izin" 
                                                                data-has-approved-leave="{{ $approvedLeave ? '1' : '' }}"
                                                                class="sr-only peer" 
                                                                {{ $currentStatus === 'Izin' ? 'checked' : '' }}>
-                                                        <span class="px-2.5 py-1 rounded-md text-[11px] font-bold border border-slate-300 text-slate-600 bg-white dark:border-slate-700 dark:text-slate-400 dark:bg-slate-900 peer-checked:bg-blue-600 peer-checked:!text-white peer-checked:border-blue-600 transition inline-block">I</span>
+                                                        <span class="attendance-pill attendance-pill-i px-2.5 py-1 rounded-md text-[11px] font-bold border transition inline-block">I</span>
                                                     </label>
                                                     <label class="cursor-pointer relative">
                                                         <input type="radio" name="attendances[{{ $student->id }}]" value="Alpa" 
                                                                data-has-approved-leave="{{ $approvedLeave ? '1' : '' }}"
                                                                class="sr-only peer" 
                                                                {{ $currentStatus === 'Alpa' ? 'checked' : '' }}>
-                                                        <span class="px-2.5 py-1 rounded-md text-[11px] font-bold border border-slate-300 text-slate-600 bg-white dark:border-slate-700 dark:text-slate-400 dark:bg-slate-900 peer-checked:bg-red-600 peer-checked:!text-white peer-checked:border-red-600 transition inline-block">A</span>
+                                                        <span class="attendance-pill attendance-pill-a px-2.5 py-1 rounded-md text-[11px] font-bold border transition inline-block">A</span>
                                                     </label>
                                                 </div>
 
@@ -450,9 +450,11 @@
                                         </div>
 
                                         <div class="p-2.5 bg-slate-900 border-t border-slate-800 flex flex-wrap items-center justify-center gap-2">
-                                            <button type="button" @click="snapPhoto()" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-extrabold text-xs shadow-md flex items-center gap-1.5 transition transform active:scale-95 cursor-pointer">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                                <span>Ambil Foto</span>
+                                            <button type="button" @click="snapPhoto()" 
+                                                    class="btn-camera-snap px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-extrabold text-xs shadow-md flex items-center gap-1.5 transition transform active:scale-95 cursor-pointer"
+                                                    style="background-color: #e11d48 !important; color: #ffffff !important;">
+                                                <svg class="w-3.5 h-3.5" style="color: #ffffff !important;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                                <span style="color: #ffffff !important;">Ambil Foto</span>
                                             </button>
                                             <button type="button" @click="toggleMirror()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 flex items-center gap-1 transition cursor-pointer">
                                                 <span x-text="isMirrored ? 'Mode: Cermin' : 'Normal'"></span>
@@ -595,7 +597,7 @@
                                                            data-has-approved-leave="{{ $approvedLeave ? '1' : '' }}"
                                                            class="sr-only peer" 
                                                            {{ $currentStatus === 'Hadir' ? 'checked' : '' }}>
-                                                    <span class="px-2.5 py-1 rounded-md text-[11px] font-bold border border-slate-300 text-slate-600 bg-white dark:border-slate-700 dark:text-slate-400 dark:bg-slate-900 peer-checked:bg-emerald-600 peer-checked:!text-white peer-checked:border-emerald-600 transition inline-block">
+                                                    <span class="attendance-pill attendance-pill-h px-2.5 py-1 rounded-md text-[11px] font-bold border transition inline-block">
                                                         H
                                                     </span>
                                                 </label>
@@ -605,7 +607,7 @@
                                                            data-has-approved-leave="{{ $approvedLeave ? '1' : '' }}"
                                                            class="sr-only peer" 
                                                            {{ $currentStatus === 'Sakit' ? 'checked' : '' }}>
-                                                    <span class="px-2.5 py-1 rounded-md text-[11px] font-bold border border-slate-300 text-slate-600 bg-white dark:border-slate-700 dark:text-slate-400 dark:bg-slate-900 peer-checked:bg-amber-500 peer-checked:!text-white peer-checked:border-amber-500 transition inline-block">
+                                                    <span class="attendance-pill attendance-pill-s px-2.5 py-1 rounded-md text-[11px] font-bold border transition inline-block">
                                                         S
                                                     </span>
                                                 </label>
@@ -615,7 +617,7 @@
                                                            data-has-approved-leave="{{ $approvedLeave ? '1' : '' }}"
                                                            class="sr-only peer" 
                                                            {{ $currentStatus === 'Izin' ? 'checked' : '' }}>
-                                                    <span class="px-2.5 py-1 rounded-md text-[11px] font-bold border border-slate-300 text-slate-600 bg-white dark:border-slate-700 dark:text-slate-400 dark:bg-slate-900 peer-checked:bg-blue-600 peer-checked:!text-white peer-checked:border-blue-600 transition inline-block">
+                                                    <span class="attendance-pill attendance-pill-i px-2.5 py-1 rounded-md text-[11px] font-bold border transition inline-block">
                                                         I
                                                     </span>
                                                 </label>
@@ -625,7 +627,7 @@
                                                            data-has-approved-leave="{{ $approvedLeave ? '1' : '' }}"
                                                            class="sr-only peer" 
                                                            {{ $currentStatus === 'Alpa' ? 'checked' : '' }}>
-                                                    <span class="px-2.5 py-1 rounded-md text-[11px] font-bold border border-slate-300 text-slate-600 bg-white dark:border-slate-700 dark:text-slate-400 dark:bg-slate-900 peer-checked:bg-red-600 peer-checked:!text-white peer-checked:border-red-600 transition inline-block">
+                                                    <span class="attendance-pill attendance-pill-a px-2.5 py-1 rounded-md text-[11px] font-bold border transition inline-block">
                                                         A
                                                     </span>
                                                 </label>

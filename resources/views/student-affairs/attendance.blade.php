@@ -62,7 +62,7 @@
                             <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Pilih Kelas Binaan:</span>
                             <div class="flex items-center gap-1.5 bg-slate-900/80 p-1 rounded-xl border border-slate-700">
                                 <select name="class_id" onchange="this.form.submit()" 
-                                        class="bg-slate-950 border border-slate-700 text-white text-xs font-semibold rounded-lg px-3 py-1.5 focus:outline-none focus:border-indigo-500 cursor-pointer">
+                                        class="bg-slate-950 border border-slate-700 text-white text-xs font-semibold rounded-lg pl-3 pr-8 py-1.5 focus:outline-none focus:border-indigo-500 cursor-pointer min-w-[10rem]">
                                     @foreach($classes as $c)
                                         <option value="{{ $c->id }}" {{ ($selectedClassId ?? '') == $c->id ? 'selected' : '' }}>
                                             Kelas {{ $c->class_name }}
@@ -81,7 +81,7 @@
                             <div class="flex items-center gap-1.5 bg-slate-900/80 p-1 rounded-xl border border-slate-700">
                                 <span class="text-slate-400 font-bold text-[10px] uppercase px-2">Tingkat:</span>
                                 <select name="grade" onchange="this.form.submit()" 
-                                        class="bg-slate-950 border border-slate-700 text-white text-xs font-semibold rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-indigo-500 cursor-pointer">
+                                        class="bg-slate-950 border border-slate-700 text-white text-xs font-semibold rounded-lg pl-2.5 pr-8 py-1.5 focus:outline-none focus:border-indigo-500 cursor-pointer min-w-[7.5rem]">
                                     <option value="">Semua Tingkat</option>
                                     <option value="X" {{ ($selectedGrade ?? request('grade')) === 'X' ? 'selected' : '' }}>Kelas 10 (X)</option>
                                     <option value="XI" {{ ($selectedGrade ?? request('grade')) === 'XI' ? 'selected' : '' }}>Kelas 11 (XI)</option>
@@ -93,7 +93,7 @@
                             <div class="flex items-center gap-1.5 bg-slate-900/80 p-1 rounded-xl border border-slate-700">
                                 <span class="text-slate-400 font-bold text-[10px] uppercase px-2">Jurusan:</span>
                                 <select name="major" onchange="this.form.submit()" 
-                                        class="bg-slate-950 border border-slate-700 text-white text-xs font-semibold rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-indigo-500 cursor-pointer">
+                                        class="bg-slate-950 border border-slate-700 text-white text-xs font-semibold rounded-lg pl-2.5 pr-8 py-1.5 focus:outline-none focus:border-indigo-500 cursor-pointer min-w-[9rem] max-w-[16rem] truncate">
                                     <option value="">Semua Jurusan</option>
                                     @foreach($majors as $m)
                                         <option value="{{ $m->code }}" {{ ($selectedMajor ?? request('major')) === $m->code ? 'selected' : '' }}>
@@ -107,7 +107,7 @@
                             <div class="flex items-center gap-1.5 bg-slate-900/80 p-1 rounded-xl border border-slate-700">
                                 <span class="text-slate-400 font-bold text-[10px] uppercase px-2">Rombel:</span>
                                 <select name="rombel" onchange="this.form.submit()" 
-                                        class="bg-slate-950 border border-slate-700 text-white text-xs font-semibold rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-indigo-500 cursor-pointer">
+                                        class="bg-slate-950 border border-slate-700 text-white text-xs font-semibold rounded-lg pl-2.5 pr-8 py-1.5 focus:outline-none focus:border-indigo-500 cursor-pointer min-w-[7.5rem]">
                                     <option value="">Semua Rombel</option>
                                     @for($r = 1; $r <= 5; $r++)
                                         <option value="{{ $r }}" {{ ($selectedRombel ?? request('rombel')) == $r ? 'selected' : '' }}>

@@ -31,20 +31,22 @@
 
         <!-- PERINGATAN JURNAL TERLAMBAT / BELUM DIISI HARI INI -->
         @if($overdueSchedules->isNotEmpty())
-            <div class="p-4 rounded-2xl bg-amber-950/40 border border-amber-600/50 text-amber-200 text-xs space-y-2">
-                <div class="flex items-center gap-2 font-black text-amber-300">
-                    <span class="h-2 w-2 rounded-full bg-amber-400 animate-pulse"></span>
-                    <span>Perhatian: Anda memiliki jadwal mengajar hari ini yang belum diisi jurnalnya:</span>
+            <div class="scp-overdue-alert p-4 sm:p-5 rounded-2xl border-2 space-y-3">
+                <div class="flex items-center gap-2.5 font-black text-amber-800 dark:text-amber-300">
+                    <span class="h-2.5 w-2.5 rounded-full bg-amber-500 animate-pulse shrink-0"></span>
+                    <span class="text-xs sm:text-sm font-extrabold tracking-wide">Perhatian: Anda memiliki jadwal mengajar hari ini yang belum diisi jurnalnya:</span>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 pt-1">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 pt-1">
                     @foreach($overdueSchedules as $os)
-                        <div class="p-3 rounded-xl bg-slate-900/90 border border-amber-500/30 flex items-center justify-between">
-                            <div>
-                                <p class="font-bold text-white">{{ $os->subject }}</p>
-                                <p class="text-[11px] text-slate-400">Kelas {{ $os->schoolClass?->class_name }} • {{ $os->start_time }} - {{ $os->end_time }}</p>
+                        <div class="scp-overdue-card p-3.5 rounded-xl border flex items-center justify-between gap-3 shadow-sm">
+                            <div class="min-w-0">
+                                <p class="font-bold text-xs sm:text-sm truncate title-subject">{{ $os->subject }}</p>
+                                <p class="text-[11px] text-desc mt-0.5 font-semibold">Kelas {{ $os->schoolClass?->class_name }} • {{ $os->period_label }}</p>
                             </div>
-                            <a href="{{ route('teacher.journals.create', ['schedule_id' => $os->id]) }}" class="px-2.5 py-1 rounded-lg bg-indigo-600 text-white font-bold text-[11px] hover:bg-indigo-500">
-                                Isi Sekarang
+                            <a href="{{ route('teacher.journals.create', ['schedule_id' => $os->id]) }}" 
+                               class="btn-fill-now px-3 py-1.5 rounded-xl text-white font-extrabold text-xs shadow-md transition whitespace-nowrap shrink-0 flex items-center gap-1.5"
+                               style="background-color: #2563eb !important; color: #ffffff !important;">
+                                <span style="color: #ffffff !important;">Isi Sekarang</span>
                             </a>
                         </div>
                     @endforeach
@@ -58,7 +60,7 @@
                 <!-- Filter Status Pengisian -->
                 <div class="flex items-center gap-1.5 bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-700">
                     <span class="text-slate-400 font-bold uppercase text-[10px]">Status:</span>
-                    <select name="status" onchange="this.form.submit()" class="bg-transparent text-white text-xs font-semibold focus:outline-none cursor-pointer">
+                    <select name="status" onchange="this.form.submit()" class="bg-transparent text-white text-xs font-semibold focus:outline-none cursor-pointer pr-6">
                         <option value="all" {{ ($statusFilter ?? 'all') === 'all' ? 'selected' : '' }} class="bg-slate-900 text-white">Semua Status</option>
                         <option value="filled" {{ ($statusFilter ?? '') === 'filled' ? 'selected' : '' }} class="bg-slate-900 text-white">Mengisi Jurnal (Hijau)</option>
                         <option value="unfilled" {{ ($statusFilter ?? '') === 'unfilled' ? 'selected' : '' }} class="bg-slate-900 text-white">Tidak Mengisi Jurnal (Merah)</option>
@@ -68,7 +70,7 @@
                 <!-- Filter Kelas -->
                 <div class="flex items-center gap-1.5 bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-700">
                     <span class="text-slate-400 font-bold uppercase text-[10px]">Kelas:</span>
-                    <select name="class_id" onchange="this.form.submit()" class="bg-transparent text-white text-xs font-semibold focus:outline-none cursor-pointer">
+                    <select name="class_id" onchange="this.form.submit()" class="bg-transparent text-white text-xs font-semibold focus:outline-none cursor-pointer pr-6">
                         <option value="" class="bg-slate-900 text-white">Semua Kelas</option>
                         @foreach($myClasses as $c)
                             <option value="{{ $c->id }}" {{ request('class_id') == $c->id ? 'selected' : '' }} class="bg-slate-900 text-white">

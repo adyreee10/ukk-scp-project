@@ -34,9 +34,9 @@
                     <span @if($isActive) style="color: #ffffff !important;" @endif>{{ $d === 'Semua' ? 'Semua Hari' : $d }}</span>
                     @if($isToday)
                         @if($isActive)
-                            <span class="ml-1.5 text-[10px] px-2 py-0.5 rounded-full bg-white/25 text-white border border-white/40 font-black" style="color: #ffffff !important;">Hari Ini</span>
+                            <span class="ml-1.5 text-[10px] px-2 py-0.5 rounded-full badge-today-tab-active font-black">Hari Ini</span>
                         @else
-                            <span class="ml-1.5 text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 dark:bg-emerald-950/80 dark:text-emerald-300 dark:border-emerald-700/80 font-black">Hari Ini</span>
+                            <span class="ml-1.5 text-[10px] px-2 py-0.5 rounded-full badge-today-tab-inactive font-black">Hari Ini</span>
                         @endif
                     @endif
                 </a>
@@ -56,7 +56,7 @@
                     <div class="bg-[#0f172a]/90 backdrop-blur-md border border-slate-800 hover:border-slate-700 shadow-xl rounded-2xl p-5 flex flex-col justify-between transition">
                         <div>
                             <div class="flex items-center justify-between gap-2 mb-2">
-                                <span class="px-2.5 py-1 rounded-md text-[10px] uppercase tracking-wider shrink-0 {{ $sc->day_of_week === $todayName ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-700/80 font-black' : 'bg-slate-800 text-slate-300 font-bold' }}">
+                                <span class="px-2.5 py-1 rounded-md text-[10px] uppercase tracking-wider shrink-0 font-black {{ $sc->day_of_week === $todayName ? 'badge-day-today' : 'bg-slate-800 text-slate-300 font-bold' }}">
                                     {{ $sc->day_of_week }}
                                 </span>
                                 <div class="text-right">

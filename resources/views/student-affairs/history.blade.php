@@ -113,7 +113,7 @@
                             <div class="flex items-center gap-1 bg-slate-950/60 p-1 rounded-xl border border-slate-800">
                                 <span class="text-slate-400 font-bold text-[10px] uppercase px-1.5">Tingkat:</span>
                                 <select name="grade" onchange="this.form.submit()" 
-                                        class="bg-slate-900 border border-slate-700 text-white text-xs font-semibold rounded-lg px-2 py-1 focus:outline-none focus:border-indigo-500 cursor-pointer">
+                                        class="bg-slate-900 border border-slate-700 text-white text-xs font-semibold rounded-lg pl-2.5 pr-8 py-1 focus:outline-none focus:border-indigo-500 cursor-pointer min-w-[7rem]">
                                     <option value="">Semua</option>
                                     <option value="X" {{ ($selectedGrade ?? request('grade')) === 'X' ? 'selected' : '' }}>Kelas 10 (X)</option>
                                     <option value="XI" {{ ($selectedGrade ?? request('grade')) === 'XI' ? 'selected' : '' }}>Kelas 11 (XI)</option>
@@ -125,7 +125,7 @@
                             <div class="flex items-center gap-1 bg-slate-950/60 p-1 rounded-xl border border-slate-800">
                                 <span class="text-slate-400 font-bold text-[10px] uppercase px-1.5">Jurusan:</span>
                                 <select name="major" onchange="this.form.submit()" 
-                                        class="bg-slate-900 border border-slate-700 text-white text-xs font-semibold rounded-lg px-2 py-1 focus:outline-none focus:border-indigo-500 cursor-pointer">
+                                        class="bg-slate-900 border border-slate-700 text-white text-xs font-semibold rounded-lg pl-2.5 pr-8 py-1 focus:outline-none focus:border-indigo-500 cursor-pointer min-w-[6.5rem]">
                                     <option value="">Semua</option>
                                     @foreach($majors as $m)
                                         <option value="{{ $m->code }}" {{ ($selectedMajor ?? request('major')) === $m->code ? 'selected' : '' }}>
@@ -139,7 +139,7 @@
                             <div class="flex items-center gap-1 bg-slate-950/60 p-1 rounded-xl border border-slate-800">
                                 <span class="text-slate-400 font-bold text-[10px] uppercase px-1.5">Rombel:</span>
                                 <select name="rombel" onchange="this.form.submit()" 
-                                        class="bg-slate-900 border border-slate-700 text-white text-xs font-semibold rounded-lg px-2 py-1 focus:outline-none focus:border-indigo-500 cursor-pointer">
+                                        class="bg-slate-900 border border-slate-700 text-white text-xs font-semibold rounded-lg pl-2.5 pr-8 py-1 focus:outline-none focus:border-indigo-500 cursor-pointer min-w-[6.5rem]">
                                     <option value="">Semua</option>
                                     @for($r = 1; $r <= 5; $r++)
                                         <option value="{{ $r }}" {{ ($selectedRombel ?? request('rombel')) == $r ? 'selected' : '' }}>
