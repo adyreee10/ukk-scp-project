@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div x-data="familyLeaveCamera()" class="max-w-4xl mx-auto space-y-6">
+    <div x-data="familyLeaveCamera()" class="w-full space-y-6">
 
         <!-- HEADER HALAMAN -->
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -199,9 +199,6 @@
                                 </div>
 
                                 <p class="text-[11px] text-teal-800 dark:text-teal-300/90 font-medium">
-                                    Siswa hanya izin pada rentang jam tersebut dan tetap mengikuti pembelajaran sebelum atau sesudahnya.
-                                </p>
-                            </div>
                                     Siswa hanya izin pada rentang jam tersebut dan tetap mengikuti pembelajaran sebelum atau sesudahnya.
                                 </p>
                             </div>
