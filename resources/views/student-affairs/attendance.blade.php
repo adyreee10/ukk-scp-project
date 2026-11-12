@@ -22,8 +22,8 @@
                     @endif
                 </span>
 
-                <!-- TOMBOL CETAK REKAP A4 (KHUSUS WALI KELAS & GURU BK, WAKA HANYA MEMANTAU) -->
-                @if(in_array(auth()->user()->role?->role_name, ['Wali Kelas', 'Guru BK']))
+                <!-- TOMBOL CETAK REKAP A4 (UNTUK WAKA KURIKULUM, GURU BK, & WALI KELAS) -->
+                @if(in_array(auth()->user()->role?->role_name, ['Wali Kelas', 'Guru BK', 'Waka Kurikulum']))
                 <button type="button" 
                         onclick="const oldT = document.title; document.title = ''; window.print(); setTimeout(() => { document.title = oldT; }, 1000);" 
                         class="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-bold shadow-lg shadow-indigo-600/30 transition cursor-pointer">
@@ -39,30 +39,38 @@
             <h1 class="text-base font-black tracking-wider text-black uppercase">SMK NEGERI 1 BANTUL</h1>
             <h2 class="text-sm font-bold uppercase tracking-wider text-black mt-0.5">LAPORAN REKAPITULASI PRESENSI SISWA</h2>
             <p class="text-[11px] text-gray-700 mt-1">
+                Periode: <strong>{{ $periodLabel }}</strong> &nbsp;•&nbsp; 
                 Kelas: <strong>{{ $activeClass?->class_name ?? 'Semua Kelas' }}</strong> &nbsp;•&nbsp; 
-                Semester: <strong>{{ \App\Models\SystemConfiguration::current()->semester }} (TA {{ \App\Models\SystemConfiguration::current()->academic_year }})</strong> &nbsp;•&nbsp; 
                 Dicetak: {{ now()->translatedFormat('d F Y, H:i') }} WIB &nbsp;•&nbsp; 
-                Oleh: {{ auth()->user()->name }}
+                Oleh: {{ auth()->user()->name }} ({{ auth()->user()->role?->role_name }})
             </p>
         </div>
 
         <!-- PANEL FILTER KELAS & INDIKATOR DISIPLIN (DIPERBAIKI: LEGA & TIDAK MEPET) -->
-        <div class="bg-[#0f172a]/90 backdrop-blur-md p-5 border border-slate-800 shadow-xl print:hidden" style="border-radius: 15px;">
-            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+        {{-- =========================================================================
+             FITUR UKK: PANEL FILTER TERPADU (KELAS & PERIODE PRESENSI)
+             - Disusun sejajar, rapi, dan proporsional untuk Waka, Guru BK, & Wali Kelas
+             - Teks periode aktif putih solid di Light & Dark Mode
+             ========================================================================= --}}
+        <div class="bg-[#0f172a]/90 backdrop-blur-md p-4 sm:p-5 border border-slate-800 shadow-xl print:hidden" style="border-radius: 15px;">
+            <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
                 
-                                <!-- FILTER KELAS: WALI KELAS (1 KELAS), GURU BK (KELAS BINAAN), WAKA (3 KRITERIA) -->
-                <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                <!-- FILTER KELAS: WALI KELAS (1 KELAS), GURU BK (KELAS BINAAN), WAKA (3 KRITERIA) -->
+                <div class="flex flex-wrap items-center gap-3">
                     @if(auth()->user()->role?->role_name === 'Wali Kelas')
-                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Kelas Perwalian:</span>
-                        <span class="px-4 py-2 rounded-xl bg-indigo-950/70 border border-indigo-700/60 text-indigo-300 font-bold text-xs">
-                            Kelas {{ $activeClass?->class_name ?? 'Belum Ditentukan' }}
-                        </span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Kelas Perwalian:</span>
+                            <span class="px-3.5 py-1.5 rounded-xl bg-indigo-950/70 border border-indigo-700/60 text-indigo-300 font-bold text-xs">
+                                Kelas {{ $activeClass?->class_name ?? 'Belum Ditentukan' }}
+                            </span>
+                        </div>
                     @elseif(auth()->user()->role?->role_name === 'Guru BK')
-                        <form method="GET" action="{{ route('student-affairs.attendance') }}" class="flex flex-wrap items-center gap-2.5">
-                            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Pilih Kelas Binaan:</span>
+                        <form method="GET" action="{{ route('student-affairs.attendance') }}" class="flex flex-wrap items-center gap-2">
+                            @if(request('period')) <input type="hidden" name="period" value="{{ request('period') }}"> @endif
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Pilih Kelas:</span>
                             <div class="flex items-center gap-1.5 bg-slate-900/80 p-1 rounded-xl border border-slate-700">
                                 <select name="class_id" onchange="this.form.submit()" 
-                                        class="bg-slate-950 border border-slate-700 text-white text-xs font-semibold rounded-lg pl-3 pr-8 py-1.5 focus:outline-none focus:border-indigo-500 cursor-pointer min-w-[10rem]">
+                                        class="bg-slate-950 border border-slate-700 text-white text-xs font-semibold rounded-lg pl-2.5 pr-8 py-1 focus:outline-none focus:border-indigo-500 cursor-pointer min-w-[9rem]">
                                     @foreach($classes as $c)
                                         <option value="{{ $c->id }}" {{ ($selectedClassId ?? '') == $c->id ? 'selected' : '' }}>
                                             Kelas {{ $c->class_name }}
@@ -70,19 +78,20 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <span class="text-[11px] font-bold text-indigo-400 bg-indigo-950/60 border border-indigo-700/50 px-2.5 py-1.5 rounded-xl">
-                                Total: {{ $classes->count() }} Kelas Diampu
+                            <span class="text-[11px] font-bold text-indigo-400 bg-indigo-950/60 border border-indigo-700/50 px-2 py-1 rounded-xl">
+                                Total: {{ $classes->count() }} Kelas
                             </span>
                         </form>
                     @else
-                        {{-- Waka Kurikulum (Filter 3 Kriteria) --}}
-                        <form method="GET" action="{{ route('student-affairs.attendance') }}" class="flex flex-wrap items-center gap-2.5">
+                        {{-- Waka Kurikulum (Filter 3 Kriteria Sejajar Horizontal) --}}
+                        <form method="GET" action="{{ route('student-affairs.attendance') }}" class="flex flex-wrap items-center gap-2">
+                            @if(request('period')) <input type="hidden" name="period" value="{{ request('period') }}"> @endif
                             <!-- 1. Tingkat -->
-                            <div class="flex items-center gap-1.5 bg-slate-900/80 p-1 rounded-xl border border-slate-700">
-                                <span class="text-slate-400 font-bold text-[10px] uppercase px-2">Tingkat:</span>
+                            <div class="flex items-center gap-1 bg-slate-900/80 p-1 rounded-xl border border-slate-700">
+                                <span class="text-slate-400 font-bold text-[10px] uppercase px-1.5">Tingkat:</span>
                                 <select name="grade" onchange="this.form.submit()" 
-                                        class="bg-slate-950 border border-slate-700 text-white text-xs font-semibold rounded-lg pl-2.5 pr-8 py-1.5 focus:outline-none focus:border-indigo-500 cursor-pointer min-w-[7.5rem]">
-                                    <option value="">Semua Tingkat</option>
+                                        class="bg-slate-950 border border-slate-700 text-white text-xs font-semibold rounded-lg pl-2 pr-7 py-1 focus:outline-none focus:border-indigo-500 cursor-pointer min-w-[6.5rem]">
+                                    <option value="">Semua</option>
                                     <option value="X" {{ ($selectedGrade ?? request('grade')) === 'X' ? 'selected' : '' }}>Kelas 10 (X)</option>
                                     <option value="XI" {{ ($selectedGrade ?? request('grade')) === 'XI' ? 'selected' : '' }}>Kelas 11 (XI)</option>
                                     <option value="XII" {{ ($selectedGrade ?? request('grade')) === 'XII' ? 'selected' : '' }}>Kelas 12 (XII)</option>
@@ -90,11 +99,11 @@
                             </div>
 
                             <!-- 2. Jurusan -->
-                            <div class="flex items-center gap-1.5 bg-slate-900/80 p-1 rounded-xl border border-slate-700">
-                                <span class="text-slate-400 font-bold text-[10px] uppercase px-2">Jurusan:</span>
+                            <div class="flex items-center gap-1 bg-slate-900/80 p-1 rounded-xl border border-slate-700">
+                                <span class="text-slate-400 font-bold text-[10px] uppercase px-1.5">Jurusan:</span>
                                 <select name="major" onchange="this.form.submit()" 
-                                        class="bg-slate-950 border border-slate-700 text-white text-xs font-semibold rounded-lg pl-2.5 pr-8 py-1.5 focus:outline-none focus:border-indigo-500 cursor-pointer min-w-[9rem] max-w-[16rem] truncate">
-                                    <option value="">Semua Jurusan</option>
+                                        class="bg-slate-950 border border-slate-700 text-white text-xs font-semibold rounded-lg pl-2 pr-7 py-1 focus:outline-none focus:border-indigo-500 cursor-pointer min-w-[6.5rem] max-w-[10rem] truncate">
+                                    <option value="">Semua</option>
                                     @foreach($majors as $m)
                                         <option value="{{ $m->code }}" {{ ($selectedMajor ?? request('major')) === $m->code ? 'selected' : '' }}>
                                             {{ $m->code }} - {{ $m->name }}
@@ -104,11 +113,11 @@
                             </div>
 
                             <!-- 3. Rombel -->
-                            <div class="flex items-center gap-1.5 bg-slate-900/80 p-1 rounded-xl border border-slate-700">
-                                <span class="text-slate-400 font-bold text-[10px] uppercase px-2">Rombel:</span>
+                            <div class="flex items-center gap-1 bg-slate-900/80 p-1 rounded-xl border border-slate-700">
+                                <span class="text-slate-400 font-bold text-[10px] uppercase px-1.5">Rombel:</span>
                                 <select name="rombel" onchange="this.form.submit()" 
-                                        class="bg-slate-950 border border-slate-700 text-white text-xs font-semibold rounded-lg pl-2.5 pr-8 py-1.5 focus:outline-none focus:border-indigo-500 cursor-pointer min-w-[7.5rem]">
-                                    <option value="">Semua Rombel</option>
+                                        class="bg-slate-950 border border-slate-700 text-white text-xs font-semibold rounded-lg pl-2 pr-7 py-1 focus:outline-none focus:border-indigo-500 cursor-pointer min-w-[6.5rem]">
+                                    <option value="">Semua</option>
                                     @for($r = 1; $r <= 5; $r++)
                                         <option value="{{ $r }}" {{ ($selectedRombel ?? request('rombel')) == $r ? 'selected' : '' }}>
                                             Rombel {{ $r }}
@@ -118,10 +127,32 @@
                             </div>
 
                             @if(request()->hasAny(['grade', 'major', 'rombel']))
-                                <a href="{{ route('student-affairs.attendance') }}" class="px-2.5 py-1.5 rounded-lg bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20 text-xs font-bold" title="Reset Filter">✕</a>
+                                <a href="{{ route('student-affairs.attendance', request('period') ? ['period' => request('period')] : []) }}" class="px-2.5 py-1 rounded-lg bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20 text-xs font-bold transition inline-flex items-center gap-1" title="Reset Filter">
+                                    ✕ <span class="hidden sm:inline">Reset</span>
+                                </a>
                             @endif
                         </form>
                     @endif
+                </div>
+
+                {{-- =========================================================================
+                     FITUR UKK: FILTER PERIODE REKAP PRESENSI (HARIAN, MINGGUAN, BULANAN, SEMESTER)
+                     - Teks aktif putih solid dan kontras di Mode Terang & Gelap
+                     ========================================================================= --}}
+                <div class="flex items-center gap-1.5 bg-slate-900/80 p-1 rounded-xl border border-slate-700 shrink-0">
+                    <span class="text-slate-400 font-bold text-[10px] uppercase px-2">Periode:</span>
+                    <a href="{{ request()->fullUrlWithQuery(['period' => 'daily']) }}" 
+                       class="px-2.5 py-1.5 rounded-lg transition text-xs font-semibold {{ ($selectedPeriod ?? 'semester') === 'daily' ? 'period-pill-active bg-indigo-600 text-white font-bold shadow' : 'text-slate-400 hover:text-white' }}"
+                       @if(($selectedPeriod ?? 'semester') === 'daily') style="color: #ffffff !important; background-color: #2563eb !important;" @endif>Harian</a>
+                    <a href="{{ request()->fullUrlWithQuery(['period' => 'weekly']) }}" 
+                       class="px-2.5 py-1.5 rounded-lg transition text-xs font-semibold {{ ($selectedPeriod ?? 'semester') === 'weekly' ? 'period-pill-active bg-indigo-600 text-white font-bold shadow' : 'text-slate-400 hover:text-white' }}"
+                       @if(($selectedPeriod ?? 'semester') === 'weekly') style="color: #ffffff !important; background-color: #2563eb !important;" @endif>Mingguan</a>
+                    <a href="{{ request()->fullUrlWithQuery(['period' => 'monthly']) }}" 
+                       class="px-2.5 py-1.5 rounded-lg transition text-xs font-semibold {{ ($selectedPeriod ?? 'semester') === 'monthly' ? 'period-pill-active bg-indigo-600 text-white font-bold shadow' : 'text-slate-400 hover:text-white' }}"
+                       @if(($selectedPeriod ?? 'semester') === 'monthly') style="color: #ffffff !important; background-color: #2563eb !important;" @endif>Bulanan</a>
+                    <a href="{{ request()->fullUrlWithQuery(['period' => 'semester']) }}" 
+                       class="px-2.5 py-1.5 rounded-lg transition text-xs font-semibold {{ ($selectedPeriod ?? 'semester') === 'semester' ? 'period-pill-active bg-indigo-600 text-white font-bold shadow' : 'text-slate-400 hover:text-white' }}"
+                       @if(($selectedPeriod ?? 'semester') === 'semester') style="color: #ffffff !important; background-color: #2563eb !important;" @endif>Semester</a>
                 </div>
             </div>
         </div>
@@ -324,7 +355,7 @@
             }
             @page {
                 size: A4 portrait;
-                margin: 1.5cm;
+                margin: 1cm 0.8cm;
             }
         }
     </style>

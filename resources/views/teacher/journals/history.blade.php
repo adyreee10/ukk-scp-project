@@ -112,6 +112,7 @@
                                 <th class="p-4">Materi Pembelajaran</th>
                                 <th class="p-4 text-center">Foto Bukti</th>
                                 <th class="p-4 text-center">Kehadiran Siswa</th>
+                                <th class="p-4 text-center whitespace-nowrap">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-800/60">
@@ -165,6 +166,43 @@
                                             <span class="text-red-400 font-bold">A: {{ $j->attendances->where('status', 'Alpa')->count() }}</span>
                                         @else
                                             <span class="text-slate-500 text-xs italic">-</span>
+                                        @endif
+                                    </td>
+                                    <td class="p-4 text-center whitespace-nowrap">
+                                        @if($j->is_filled)
+                                            @if(\Carbon\Carbon::parse($j->date)->isToday())
+                                                {{-- 
+                                                    ========================================================================
+                                                    Fitur Aksi: Edit Jurnal & Presensi Siswa (Toleransi Hari KBM / 24 Jam)
+                                                    ========================================================================
+                                                    Guru, Wali Kelas, dan Guru BK dapat memperbarui data kehadiran siswa
+                                                    pada sesi KBM hari ini selama kurun waktu 24 jam (hingga 23:59 WIB).
+                                                --}}
+                                                <a href="{{ route('teacher.journals.edit-attendance', $j->id) }}" 
+                                                   class="btn-action-edit inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm transition whitespace-nowrap cursor-pointer"
+                                                   title="Edit data presensi siswa untuk sesi KBM ini (Masa edit aktif hingga pukul 23:59 WIB)">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                                    </svg>
+                                                    <span>Edit Presensi</span>
+                                                </a>
+                                            @else
+                                                {{-- 
+                                                    ========================================================================
+                                                    Fitur Status: Presensi KBM Terkunci Permanen (> 24 Jam)
+                                                    ========================================================================
+                                                    Setelah melewati hari KBM, presensi terkunci permanen demi integritas.
+                                                --}}
+                                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-slate-800/80 border border-slate-700/60 text-slate-400 text-xs font-semibold cursor-default whitespace-nowrap"
+                                                      title="Presensi telah terkunci permanen karena telah melewati batas toleransi 24 jam di hari KBM">
+                                                    <svg class="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                                    </svg>
+                                                    <span>Terkunci</span>
+                                                </span>
+                                            @endif
+                                        @else
+                                            <span class="text-slate-500 text-xs font-bold">-</span>
                                         @endif
                                     </td>
                                 </tr>

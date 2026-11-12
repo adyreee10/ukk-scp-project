@@ -37,7 +37,9 @@ class TeacherScheduleController extends Controller
             'meta' => [
                 'active_cycle' => SystemConfiguration::current()->active_cycle,
                 'selected_cycle' => $cycle,
-                'is_schedule_locked' => SystemConfiguration::current()->is_schedule_locked,
+                'is_schedule_locked' => SystemConfiguration::current()->isCycleLocked($cycle),
+                'is_cycle_1_locked' => SystemConfiguration::current()->isCycleLocked('Putaran 1'),
+                'is_cycle_2_locked' => SystemConfiguration::current()->isCycleLocked('Putaran 2'),
             ],
         ]);
     }

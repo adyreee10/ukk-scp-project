@@ -117,15 +117,20 @@
                                 </td>
                                 <td class="p-4 text-center whitespace-nowrap min-w-[190px]">
                                     @if(in_array($schedule->id, $filledScheduleIdsToday ?? []))
-                                        <!-- BADGE HIJAU: JIKA SUDAH DIISI HARI INI (Bisa Klik untuk Edit Presensi hingga 23:59) -->
-                                        <a href="{{ route('teacher.journals.create', ['schedule_id' => $schedule->id]) }}" 
-                                           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-950/70 border border-emerald-700/60 text-emerald-300 text-xs font-bold shadow-sm whitespace-nowrap hover:bg-emerald-900/60 transition"
-                                           title="Jurnal sudah diisi. Anda dapat mengedit presensi siswa hingga pukul 23:59 malam ini">
-                                            <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        {{-- 
+                                            ========================================================================
+                                            Fitur Status: Indikator Jurnal KBM Sudah Diisi Hari Ini
+                                            ========================================================================
+                                            Sistem menampilkan badge status bahwa jurnal sesi ini telah diisi.
+                                            Fitur pengeditan presensi siswa dialihkan ke menu 'Riwayat Jurnal KBM'.
+                                        --}}
+                                        <span class="badge-filled-status cursor-default"
+                                              title="Jurnal pembelajaran untuk jadwal ini sudah diisi. Untuk mengedit presensi siswa, silakan buka menu Riwayat Jurnal KBM.">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
                                             </svg>
-                                            <span>Sudah Diisi (Edit Presensi)</span>
-                                        </a>
+                                            <span>Sudah Diisi</span>
+                                        </span>
                                     @elseif(!$schedule->isTeachingTimeStarted())
                                         <!-- BELUM WAKTUNYA MENGAJAR: SISTEM MENOLAK (TOMBOL TERKUNCI) -->
                                         <button type="button" disabled 

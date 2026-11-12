@@ -22,6 +22,8 @@ class WakaConfigurationController extends Controller
             'active_cycle' => ['sometimes', 'required', 
             Rule::in(SystemConfiguration::CYCLES)],
             'is_schedule_locked' => ['sometimes', 'required', 'boolean'], 
+            'is_cycle_1_locked'  => ['sometimes', 'required', 'boolean'],
+            'is_cycle_2_locked'  => ['sometimes', 'required', 'boolean'], 
         ]);
 
         if ($validated === [])

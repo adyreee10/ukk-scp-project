@@ -615,10 +615,23 @@
                         <input type="text" name="name" x-model="editForm.name" required class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" />
                     </div>
 
+                    {{-- =========================================================================
+                         FITUR UKK: INPUT NIP & NOMOR HP GURU (EDIT DATA)
+                         - NIP: Khusus angka, dibatasi maksimal 18 digit karakter
+                         - Nomor HP: Khusus angka, dibatasi maksimal 13 digit karakter
+                         ========================================================================= --}}
                     <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs font-bold text-slate-300 mb-1">NIP (Opsional)</label>
-                            <input type="text" name="nip" x-model="editForm.nip" class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" placeholder="1985..." />
+                            <label class="block text-xs font-bold text-slate-300 mb-1">NIP (Opsional - Maks. 18 Angka)</label>
+                            <input type="text" 
+                                   name="nip" 
+                                   inputmode="numeric" 
+                                   maxlength="18" 
+                                   x-model="editForm.nip" 
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 18)" 
+                                   @input="editForm.nip = $event.target.value.replace(/[^0-9]/g, '').slice(0, 18)" 
+                                   class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" 
+                                   placeholder="1985..." />
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-300 mb-1">Username Login</label>
@@ -632,8 +645,16 @@
                             <input type="email" name="email" x-model="editForm.email" class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" placeholder="guru@sekolah.sch.id" />
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-300 mb-1">Nomor HP / WhatsApp (Opsional)</label>
-                            <input type="text" name="phone" x-model="editForm.phone" class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" placeholder="0812..." />
+                            <label class="block text-xs font-bold text-slate-300 mb-1">Nomor HP / WhatsApp (Maks. 13 Angka)</label>
+                            <input type="text" 
+                                   name="phone" 
+                                   inputmode="numeric" 
+                                   maxlength="13" 
+                                   x-model="editForm.phone" 
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 13)" 
+                                   @input="editForm.phone = $event.target.value.replace(/[^0-9]/g, '').slice(0, 13)" 
+                                   class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" 
+                                   placeholder="0812..." />
                         </div>
                     </div>
 
@@ -797,10 +818,23 @@
                         <input type="text" name="name" x-model="addForm.name" required class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" placeholder="Contoh: Drs. Budi Santoso, M.Pd" />
                     </div>
 
+                    {{-- =========================================================================
+                         FITUR UKK: INPUT NIP & NOMOR HP GURU (TAMBAH DATA BARU)
+                         - NIP: Khusus angka, dibatasi maksimal 18 digit karakter
+                         - Nomor HP: Khusus angka, dibatasi maksimal 13 digit karakter
+                         ========================================================================= --}}
                     <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs font-bold text-slate-300 mb-1">NIP (Opsional)</label>
-                            <input type="text" name="nip" x-model="addForm.nip" class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" placeholder="19850101..." />
+                            <label class="block text-xs font-bold text-slate-300 mb-1">NIP (Opsional - Maks. 18 Angka)</label>
+                            <input type="text" 
+                                   name="nip" 
+                                   inputmode="numeric" 
+                                   maxlength="18" 
+                                   x-model="addForm.nip" 
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 18)" 
+                                   @input="addForm.nip = $event.target.value.replace(/[^0-9]/g, '').slice(0, 18)" 
+                                   class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" 
+                                   placeholder="19850101..." />
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-300 mb-1">Username Login (Opsional)</label>
@@ -814,8 +848,16 @@
                             <input type="email" name="email" x-model="addForm.email" class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" placeholder="budi@sekolah.sch.id" />
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-300 mb-1">Nomor HP / WhatsApp (Opsional)</label>
-                            <input type="text" name="phone" x-model="addForm.phone" class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" placeholder="08123456789" />
+                            <label class="block text-xs font-bold text-slate-300 mb-1">Nomor HP / WhatsApp (Maks. 13 Angka)</label>
+                            <input type="text" 
+                                   name="phone" 
+                                   inputmode="numeric" 
+                                   maxlength="13" 
+                                   x-model="addForm.phone" 
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 13)" 
+                                   @input="addForm.phone = $event.target.value.replace(/[^0-9]/g, '').slice(0, 13)" 
+                                   class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" 
+                                   placeholder="08123456789" />
                         </div>
                     </div>
 

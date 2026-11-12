@@ -35,12 +35,15 @@
             </div>
 
             <div class="bg-[#0f172a]/90 backdrop-blur-md p-5 border border-slate-800 shadow-xl" style="border-radius: 15px;">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Status Kuncian</span>
-                <div class="text-2xl font-black {{ ($configuration->is_schedule_locked ?? false) ? 'text-red-400' : 'text-emerald-400' }} mt-1">
-                    {{ ($configuration->is_schedule_locked ?? false) ? 'Terkunci' : 'Terbuka' }}
+                @php
+                    $isLocked = $configuration ? $configuration->isCycleLocked() : false;
+                @endphp
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Status Kuncian ({{ $configuration->active_cycle ?? 'Putaran 1' }})</span>
+                <div class="text-2xl font-black {{ $isLocked ? 'text-red-400' : 'text-emerald-400' }} mt-1">
+                    {{ $isLocked ? 'Terkunci' : 'Terbuka' }}
                 </div>
                 <p class="text-xs text-slate-400 mt-0.5">
-                    {{ ($configuration->is_schedule_locked ?? false) ? 'Jadwal telah difinalisasi waka' : 'Jadwal dapat disesuaikan waka' }}
+                    {{ $isLocked ? 'Jadwal telah difinalisasi waka' : 'Jadwal dapat disesuaikan waka' }}
                 </p>
             </div>
         </div>

@@ -13,7 +13,7 @@ class ScheduleService
     public function create(User $teacher, array $data): Schedule
     {
         return DB::transaction(function () use ($teacher, $data) {
-            $this->assertUnlocked();
+            $this->assertUnlocked($data['cycle_type'] ?? null);
             $this->assertNoConflict($teacher->id, $data);
 
             return Schedule::create([...$data, 'teacher_id' => $teacher->id]);
@@ -23,7 +23,10 @@ class ScheduleService
     public function update(Schedule $schedule, array $data): Schedule
     {
         return DB::transaction(function () use ($schedule, $data) {
-            $this->assertUnlocked();
+            $this->assertUnlocked($schedule->cycle_type);
+            if (isset($data['cycle_type']) && $data['cycle_type'] !== $schedule->cycle_type) {
+                $this->assertUnlocked($data['cycle_type']);
+            }
             $this->assertNoConflict($schedule->teacher_id, $data, $schedule->id);
             $schedule->update($data);
 
@@ -34,7 +37,7 @@ class ScheduleService
     public function delete(Schedule $schedule): void
     {
         DB::transaction(function () use ($schedule) {
-            $this->assertUnlocked();
+            $this->assertUnlocked($schedule->cycle_type);
 
             if ($schedule->journals()->exists()) {
                 abort(409, 'Jadwal yang sudah memiliki jurnal tidak dapat dihapus.');
@@ -44,12 +47,13 @@ class ScheduleService
         });
     }
 
-    private function assertUnlocked(): void
+    private function assertUnlocked(?string $cycle = null): void
     {
-        $configuration = SystemConfiguration::query()->lockForUpdate()->findOrFail(1);
+        $configuration = SystemConfiguration::query()->lockForUpdate()->first() ?? SystemConfiguration::current();
 
-        if ($configuration->is_schedule_locked) {
-            abort(403, 'Jadwal sedang dikunci oleh Waka Kurikulum.');
+        if ($configuration->isCycleLocked($cycle)) {
+            $label = $cycle ? " ({$cycle})" : '';
+            abort(403, "Jadwal{$label} sedang dikunci oleh Waka Kurikulum.");
         }
     }
 

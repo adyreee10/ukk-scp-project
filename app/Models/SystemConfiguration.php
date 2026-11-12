@@ -13,12 +13,49 @@ class SystemConfiguration extends Model
         'academic_year',
         'semester',
         'is_schedule_locked',
+        'is_cycle_1_locked',
+        'is_cycle_2_locked',
         'updated_by',
     ];
 
     protected function casts(): array
     {
-        return ['is_schedule_locked' => 'boolean'];
+        return [
+            'is_schedule_locked' => 'boolean',
+            'is_cycle_1_locked'  => 'boolean',
+            'is_cycle_2_locked'  => 'boolean',
+        ];
+    }
+
+    /**
+     * Memeriksa apakah siklus tertentu (Putaran 1 / Putaran 2) sedang dikunci.
+     * Jika parameter $cycle tidak disertakan, periksa siklus aktif saat ini.
+     */
+    public function isCycleLocked(?string $cycle = null): bool
+    {
+        $target = $cycle ?? $this->active_cycle;
+
+        if ($target === 'Putaran 1') {
+            return (bool) ($this->is_cycle_1_locked ?? false);
+        }
+
+        if ($target === 'Putaran 2') {
+            return (bool) ($this->is_cycle_2_locked ?? false);
+        }
+
+        if ($target === 'all') {
+            return (bool) ($this->is_cycle_1_locked && $this->is_cycle_2_locked);
+        }
+
+        return (bool) ($this->is_schedule_locked ?? false);
+    }
+
+    /**
+     * Mengecek apakah semua putaran terkunci
+     */
+    public function isAllCyclesLocked(): bool
+    {
+        return (bool) ($this->is_cycle_1_locked && $this->is_cycle_2_locked);
     }
 
     public function updater()
@@ -43,6 +80,8 @@ class SystemConfiguration extends Model
             'academic_year'      => '2026/2027',
             'semester'           => 'Semester 1 (Ganjil)',
             'is_schedule_locked' => false,
+            'is_cycle_1_locked'  => false,
+            'is_cycle_2_locked'  => false,
         ]);
     }
 }

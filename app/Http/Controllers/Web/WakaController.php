@@ -89,26 +89,52 @@ class WakaController extends Controller
         $configuration = SystemConfiguration::first() ?? SystemConfiguration::create([
             'active_cycle' => 'Putaran 1',
             'is_schedule_locked' => false,
+            'is_cycle_1_locked' => false,
+            'is_cycle_2_locked' => false,
         ]);
 
         return view('waka.cycle.index', compact('configuration'));
     }
 
     /**
-     * [FITUR UKK: TC-SCH-04 & TC-SCH-05 - KUNCI JADWAL / LOCK SCHEDULE]
-     * Mengunci atau membuka gembok seluruh jadwal mengajar KBM.
-     * Saat status terkunci, tombol aksi di frontend non-aktif dan backend menolak request tambah/edit/hapus.
+     * [FITUR UKK: TC-SCH-04 & TC-SCH-05 - KUNCI JADWAL / LOCK SCHEDULE PER PUTARAN]
+     * Mengunci atau membuka gembok jadwal mengajar KBM per putaran (Putaran 1 / Putaran 2) secara independen.
+     * Saat status salah satu putaran terkunci, putaran lainnya yang tidak dikunci tetap bebas diedit, ditambah, diimpor, dan dihapus.
      */
-    public function toggleLock()
+    public function toggleLock(Request $request)
     {
-        $config = SystemConfiguration::first();
+        $config = SystemConfiguration::first() ?? SystemConfiguration::current();
         if ($config) {
-            $config->update([
-                'is_schedule_locked' => !$config->is_schedule_locked,
-                'updated_by' => auth()->id(),
-            ]);
-            $status = $config->is_schedule_locked ? 'dikunci' : 'dibuka';
-            return redirect()->back()->with('success', "Status jadwal berhasil $status!");
+            $cycle = $request->input('cycle');
+
+            if ($cycle === 'Putaran 1') {
+                $newStatus = !$config->is_cycle_1_locked;
+                $config->is_cycle_1_locked = $newStatus;
+                $targetDesc = "Putaran 1";
+            } elseif ($cycle === 'Putaran 2') {
+                $newStatus = !$config->is_cycle_2_locked;
+                $config->is_cycle_2_locked = $newStatus;
+                $targetDesc = "Putaran 2";
+            } else {
+                $active = $config->active_cycle;
+                if ($active === 'Putaran 1') {
+                    $newStatus = !$config->is_cycle_1_locked;
+                    $config->is_cycle_1_locked = $newStatus;
+                    $targetDesc = "Putaran 1";
+                } else {
+                    $newStatus = !$config->is_cycle_2_locked;
+                    $config->is_cycle_2_locked = $newStatus;
+                    $targetDesc = "Putaran 2";
+                }
+            }
+
+            // is_schedule_locked bernilai true jika kedua putaran terkunci
+            $config->is_schedule_locked = (bool) ($config->is_cycle_1_locked && $config->is_cycle_2_locked);
+            $config->updated_by = auth()->id();
+            $config->save();
+
+            $status = $newStatus ? 'dikunci' : 'dibuka';
+            return redirect()->back()->with('success', "Status jadwal {$targetDesc} berhasil {$status}!");
         }
 
         return redirect()->back()->with('error', 'Konfigurasi sistem tidak ditemukan.');
@@ -120,13 +146,8 @@ class WakaController extends Controller
      */
     public function toggleCycle()
     {
-        $config = SystemConfiguration::first();
+        $config = SystemConfiguration::first() ?? SystemConfiguration::current();
         if ($config) {
-            // Validasi: Jika jadwal terkunci, tidak boleh mengubah putaran
-            if ($config->is_schedule_locked) {
-                return redirect()->back()->with('error', 'Gagal mengubah putaran: Siklus dan jadwal saat ini sedang TERKUNCI. Silakan buka kunci jadwal terlebih dahulu.');
-            }
-
             $newCycle = $config->active_cycle === 'Putaran 1' ? 'Putaran 2' : 'Putaran 1';
             $config->update([
                 'active_cycle' => $newCycle,
@@ -200,6 +221,15 @@ class WakaController extends Controller
         $classes = SchoolClass::orderBy('class_name')->get();
         $rooms = Room::orderBy('room_name')->get();
 
+        // [FITUR UKK: TC-SCH-01 - DAFTAR MATA PELAJARAN DROP-DOWN]
+        // Mengambil daftar mata pelajaran unik untuk pilihan dropdown pada modal tambah & edit jadwal
+        $subjects = Schedule::whereNotNull('subject')
+            ->where('subject', '!=', '')
+            ->distinct()
+            ->orderBy('subject')
+            ->pluck('subject')
+            ->toArray();
+
         // Opsi Dropdown Filter 3 Kolom
         $availableGrades = ['X', 'XI', 'XII'];
         $availableMajors = Major::orderBy('code')->pluck('code')->toArray();
@@ -213,6 +243,7 @@ class WakaController extends Controller
             'teachers', 
             'classes', 
             'rooms', 
+            'subjects',
             'config',
             'availableGrades',
             'availableMajors',
@@ -222,15 +253,10 @@ class WakaController extends Controller
 
     /**
      * [FITUR UKK: TC-SCH-01 & TC-SCH-02 - TAMBAH JADWAL MENGAJAR & VALIDASI BENTROK]
-     * Menyimpan jadwal baru ke database dengan proteksi Lock Schedule dan validasi anti-bentrok.
+     * Menyimpan jadwal baru ke database dengan proteksi Lock Schedule per putaran dan validasi anti-bentrok.
      */
     public function schedulesStore(Request $request)
     {
-        $config = SystemConfiguration::current();
-        if ($config->is_schedule_locked) {
-            return redirect()->back()->with('error', 'Gagal menambahkan jadwal: Siklus blok saat ini sedang TERKUNCI. Buka kunci jadwal terlebih dahulu di menu Siklus Blok.');
-        }
-
         $validated = $request->validate([
             'teacher_id'  => ['required', 'exists:users,id'],
             'class_id'    => ['required', 'exists:classes,id'],
@@ -241,6 +267,11 @@ class WakaController extends Controller
             'end_time'    => ['required', 'in:01:00,02:00,03:00,04:00,05:00,06:00,07:00,08:00,09:00,10:00', 'gte:start_time'],
             'cycle_type'  => ['required', 'in:Putaran 1,Putaran 2'],
         ]);
+
+        $config = SystemConfiguration::current();
+        if ($config->isCycleLocked($validated['cycle_type'])) {
+            return redirect()->back()->withInput()->with('error', "Gagal menambahkan jadwal: {$validated['cycle_type']} saat ini sedang TERKUNCI. Buka kunci {$validated['cycle_type']} terlebih dahulu di menu Siklus Blok.");
+        }
 
         // Pembatasan hari Jumat: Maksimal hanya sampai Jam ke - 8
         if ($validated['day_of_week'] === 'Jumat') {
@@ -256,13 +287,13 @@ class WakaController extends Controller
 
     /**
      * [FITUR UKK: TC-SCH-02 - EDIT / PERBARUI JADWAL MENGAJAR]
-     * Memperbarui jadwal pelajaran dengan proteksi status Lock Schedule.
+     * Memperbarui jadwal pelajaran dengan proteksi status Lock Schedule per putaran.
      */
     public function schedulesUpdate(Request $request, Schedule $schedule)
     {
         $config = SystemConfiguration::current();
-        if ($config->is_schedule_locked) {
-            return redirect()->back()->with('error', 'Gagal memperbarui jadwal: Siklus blok saat ini sedang TERKUNCI. Buka kunci jadwal terlebih dahulu untuk mengedit.');
+        if ($config->isCycleLocked($schedule->cycle_type)) {
+            return redirect()->back()->with('error', "Gagal memperbarui jadwal: {$schedule->cycle_type} saat ini sedang TERKUNCI. Buka kunci {$schedule->cycle_type} terlebih dahulu untuk mengedit.");
         }
 
         $validated = $request->validate([
@@ -275,6 +306,10 @@ class WakaController extends Controller
             'end_time'    => ['required', 'in:01:00,02:00,03:00,04:00,05:00,06:00,07:00,08:00,09:00,10:00', 'gte:start_time'],
             'cycle_type'  => ['required', 'in:Putaran 1,Putaran 2'],
         ]);
+
+        if ($validated['cycle_type'] !== $schedule->cycle_type && $config->isCycleLocked($validated['cycle_type'])) {
+            return redirect()->back()->withInput()->with('error', "Gagal memindahkan jadwal ke {$validated['cycle_type']}: Siklus {$validated['cycle_type']} saat ini sedang TERKUNCI.");
+        }
 
         // Pembatasan hari Jumat: Maksimal hanya sampai Jam ke - 8
         if ($validated['day_of_week'] === 'Jumat') {
@@ -290,13 +325,13 @@ class WakaController extends Controller
 
     /**
      * [FITUR UKK: HAPUS SATU JADWAL MENGAJAR]
-     * Menghapus 1 data jadwal KBM dengan verifikasi proteksi gembok jadwal.
+     * Menghapus 1 data jadwal KBM dengan verifikasi proteksi gembok jadwal per putaran.
      */
     public function schedulesDestroy(Schedule $schedule)
     {
         $config = SystemConfiguration::current();
-        if ($config->is_schedule_locked) {
-            return redirect()->back()->with('error', 'Gagal menghapus jadwal: Siklus blok saat ini sedang TERKUNCI.');
+        if ($config->isCycleLocked($schedule->cycle_type)) {
+            return redirect()->back()->with('error', "Gagal menghapus jadwal: {$schedule->cycle_type} saat ini sedang TERKUNCI. Buka kunci {$schedule->cycle_type} terlebih dahulu.");
         }
 
         $schedule->delete();
@@ -309,19 +344,36 @@ class WakaController extends Controller
     public function schedulesDeleteSelected(Request $request)
     {
         $config = SystemConfiguration::current();
-        if ($config->is_schedule_locked) {
-            return redirect()->back()->with('error', 'Gagal menghapus jadwal: Siklus blok saat ini sedang TERKUNCI.');
-        }
-
         $request->validate([
             'schedule_ids'   => ['required', 'array', 'min:1'],
             'schedule_ids.*' => ['exists:schedules,id'],
         ]);
 
-        $count = Schedule::whereIn('id', $request->schedule_ids)->delete();
+        $selectedSchedules = Schedule::whereIn('id', $request->schedule_ids)->get();
+        $lockedCount = 0;
+        $deletableIds = [];
+
+        foreach ($selectedSchedules as $sch) {
+            if ($config->isCycleLocked($sch->cycle_type)) {
+                $lockedCount++;
+            } else {
+                $deletableIds[] = $sch->id;
+            }
+        }
+
+        if ($lockedCount > 0 && empty($deletableIds)) {
+            return redirect()->back()->with('error', 'Gagal menghapus jadwal: Seluruh jadwal yang dipilih berada pada putaran yang sedang TERKUNCI.');
+        }
+
+        $count = Schedule::whereIn('id', $deletableIds)->delete();
+
+        $msg = "Sukses! Berhasil menghapus {$count} jadwal pelajaran yang dipilih.";
+        if ($lockedCount > 0) {
+            $msg .= " ({$lockedCount} jadwal dilewati karena berada pada putaran yang sedang terkunci).";
+        }
 
         return redirect()->route('waka.schedules.index')
-            ->with('success', "Sukses! Berhasil menghapus {$count} jadwal pelajaran yang dipilih.");
+            ->with('success', $msg);
     }
 
     /**
@@ -330,25 +382,43 @@ class WakaController extends Controller
     public function schedulesDeleteAll(Request $request)
     {
         $config = SystemConfiguration::current();
-        if ($config->is_schedule_locked) {
-            return redirect()->back()->with('error', 'Gagal menghapus jadwal: Siklus blok saat ini sedang TERKUNCI.');
-        }
-
+        $scope = $request->input('scope', 'cycle_1');
         $query = Schedule::query();
 
-        $scope = $request->input('scope', 'cycle_1');
         if ($scope === 'cycle_1' || $scope === 'Putaran 1') {
+            if ($config->isCycleLocked('Putaran 1')) {
+                return redirect()->back()->with('error', 'Gagal menghapus jadwal: Putaran 1 saat ini sedang TERKUNCI. Buka kuncinya di menu Siklus Blok.');
+            }
             $query->where('cycle_type', 'Putaran 1');
             $scopeDesc = "di Putaran 1";
         } elseif ($scope === 'cycle_2' || $scope === 'Putaran 2') {
+            if ($config->isCycleLocked('Putaran 2')) {
+                return redirect()->back()->with('error', 'Gagal menghapus jadwal: Putaran 2 saat ini sedang TERKUNCI. Buka kuncinya di menu Siklus Blok.');
+            }
             $query->where('cycle_type', 'Putaran 2');
             $scopeDesc = "di Putaran 2";
         } elseif ($scope === 'active_cycle') {
             $cycle = $request->input('cycle_type', $config->active_cycle);
+            if ($config->isCycleLocked($cycle)) {
+                return redirect()->back()->with('error', "Gagal menghapus jadwal: {$cycle} saat ini sedang TERKUNCI. Buka kuncinya di menu Siklus Blok.");
+            }
             $query->where('cycle_type', $cycle);
             $scopeDesc = "di {$cycle}";
         } else {
-            $scopeDesc = "di SELURUH Putaran";
+            // scope === 'all'
+            if ($config->isCycleLocked('Putaran 1') && $config->isCycleLocked('Putaran 2')) {
+                return redirect()->back()->with('error', 'Gagal menghapus jadwal: Seluruh putaran saat ini sedang TERKUNCI.');
+            }
+
+            if ($config->isCycleLocked('Putaran 1')) {
+                $query->where('cycle_type', 'Putaran 2');
+                $scopeDesc = "di Putaran 2 (Putaran 1 dilewati karena sedang terkunci)";
+            } elseif ($config->isCycleLocked('Putaran 2')) {
+                $query->where('cycle_type', 'Putaran 1');
+                $scopeDesc = "di Putaran 1 (Putaran 2 dilewati karena sedang terkunci)";
+            } else {
+                $scopeDesc = "di SELURUH Putaran";
+            }
         }
 
         if ($request->filled('class_id') && $request->class_id !== 'all') {
@@ -389,8 +459,13 @@ class WakaController extends Controller
         ini_set('memory_limit', '512M');
 
         $config = SystemConfiguration::current();
-        if ($config->is_schedule_locked) {
-            return redirect()->back()->with('error', 'Gagal mengimpor jadwal: Siklus blok saat ini sedang TERKUNCI. Buka kunci terlebih dahulu di menu Siklus Blok.');
+        $targetCycle = $request->input('cycle_type');
+        if ($targetCycle && $config->isCycleLocked($targetCycle)) {
+            return redirect()->back()->with('error', "Gagal mengimpor jadwal: {$targetCycle} saat ini sedang TERKUNCI. Buka kunci {$targetCycle} di menu Siklus Blok.");
+        }
+
+        if ($config->isCycleLocked('Putaran 1') && $config->isCycleLocked('Putaran 2')) {
+            return redirect()->back()->with('error', 'Gagal mengimpor jadwal: Seluruh putaran saat ini sedang TERKUNCI. Buka kunci di menu Siklus Blok.');
         }
 
         $request->validate([
@@ -633,20 +708,26 @@ class WakaController extends Controller
     /**
      * [FITUR UKK: TAMBAH GURU BARU & PEMETAAN PERAN (WALI KELAS / GURU BK)]
      * Menyimpan guru baru, otomatis membuat akun login terenkripsi, dan menetapkan kelas perwalian / binaan.
+     * NIP dibatasi khusus angka (maksimal 18 digit) dan No HP (maksimal 13 digit).
      */
     public function teachersStore(Request $request)
     {
         $validated = $request->validate([
             'name'                  => ['required', 'string', 'max:255'],
             'username'              => ['nullable', 'string', 'max:50', 'unique:users,username'],
-            'nip'                   => ['nullable', 'string', 'max:30'],
+            'nip'                   => ['nullable', 'regex:/^[0-9]+$/', 'max:18'],
             'email'                 => ['nullable', 'string', 'email', 'max:255', 'unique:users,email'],
-            'phone'                 => ['nullable', 'string', 'max:20'],
+            'phone'                 => ['nullable', 'regex:/^[0-9]+$/', 'max:13'],
             'address'               => ['nullable', 'string', 'max:500'],
             'role_id'               => ['required', 'exists:roles,id'],
             'homeroom_class_id'     => ['nullable', 'exists:classes,id'],
             'counselor_class_ids'   => ['nullable', 'array'],
             'counselor_class_ids.*' => ['exists:classes,id'],
+        ], [
+            'nip.regex'   => 'NIP hanya boleh berisi angka.',
+            'nip.max'     => 'NIP maksimal 18 digit angka.',
+            'phone.regex' => 'Nomor HP hanya boleh berisi angka.',
+            'phone.max'   => 'Nomor HP maksimal 13 digit angka.',
         ]);
 
         if (empty($validated['username'])) {
@@ -677,21 +758,27 @@ class WakaController extends Controller
     /**
      * [FITUR UKK: EDIT DATA GURU & PERUBAHAN PERAN / KELAS BINAAN]
      * Memperbarui profil guru, sinkronisasi relasi perwalian kelas, dan kelas binaan BK.
+     * NIP dibatasi khusus angka (maksimal 18 digit) dan No HP (maksimal 13 digit).
      */
     public function teachersUpdate(Request $request, User $teacher)
     {
         $validated = $request->validate([
             'name'                  => ['required', 'string', 'max:255'],
             'username'              => ['required', 'string', 'max:50', 'unique:users,username,' . $teacher->id],
-            'nip'                   => ['nullable', 'string', 'max:30'],
+            'nip'                   => ['nullable', 'regex:/^[0-9]+$/', 'max:18'],
             'email'                 => ['nullable', 'string', 'email', 'max:255', 'unique:users,email,' . $teacher->id],
-            'phone'                 => ['nullable', 'string', 'max:20'],
+            'phone'                 => ['nullable', 'regex:/^[0-9]+$/', 'max:13'],
             'address'               => ['nullable', 'string', 'max:500'],
             'role_id'               => ['required', 'exists:roles,id'],
             'homeroom_class_id'     => ['nullable', 'exists:classes,id'],
             'counselor_class_ids'   => ['nullable', 'array'],
             'counselor_class_ids.*' => ['exists:classes,id'],
             'password'              => ['nullable', 'string', 'min:6'],
+        ], [
+            'nip.regex'   => 'NIP hanya boleh berisi angka.',
+            'nip.max'     => 'NIP maksimal 18 digit angka.',
+            'phone.regex' => 'Nomor HP hanya boleh berisi angka.',
+            'phone.max'   => 'Nomor HP maksimal 13 digit angka.',
         ]);
 
         if (empty($validated['email'])) {
@@ -1049,12 +1136,17 @@ class WakaController extends Controller
         $validated = $request->validate([
             'name'       => ['required', 'string', 'max:255'],
             'username'   => ['required', 'string', 'max:50', 'unique:users,username'],
-            'nis'        => ['nullable', 'string', 'max:30'],
+            'nis'        => ['nullable', 'regex:/^[0-9]+$/', 'max:10'],
             'email'      => ['nullable', 'string', 'email', 'max:255', 'unique:users,email'],
-            'phone'      => ['nullable', 'string', 'max:20'],
+            'phone'      => ['nullable', 'regex:/^[0-9]+$/', 'max:13'],
             'address'    => ['nullable', 'string', 'max:500'],
             'birth_date' => ['nullable', 'date'],
             'class_id'   => ['required', 'exists:classes,id'],
+        ], [
+            'nis.regex'   => 'NIS hanya boleh berisi angka.',
+            'nis.max'     => 'NIS maksimal 10 digit angka.',
+            'phone.regex' => 'Nomor HP siswa hanya boleh berisi angka.',
+            'phone.max'   => 'Nomor HP siswa maksimal 13 digit angka.',
         ]);
 
         if (empty($validated['email'])) {
@@ -1115,13 +1207,18 @@ class WakaController extends Controller
         $validated = $request->validate([
             'name'       => ['required', 'string', 'max:255'],
             'username'   => ['required', 'string', 'max:50', 'unique:users,username,' . $student->id],
-            'nis'        => ['nullable', 'string', 'max:30'],
+            'nis'        => ['nullable', 'regex:/^[0-9]+$/', 'max:10'],
             'email'      => ['nullable', 'string', 'email', 'max:255', 'unique:users,email,' . $student->id],
-            'phone'      => ['nullable', 'string', 'max:20'],
+            'phone'      => ['nullable', 'regex:/^[0-9]+$/', 'max:13'],
             'address'    => ['nullable', 'string', 'max:500'],
             'birth_date' => ['nullable', 'date'],
             'class_id'   => ['required', 'exists:classes,id'],
             'password'   => ['nullable', 'string', 'min:6'],
+        ], [
+            'nis.regex'   => 'NIS hanya boleh berisi angka.',
+            'nis.max'     => 'NIS maksimal 10 digit angka.',
+            'phone.regex' => 'Nomor HP siswa hanya boleh berisi angka.',
+            'phone.max'   => 'Nomor HP siswa maksimal 13 digit angka.',
         ]);
 
         if (empty($validated['email'])) {
@@ -1935,6 +2032,167 @@ public function classesDestroy(SchoolClass $schoolClass)
             'totalScheduled'   => $totalScheduled,
             'totalFilled'      => $totalFilled,
             'totalUnfilled'    => $totalUnfilled,
+        ]);
+    }
+
+    /**
+     * =========================================================================
+     * FITUR UKK: CETAK SEMUA JURNAL KBM TERISI (ROLE WAKA)
+     * =========================================================================
+     * Mencetak seluruh lembar jurnal dan presensi KBM yang telah diisi oleh guru
+     * berdasarkan filter tanggal, tingkat, jurusan, rombel, atau guru pengampu.
+     * Setiap jurnal otomatis diformat 1 halaman A4 dengan page-break-after.
+     */
+    public function journalsPrintAll(Request $request)
+    {
+        $config = SystemConfiguration::current();
+        $activeCycle = $config->active_cycle ?? 'Putaran 1';
+        $academicYear = $config->academic_year ?? '2026/2027';
+        $semester = $config->semester ?? 'Semester 1 (Ganjil)';
+
+        $date = $request->get('date');
+        if (empty($date)) {
+            $now = now();
+            if ($now->isSaturday()) {
+                $date = $now->subDay()->toDateString();
+            } elseif ($now->isSunday()) {
+                $date = $now->subDays(2)->toDateString();
+            } else {
+                $date = $now->toDateString();
+            }
+        }
+
+        $carbonDate = \Carbon\Carbon::parse($date);
+        $dayOfWeek = \App\Support\IndonesianDay::from($carbonDate);
+
+        $teacherId = $request->get('teacher_id');
+        $grade     = $request->get('grade', 'all');
+        $major     = $request->get('major', 'all');
+        $rombel    = $request->get('rombel', 'all');
+        $classId   = $request->get('class_id', 'all');
+
+        $scheduleQuery = Schedule::query()
+            ->with([
+                'teacher:id,name,nip',
+                'schoolClass:id,class_name',
+                'room:id,room_name'
+            ])
+            ->where('cycle_type', $activeCycle)
+            ->where('day_of_week', $dayOfWeek);
+
+        if ($teacherId) {
+            $scheduleQuery->where('teacher_id', $teacherId);
+        }
+        if ($grade && $grade !== 'all') {
+            $gradeMap = ['10' => 'X', '11' => 'XI', '12' => 'XII', 'X' => 'X', 'XI' => 'XI', 'XII' => 'XII'];
+            $gVal = $gradeMap[$grade] ?? $grade;
+            $scheduleQuery->whereHas('schoolClass', fn($q) => $q->where('class_name', 'like', "{$gVal} %"));
+        }
+        if ($major && $major !== 'all') {
+            $majorTrim = trim($major);
+            $scheduleQuery->whereHas('schoolClass', fn($q) => $q->where('class_name', 'like', "% {$majorTrim} %")->orWhere('class_name', 'like', "% {$majorTrim}"));
+        }
+        if ($rombel && $rombel !== 'all') {
+            $rombelTrim = trim($rombel);
+            $scheduleQuery->whereHas('schoolClass', fn($q) => $q->where('class_name', 'like', "% {$rombelTrim}"));
+        }
+        if ($classId && $classId !== 'all') {
+            $scheduleQuery->where('class_id', $classId);
+        }
+
+        $schedules = $scheduleQuery->orderBy('start_time')->get();
+        $scheduleIds = $schedules->pluck('id');
+
+        // Ambil hanya jurnal yang sudah terisi
+        $rawJournals = \App\Models\Journal::with([
+            'schedule.teacher',
+            'schedule.schoolClass',
+            'schedule.room',
+            'attendances.student'
+        ])
+        ->whereDate('date', $date)
+        ->whereIn('schedule_id', $scheduleIds)
+        ->get();
+
+        // Urutkan jurnal sesuai urutan jam mulai jadwal
+        $rawJournals = $rawJournals->sortBy(fn($j) => $j->schedule?->start_time ?? '00:00:00')->values();
+
+        $processedJournals = $rawJournals->map(function ($journal) use ($dayOfWeek) {
+            $attendances = $journal->attendances->sortBy(function ($item) {
+                return $item->student?->name ?? '';
+            })->values();
+
+            return (object) [
+                'journal'      => $journal,
+                'schedule'     => $journal->schedule,
+                'date'         => $journal->date,
+                'dayOfWeek'    => $dayOfWeek,
+                'attendances'  => $attendances,
+                'hadirCount'   => $journal->attendances->where('status', 'Hadir')->count(),
+                'sakitCount'   => $journal->attendances->where('status', 'Sakit')->count(),
+                'izinCount'    => $journal->attendances->where('status', 'Izin')->count(),
+                'alpaCount'    => $journal->attendances->where('status', 'Alpa')->count(),
+            ];
+        });
+
+        return view('waka.journals.print', [
+            'isMulti'          => true,
+            'processedJournals'=> $processedJournals,
+            'academicYear'     => $academicYear,
+            'semester'         => $semester,
+            'date'             => $date,
+            'dayOfWeek'        => $dayOfWeek,
+        ]);
+    }
+
+    /**
+     * =========================================================================
+     * FITUR UKK: CETAK LEMBAR JURNAL & PRESENSI KBM PER SESI (ROLE WAKA)
+     * =========================================================================
+     * Mencetak dokumen resmi A4 per jurnal yang telah diinputkan oleh guru,
+     * memuat kop resmi sekolah, identitas sesi KBM, uraian materi pembelajaran,
+     * dokumentasi foto KBM, daftar presensi siswa, serta tanda tangan legal.
+     */
+    public function journalPrint($id)
+    {
+        $journal = \App\Models\Journal::with([
+            'schedule.teacher',
+            'schedule.schoolClass',
+            'schedule.room',
+            'attendances.student'
+        ])->findOrFail($id);
+
+        $config = SystemConfiguration::current();
+        $academicYear = $config->academic_year ?? '2026/2027';
+        $semester = $config->semester ?? 'Semester 1 (Ganjil)';
+
+        $carbonDate = \Carbon\Carbon::parse($journal->date);
+        $dayOfWeek = \App\Support\IndonesianDay::from($carbonDate);
+
+        // Urutkan siswa berdasarkan nama agar rapi dan teratur saat dicetak
+        $attendances = $journal->attendances->sortBy(function ($item) {
+            return $item->student?->name ?? '';
+        })->values();
+
+        $itemObj = (object) [
+            'journal'      => $journal,
+            'schedule'     => $journal->schedule,
+            'date'         => $journal->date,
+            'dayOfWeek'    => $dayOfWeek,
+            'attendances'  => $attendances,
+            'hadirCount'   => $journal->attendances->where('status', 'Hadir')->count(),
+            'sakitCount'   => $journal->attendances->where('status', 'Sakit')->count(),
+            'izinCount'    => $journal->attendances->where('status', 'Izin')->count(),
+            'alpaCount'    => $journal->attendances->where('status', 'Alpa')->count(),
+        ];
+
+        return view('waka.journals.print', [
+            'isMulti'          => false,
+            'processedJournals'=> collect([$itemObj]),
+            'academicYear'     => $academicYear,
+            'semester'         => $semester,
+            'date'             => $journal->date,
+            'dayOfWeek'        => $dayOfWeek,
         ]);
     }
 

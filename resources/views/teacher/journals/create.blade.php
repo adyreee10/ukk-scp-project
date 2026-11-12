@@ -1,7 +1,11 @@
 <x-app-layout>
     <div x-data="teacherJournalManager()" class="space-y-3.5">
 
-        <!-- Header & Navigasi Halaman Ramping (Anti Runaway Scroll) -->
+        {{-- 
+            ========================================================================
+            Fitur Header & Navigasi Halaman Pengisian Jurnal Baru
+            ========================================================================
+        --}}
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-2 border-b border-slate-800/80">
             <div>
                 <a href="{{ route('teacher.dashboard') }}" class="inline-flex items-center text-xs font-bold text-indigo-400 hover:text-indigo-300 transition hover:underline mb-1">
@@ -11,14 +15,14 @@
                     Isi Jurnal & Presensi Siswa
                 </h1>
                 <p class="text-xs text-slate-400 mt-0.5 font-medium">
-                    Dokumentasikan aktivitas KBM dan catat kehadiran siswa di kelas
+                    Dokumentasikan aktivitas KBM dan catat kehadiran siswa di kelas secara real-time
                 </p>
             </div>
             
             <div class="shrink-0">
-                @if($isEffectiveDayToday && $selectedSchedule && $selectedSchedule->day_of_week === $todayName)
+                @if($selectedSchedule)
                     <span class="px-3.5 py-1.5 rounded-xl text-xs font-black bg-[#0f172a]/90 text-indigo-300 border border-slate-800 shadow-sm flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                         <span>{{ $todayName }} • {{ $selectedSchedule->period_label }}</span>
                     </span>
                 @else
@@ -30,18 +34,22 @@
             </div>
         </div>
 
-        @if(!$selectedSchedule)
-            <!-- Peringatan jika belum ada jadwal -->
-            <div class="p-8 text-center bg-[#0f172a]/90 backdrop-blur-md rounded-2xl border border-slate-800 shadow-xl">
-                <div class="w-14 h-14 rounded-2xl bg-indigo-950/60 border border-indigo-500/40 text-indigo-400 mx-auto flex items-center justify-center mb-3">
+        @if(!$isEffectiveDayToday)
+            {{-- 
+                ========================================================================
+                Kondisi 1: Tidak Ada Jadwal Mengajar Hari Ini / Hari Libur KBM
+                ========================================================================
+            --}}
+            <div class="p-8 text-center bg-white dark:bg-[#0f172a]/90 backdrop-blur-md rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-xl">
+                <div class="w-14 h-14 rounded-2xl bg-indigo-50 border border-indigo-200 text-indigo-600 dark:bg-indigo-950/60 dark:border-indigo-500/40 dark:text-indigo-400 mx-auto flex items-center justify-center mb-3">
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                 </div>
-                <p class="text-base font-bold text-white">Tidak Ada Jadwal Mengajar Hari Ini ({{ $todayName ?? 'Hari Ini' }})</p>
-                <p class="text-xs text-slate-400 mt-1 max-w-md mx-auto">
-                    Sistem pengisian jurnal KBM otomatis mendeteksi jadwal mengajar guru pada hari ini. Anda dapat memeriksa jadwal lengkap di menu Jadwal Mengajar.
+                <p class="text-base font-bold text-slate-900 dark:text-white">Tidak Ada Jadwal Mengajar Hari Ini ({{ $todayName ?? 'Hari Ini' }})</p>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-md mx-auto">
+                    Sistem pengisian jurnal KBM otomatis mendeteksi jadwal mengajar guru pada hari ini. Anda dapat memeriksa jadwal lengkap mingguan di menu Jadwal Mengajar.
                 </p>
                 <div class="mt-4 flex justify-center gap-3">
-                    <a href="{{ route('teacher.dashboard') }}" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white shadow-sm transition inline-block">
+                    <a href="{{ route('teacher.dashboard') }}" class="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-white text-xs font-bold shadow-sm transition inline-block">
                         Ke Dashboard
                     </a>
                     <a href="{{ route('teacher.schedules.index') }}" class="px-5 py-2.5 rounded-xl scp-btn-gradient text-xs font-bold text-white shadow-sm inline-block" style="color: #ffffff !important;">
@@ -50,294 +58,118 @@
                 </div>
             </div>
 
-        @elseif($existingJournalToday)
-            <!-- ========================================================================= -->
-            <!-- KONDISI A: JURNAL SUDAH DIISI HARI INI                                     -->
-            <!-- (Bisa Edit Absensi Siswa dalam 24 Jam, Topic & Foto Terkunci)            -->
-            <!-- ========================================================================= -->
-            <div class="space-y-6">
-                <!-- BANNER STATUS PENGISIAN & MASA EDIT 24 JAM -->
-                <div class="p-5 bg-white dark:bg-[#0f172a]/90 backdrop-blur-md rounded-2xl border {{ $isEditableWithin24Hours ? 'border-indigo-200 dark:border-indigo-500/50 shadow-sm dark:shadow-xl' : 'border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-xl' }} flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <div class="flex items-center gap-3.5">
-                        <div class="w-12 h-12 rounded-xl {{ $isEditableWithin24Hours ? 'bg-indigo-50 text-indigo-600 border border-indigo-200 dark:bg-indigo-500/20 dark:text-indigo-400 dark:border-transparent' : 'bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-transparent' }} flex items-center justify-center shrink-0">
-                            @if($isEditableWithin24Hours)
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                            @else
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                            @endif
-                        </div>
-                        <div>
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <h2 class="text-base font-extrabold text-slate-900 dark:text-white">Jurnal KBM Hari Ini Telah Tersimpan</h2>
-                                @if($isEditableWithin24Hours)
-                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/80 dark:text-indigo-300 dark:border-indigo-600/70">
-                                        Masa Edit Presensi Aktif (Batas 24 Jam)
-                                    </span>
-                                @else
-                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700">
-                                        Terkunci Permanen (> 24 Jam)
-                                    </span>
-                                @endif
-                            </div>
-                            <p class="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
-                                @if($isEditableWithin24Hours)
-                                    Dokumentasi dan materi terkunci. Anda masih dapat mengubah dan memperbarui kehadiran siswa di bawah ini selama kurun waktu 24 jam.
-                                @else
-                                    Batas toleransi 24 jam telah berakhir. Data jurnal dan absensi siswa telah tersimpan permanen di riwayat.
-                                @endif
-                            </p>
-                        </div>
+        @elseif($allFilledToday)
+            {{-- 
+                ========================================================================
+                Kondisi 2: Seluruh Jadwal Mengajar Hari Ini Telah Selesai Diisi
+                ========================================================================
+                Memberitahu guru bahwa semua sesi KBM hari ini sudah berhasil diisi.
+                Pengeditan presensi dialihkan ke Riwayat Jurnal atau melalui tombol pintas di bawah.
+            --}}
+            <div class="space-y-4">
+                <div class="p-6 sm:p-8 bg-white dark:bg-[#0f172a]/90 backdrop-blur-md rounded-2xl border border-emerald-200 dark:border-emerald-600/40 shadow-sm dark:shadow-xl text-center space-y-3">
+                    <div class="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-600 dark:bg-emerald-950/60 dark:border-emerald-500/50 dark:text-emerald-400 mx-auto flex items-center justify-center">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-base sm:text-lg font-black text-slate-900 dark:text-white">
+                            Seluruh Jadwal KBM Hari Ini Telah Selesai Diisi!
+                        </h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-lg mx-auto">
+                            Luar biasa! Seluruh sesi pembelajaran Anda pada hari ini ({{ $todayName }}) sudah berhasil didokumentasikan ke sistem. Apabila Anda ingin memeriksa atau memperbarui kehadiran siswa, silakan akses melalui menu <strong>Riwayat Jurnal KBM</strong>.
+                        </p>
                     </div>
 
-                </div>
-
-                <!-- FORM EDIT PRESENSI SISWA (DALAM 24 JAM) -->
-                @if($isEditableWithin24Hours)
-                    <form method="POST" action="{{ route('teacher.journals.update-attendance', $existingJournalToday->id) }}" class="space-y-3.5">
-                        @csrf
-                        @method('PUT')
-
-                        <!-- KARTU 1: Informasi Otomatis Kelas, Ruang, dan Tanggal KBM (Sesuai Foto 5) -->
-                        <div class="bg-white dark:bg-[#0f172a]/90 backdrop-blur-md p-3.5 sm:p-4 border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-xl space-y-3" style="border-radius: 15px;">
-                            <!-- Baris 1 (Atas - Memanjang Penuh): Kelas & Mata Pelajaran -->
-                            <div>
-                                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
-                                    Kelas & Mata Pelajaran
-                                </label>
-                                <input type="text" readonly 
-                                       value="{{ $selectedSchedule->schoolClass?->class_name }} — {{ $selectedSchedule->subject }}" 
-                                       class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/80 px-3.5 py-2.5 text-xs sm:text-sm font-bold text-slate-900 dark:text-white focus:outline-none cursor-default shadow-sm dark:shadow-inner" />
-                            </div>
-
-                            <!-- Baris 2 (Bawah - 2 Kolom): Ruang Kelas & Tanggal Pelaksanaan KBM -->
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <div>
-                                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
-                                        Ruang Kelas / Laboratorium
-                                    </label>
-                                    <input type="text" readonly 
-                                           value="{{ $selectedSchedule->room?->room_name ?? '-' }}" 
-                                           class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/80 px-3.5 py-2.5 text-xs sm:text-sm font-bold text-slate-900 dark:text-white focus:outline-none cursor-default shadow-sm dark:shadow-inner" />
-                                </div>
-
-                                <div>
-                                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
-                                        Tanggal Pelaksanaan KBM *
-                                    </label>
-                                    <input type="text" readonly 
-                                           value="{{ \Carbon\Carbon::parse($existingJournalToday->date)->format('d/m/Y') }}" 
-                                           class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/80 px-3.5 py-2.5 text-xs sm:text-sm font-bold text-slate-900 dark:text-white focus:outline-none cursor-default shadow-sm dark:shadow-inner" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- GRID 2 KOLOM: DOKUMENTASI (TERKUNCI) & EDIT PRESENSI SISWA -->
-                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-                            
-                            <!-- KIRI (5 Kolom): Ringkasan Dokumentasi KBM & Tombol Simpan -->
-                            <div class="lg:col-span-5 space-y-3">
-                                <div class="bg-white dark:bg-[#0f172a]/90 backdrop-blur-md p-4 border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-xl space-y-3" style="border-radius: 15px;">
-                                    <div class="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
-                                        <h2 class="text-sm font-extrabold text-slate-900 dark:text-white">Dokumentasi Pembelajaran</h2>
-                                        <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400">Tersimpan</span>
-                                    </div>
-
-                                    <div>
-                                        <span class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Materi / Topik KBM:</span>
-                                        <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-xs text-slate-800 dark:text-slate-200 leading-relaxed whitespace-pre-line max-h-32 overflow-y-auto">
-                                            {{ $existingJournalToday->topic_description }}
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <span class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Bukti Foto Real-Time KBM:</span>
-                                        @php
-                                            $photoSrc = $existingJournalToday->photo_path 
-                                                ? (str_starts_with($existingJournalToday->photo_path, 'http') ? $existingJournalToday->photo_path : url('media/' . ltrim($existingJournalToday->photo_path, '/')))
-                                                : $existingJournalToday->photo_url;
-                                        @endphp
-                                        @if($photoSrc)
-                                            <div class="relative group rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-md bg-slate-900">
-                                                <a href="{{ $photoSrc }}" target="_blank" rel="noopener noreferrer" title="Klik untuk memperbesar foto KBM">
-                                                    <img src="{{ $photoSrc }}" alt="Bukti KBM" class="w-full max-h-48 object-cover rounded-xl transition duration-200 group-hover:scale-105">
-                                                    <div class="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-bold gap-1.5 backdrop-blur-[1px]">
-                                                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                                        <span>Lihat Foto Penuh</span>
-                                                    </div>
-                                                </a>
-                                            </div>
-                                        @else
-                                            <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 text-center">
-                                                Tidak ada foto dokumentasi
-                                            </div>
-                                        @endif
-                                    </div>
-                                </div>
-
-                                <!-- Tombol Update Presensi -->
-                                <div class="bg-white dark:bg-[#0f172a]/90 backdrop-blur-md p-3.5 border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-xl space-y-1.5" style="border-radius: 15px;">
-                                    <button type="submit" 
-                                            style="border-radius: 12px; color: #ffffff !important;"
-                                            class="w-full py-2.5 px-4 font-bold text-xs scp-btn-gradient cursor-pointer tracking-wider uppercase shadow-md hover:shadow-lg transition">
-                                        Simpan Perubahan Presensi Siswa
-                                    </button>
-                                    <p class="text-[10px] text-center text-slate-500 dark:text-slate-400">
-                                        Pengeditan presensi masih dapat dilakukan dalam batas waktu 24 jam sejak jurnal dibuat
-                                    </p>
-                                </div>
-                            </div>
-
-                            <!-- KANAN (7 Kolom): Formulir Edit Presensi Siswa -->
-                            <div class="lg:col-span-7">
-                                <div class="bg-white dark:bg-[#0f172a]/90 backdrop-blur-md p-4 border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-xl" style="border-radius: 15px;">
-                                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 pb-2.5 border-b border-slate-200 dark:border-slate-800 mb-2.5">
-                                        <div>
-                                            <h2 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Presensi Siswa</h2>
+                    <!-- RINGKASAN JADWAL YANG TELAH DIISI HARI INI -->
+                    @if(isset($filledJournalsToday) && $filledJournalsToday->isNotEmpty())
+                        <div class="max-w-xl mx-auto pt-2">
+                            <div class="grid grid-cols-1 gap-2.5 text-left">
+                                @foreach($filledJournalsToday as $fj)
+                                    <div class="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/60 flex items-center justify-between gap-3 shadow-sm">
+                                        <div class="min-w-0">
+                                            <p class="font-bold text-xs sm:text-sm text-slate-900 dark:text-white truncate">
+                                                {{ $fj->schedule?->subject }}
+                                            </p>
                                             <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                                                Kelas {{ $selectedSchedule->schoolClass->class_name }} ({{ $students->count() }} Siswa)
+                                                Kelas {{ $fj->schedule?->schoolClass?->class_name }} • {{ $fj->schedule?->period_label }} ({{ $fj->attendances->count() }} Siswa Tercatat)
                                             </p>
                                         </div>
-                                        
-                                        <!-- Tombol Cepat: Set Semua Hadir -->
-                                        <button type="button" @click="setAll('Hadir')" 
-                                                class="text-xs font-bold px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:hover:bg-emerald-900 dark:border-emerald-800/60 transition cursor-pointer self-start sm:self-auto">
-                                            ✓ Set Semua Hadir
-                                        </button>
+                                        <a href="{{ route('teacher.journals.edit-attendance', $fj->id) }}" 
+                                           class="btn-action-edit inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm transition whitespace-nowrap shrink-0 cursor-pointer"
+                                           title="Edit presensi siswa untuk sesi ini">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                            </svg>
+                                            <span>Edit Presensi</span>
+                                        </a>
                                     </div>
-
-                                    <!-- LIVE COUNTER STATUS KEHADIRAN SISWA -->
-                                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 mb-2.5">
-                                        <div class="px-2.5 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 dark:bg-emerald-950/40 dark:border-emerald-800/50 dark:text-emerald-300 flex items-center justify-between">
-                                            <span class="text-[11px] font-bold">Hadir</span>
-                                            <span x-text="counts.Hadir" class="text-xs sm:text-sm font-black text-emerald-950 dark:text-white">0</span>
-                                        </div>
-                                        <div class="px-2.5 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 dark:bg-amber-950/40 dark:border-amber-800/50 dark:text-amber-300 flex items-center justify-between">
-                                            <span class="text-[11px] font-bold">Sakit</span>
-                                            <span x-text="counts.Sakit" class="text-xs sm:text-sm font-black text-amber-950 dark:text-white">0</span>
-                                        </div>
-                                        <div class="px-2.5 py-1.5 rounded-xl bg-blue-50 border border-blue-200 text-blue-700 dark:bg-blue-950/40 dark:border-blue-800/50 dark:text-blue-300 flex items-center justify-between">
-                                            <span class="text-[11px] font-bold">Izin</span>
-                                            <span x-text="counts.Izin" class="text-xs sm:text-sm font-black text-blue-950 dark:text-white">0</span>
-                                        </div>
-                                        <div class="px-2.5 py-1.5 rounded-xl bg-red-50 border border-red-200 text-red-700 dark:bg-red-950/40 dark:border-red-800/50 dark:text-red-300 flex items-center justify-between">
-                                            <span class="text-[11px] font-bold">Alpa</span>
-                                            <span x-text="counts.Alpa" class="text-xs sm:text-sm font-black text-red-950 dark:text-white">0</span>
-                                        </div>
-                                    </div>
-
-                                    <!-- KOLOM PENCARIAN SISWA -->
-                                    <div class="mb-2.5 relative">
-                                        <input type="text" x-model="searchStudent" 
-                                               placeholder="Cari nama siswa di kelas ini..." 
-                                               class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-3.5 py-1.5 pl-9 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-1 focus:ring-indigo-500">
-                                        <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                        </svg>
-                                    </div>
-
-                                    <!-- DAFTAR SISWA (SCROLL DALAM KONTEN AGAR HALAMAN TIDAK HILANG) -->
-                                    @php
-                                        $existingAttendances = $existingJournalToday->attendances->keyBy('student_id');
-                                    @endphp
-                                    <div class="space-y-2 max-h-[260px] sm:max-h-[280px] xl:max-h-[320px] overflow-y-auto overscroll-contain pr-1 relative">
-                                        @foreach ($students as $index => $student)
-                                            @php
-                                                 $att = $existingAttendances->get($student->id);
-                                                $approvedLeave = isset($approvedLeavesToday) ? $approvedLeavesToday->get($student->id) : null;
-                                                $currentStatus = $att ? $att->status : ($approvedLeave ? ($approvedLeave->leave_type === 'Sakit' ? 'Sakit' : 'Izin') : 'Hadir');
-                                                $currentNote = $att ? $att->note : ($approvedLeave ? 'Alasan ACC: ' . $approvedLeave->reason : '');
-                                            @endphp
-                                            <div x-show="!searchStudent || '{{ strtolower(addcslashes($student->name, "'\\")) }}'.includes(searchStudent.toLowerCase())"
-                                                 class="p-2.5 sm:p-3 rounded-xl border relative {{ $approvedLeave ? 'border-indigo-300 bg-indigo-50/60 dark:border-indigo-500/40 dark:bg-indigo-950/20' : 'border-slate-200 bg-slate-50/70 hover:bg-slate-100 dark:border-slate-800/80 dark:bg-slate-900/40 dark:hover:bg-slate-800/40' }} flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 transition">
-                                                <div class="flex items-center gap-2.5 min-w-0">
-                                                    <span class="text-xs font-bold text-slate-400 dark:text-slate-500 w-5 text-right">{{ $index + 1 }}.</span>
-                                                    <div class="min-w-0">
-                                                        <div class="flex items-center gap-2 flex-wrap">
-                                                            <p class="text-xs font-bold text-slate-900 dark:text-white truncate">{{ $student->name }}</p>
-                                                            @if($approvedLeave)
-                                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-black {{ $approvedLeave->leave_type === 'Sakit' ? 'bg-amber-100 text-amber-800 border border-amber-300 dark:bg-amber-950/80 dark:text-amber-300 dark:border-amber-600/70' : 'bg-blue-100 text-blue-800 border border-blue-300 dark:bg-blue-950/80 dark:text-blue-300 dark:border-blue-600/70' }}">
-                                                                    ✓ ACC: {{ $approvedLeave->leave_type }}
-                                                                </span>
-                                                            @endif
-                                                        </div>
-                                                        <p class="text-[10px] text-slate-500 dark:text-slate-400">@<span>{{ $student->username }}</span></p>
-                                                    </div>
-                                                </div>
-
-                                                <div class="flex items-center gap-1.5 shrink-0 self-end sm:self-auto">
-                                                    <label class="cursor-pointer relative">
-                                                        <input type="radio" name="attendances[{{ $student->id }}]" value="Hadir" 
-                                                               data-has-approved-leave="{{ $approvedLeave ? '1' : '' }}"
-                                                               class="sr-only peer" 
-                                                               {{ $currentStatus === 'Hadir' ? 'checked' : '' }}>
-                                                        <span class="attendance-pill attendance-pill-h px-2.5 py-1 rounded-md text-[11px] font-bold border transition inline-block">H</span>
-                                                    </label>
-                                                    <label class="cursor-pointer relative">
-                                                        <input type="radio" name="attendances[{{ $student->id }}]" value="Sakit" 
-                                                               data-has-approved-leave="{{ $approvedLeave ? '1' : '' }}"
-                                                               class="sr-only peer" 
-                                                               {{ $currentStatus === 'Sakit' ? 'checked' : '' }}>
-                                                        <span class="attendance-pill attendance-pill-s px-2.5 py-1 rounded-md text-[11px] font-bold border transition inline-block">S</span>
-                                                    </label>
-                                                    <label class="cursor-pointer relative">
-                                                        <input type="radio" name="attendances[{{ $student->id }}]" value="Izin" 
-                                                               data-has-approved-leave="{{ $approvedLeave ? '1' : '' }}"
-                                                               class="sr-only peer" 
-                                                               {{ $currentStatus === 'Izin' ? 'checked' : '' }}>
-                                                        <span class="attendance-pill attendance-pill-i px-2.5 py-1 rounded-md text-[11px] font-bold border transition inline-block">I</span>
-                                                    </label>
-                                                    <label class="cursor-pointer relative">
-                                                        <input type="radio" name="attendances[{{ $student->id }}]" value="Alpa" 
-                                                               data-has-approved-leave="{{ $approvedLeave ? '1' : '' }}"
-                                                               class="sr-only peer" 
-                                                               {{ $currentStatus === 'Alpa' ? 'checked' : '' }}>
-                                                        <span class="attendance-pill attendance-pill-a px-2.5 py-1 rounded-md text-[11px] font-bold border transition inline-block">A</span>
-                                                    </label>
-                                                </div>
-
-                                                <input type="text" name="attendance_notes[{{ $student->id }}]" 
-                                                       value="{{ $currentNote }}"
-                                                       placeholder="{{ $approvedLeave ? 'Alasan ACC: ' . $approvedLeave->reason : 'Catatan khusus (opsional)...' }}" 
-                                                       class="w-full sm:w-44 text-[11px] rounded-lg bg-white dark:bg-slate-950/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 px-2.5 py-1 focus:border-indigo-500 focus:outline-none">
-                                            </div>
-                                        @endforeach
-                                    </div>
-
-                                    <div class="mt-3 pt-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 font-semibold">
-                                        <span>Keterangan:</span>
-                                        <div class="flex gap-2.5">
-                                            <span class="text-emerald-600 dark:text-emerald-400 font-bold">H = Hadir</span>
-                                            <span class="text-amber-600 dark:text-amber-400 font-bold">S = Sakit</span>
-                                            <span class="text-blue-600 dark:text-blue-400 font-bold">I = Izin</span>
-                                            <span class="text-red-600 dark:text-red-400 font-bold">A = Alpa</span>
-                                        </div>
-                                    </div>
-                                </div>
+                                @endforeach
                             </div>
                         </div>
-                    </form>
-                @else
-                    <!-- TAMPILAN TERKUNCI PERMANEN (> 24 JAM) -->
-                    <div class="bg-white dark:bg-[#0f172a]/90 backdrop-blur-md p-6 border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-xl space-y-4" style="border-radius: 15px;">
-                        <p class="text-xs text-slate-600 dark:text-slate-400">
-                            Jurnal ini telah melewati batas waktu 24 jam dan telah dikunci permanen. Seluruh rekapan presensi siswa dapat dilihat melalui menu Riwayat Jurnal KBM.
-                        </p>
-                        <div class="flex gap-2">
-                            <a href="{{ route('teacher.dashboard') }}" class="px-4 py-2 rounded-xl scp-btn-gradient text-xs font-bold text-white shadow-md transition" style="color: #ffffff !important;">
-                                ← Ke Dashboard
-                            </a>
-                            <a href="{{ route('teacher.journals.history') }}" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 text-xs font-bold transition">
-                                Buka Riwayat Jurnal
-                            </a>
-                        </div>
+                    @endif
+
+                    <div class="pt-3 flex justify-center gap-3">
+                        <a href="{{ route('teacher.dashboard') }}" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-white text-xs font-bold transition">
+                            ← Kembali ke Dashboard
+                        </a>
+                        <a href="{{ route('teacher.journals.history') }}" class="px-4 py-2 rounded-xl scp-btn-gradient text-xs font-bold text-white shadow-md transition" style="color: #ffffff !important;">
+                            Buka Riwayat Jurnal KBM →
+                        </a>
                     </div>
-                @endif
+                </div>
             </div>
 
-        @else
-            <!-- ========================================================================= -->
-            <!-- KONDISI B: PENGISIAN JURNAL BARU OTOMATIS (SESUAI FOTO 5)                 -->
-            <!-- ========================================================================= -->
+        @elseif($waitingNextSession && $waitingSchedule)
+            {{-- 
+                ========================================================================
+                Kondisi 3: Menunggu Jam Mengajar Sesi Berikutnya
+                ========================================================================
+                Kasus guru mengajar lebih dari 1 sesi dalam 1 hari.
+                Sesi sebelumnya sudah diisi, sesi berikutnya belum tiba jam mulainya.
+            --}}
+            <div class="p-8 text-center bg-white dark:bg-[#0f172a]/90 backdrop-blur-md rounded-2xl border border-amber-200 dark:border-amber-600/40 shadow-sm dark:shadow-xl space-y-3">
+                <div class="w-14 h-14 rounded-2xl bg-amber-50 border border-amber-200 text-amber-600 dark:bg-amber-950/60 dark:border-amber-500/50 dark:text-amber-400 mx-auto flex items-center justify-center">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-base sm:text-lg font-black text-slate-900 dark:text-white">
+                        Menunggu Jam Mengajar Sesi Berikutnya
+                    </h2>
+                    <p class="text-xs text-slate-600 dark:text-slate-300 mt-1 max-w-lg mx-auto">
+                        Anda memiliki jadwal mengajar berikutnya hari ini untuk mata pelajaran <strong class="text-indigo-600 dark:text-indigo-400">{{ $waitingSchedule->subject }}</strong> di kelas <strong class="text-indigo-600 dark:text-indigo-400">{{ $waitingSchedule->schoolClass?->class_name }}</strong>.
+                    </p>
+                </div>
+
+                <div class="inline-block p-4 rounded-xl bg-amber-50/70 border border-amber-200 dark:bg-amber-950/30 dark:border-amber-800/50 text-xs text-amber-800 dark:text-amber-300 font-semibold max-w-md">
+                    <div class="flex items-center justify-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                        <span>Jam Pembelajaran Dimulai Pukul <strong>{{ substr($waitingSchedule->real_start_time, 0, 5) }} WIB</strong></span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 font-normal">
+                        Formulir jurnal dan presensi siswa akan aktif secara otomatis saat jam mengajar Anda telah dimulai.
+                    </p>
+                </div>
+
+                <div class="pt-3 flex justify-center gap-3">
+                    <a href="{{ route('teacher.dashboard') }}" class="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-white text-xs font-bold transition">
+                        ← Ke Dashboard
+                    </a>
+                    <a href="{{ route('teacher.journals.history') }}" class="px-5 py-2.5 rounded-xl scp-btn-gradient text-xs font-bold text-white shadow-md transition" style="color: #ffffff !important;">
+                        Lihat Riwayat Jurnal
+                    </a>
+                </div>
+            </div>
+
+        @elseif($selectedSchedule)
+            {{-- 
+                ========================================================================
+                Kondisi 4: Formulir Pengisian Jurnal KBM & Presensi Siswa Baru
+                ========================================================================
+            --}}
             <form method="POST" action="{{ route('teacher.journals.store') }}" enctype="multipart/form-data" @change="updateCounts()" class="space-y-3.5">
                 @csrf
                 <input type="hidden" name="schedule_id" value="{{ $selectedSchedule->id }}">
@@ -597,9 +429,7 @@
                                                            data-has-approved-leave="{{ $approvedLeave ? '1' : '' }}"
                                                            class="sr-only peer" 
                                                            {{ $currentStatus === 'Hadir' ? 'checked' : '' }}>
-                                                    <span class="attendance-pill attendance-pill-h px-2.5 py-1 rounded-md text-[11px] font-bold border transition inline-block">
-                                                        H
-                                                    </span>
+                                                    <span class="attendance-pill attendance-pill-h px-2.5 py-1 rounded-md text-[11px] font-bold border transition inline-block">H</span>
                                                 </label>
 
                                                 <label class="cursor-pointer relative">
@@ -607,9 +437,7 @@
                                                            data-has-approved-leave="{{ $approvedLeave ? '1' : '' }}"
                                                            class="sr-only peer" 
                                                            {{ $currentStatus === 'Sakit' ? 'checked' : '' }}>
-                                                    <span class="attendance-pill attendance-pill-s px-2.5 py-1 rounded-md text-[11px] font-bold border transition inline-block">
-                                                        S
-                                                    </span>
+                                                    <span class="attendance-pill attendance-pill-s px-2.5 py-1 rounded-md text-[11px] font-bold border transition inline-block">S</span>
                                                 </label>
 
                                                 <label class="cursor-pointer relative">
@@ -617,9 +445,7 @@
                                                            data-has-approved-leave="{{ $approvedLeave ? '1' : '' }}"
                                                            class="sr-only peer" 
                                                            {{ $currentStatus === 'Izin' ? 'checked' : '' }}>
-                                                    <span class="attendance-pill attendance-pill-i px-2.5 py-1 rounded-md text-[11px] font-bold border transition inline-block">
-                                                        I
-                                                    </span>
+                                                    <span class="attendance-pill attendance-pill-i px-2.5 py-1 rounded-md text-[11px] font-bold border transition inline-block">I</span>
                                                 </label>
 
                                                 <label class="cursor-pointer relative">
@@ -627,9 +453,7 @@
                                                            data-has-approved-leave="{{ $approvedLeave ? '1' : '' }}"
                                                            class="sr-only peer" 
                                                            {{ $currentStatus === 'Alpa' ? 'checked' : '' }}>
-                                                    <span class="attendance-pill attendance-pill-a px-2.5 py-1 rounded-md text-[11px] font-bold border transition inline-block">
-                                                        A
-                                                    </span>
+                                                    <span class="attendance-pill attendance-pill-a px-2.5 py-1 rounded-md text-[11px] font-bold border transition inline-block">A</span>
                                                 </label>
                                             </div>
 
@@ -849,4 +673,88 @@
         };
     }
     </script>
+
+    <style>
+        /* ===============================================================
+           INDIKATOR PRESENSI H, S, I, A - PERLINDUNGAN EKSTRA MODE TERANG & GELAP
+           =============================================================== */
+        .attendance-pill {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            min-width: 28px !important;
+            height: 28px !important;
+            font-weight: 900 !important;
+            font-size: 11px !important;
+            text-align: center !important;
+            border-radius: 8px !important;
+            cursor: pointer !important;
+            user-select: none !important;
+            transition: all 0.15s ease-in-out !important;
+        }
+
+        /* 1. KETIKA CHECKED / TERPILIH -> LATAR SOLID + TEKS PUTIH #ffffff MAKSIMAL */
+        input[type="radio"]:checked + .attendance-pill.attendance-pill-h,
+        input[type="radio"][value="Hadir"]:checked + .attendance-pill {
+            background-color: #059669 !important;
+            border: 1.5px solid #047857 !important;
+            color: #ffffff !important;
+            box-shadow: 0 2px 6px rgba(5, 150, 105, 0.45) !important;
+        }
+        input[type="radio"]:checked + .attendance-pill.attendance-pill-s,
+        input[type="radio"][value="Sakit"]:checked + .attendance-pill {
+            background-color: #d97706 !important;
+            border: 1.5px solid #b45309 !important;
+            color: #ffffff !important;
+            box-shadow: 0 2px 6px rgba(217, 119, 6, 0.45) !important;
+        }
+        input[type="radio"]:checked + .attendance-pill.attendance-pill-i,
+        input[type="radio"][value="Izin"]:checked + .attendance-pill {
+            background-color: #2563eb !important;
+            border: 1.5px solid #1d4ed8 !important;
+            color: #ffffff !important;
+            box-shadow: 0 2px 6px rgba(37, 99, 235, 0.45) !important;
+        }
+        input[type="radio"]:checked + .attendance-pill.attendance-pill-a,
+        input[type="radio"][value="Alpa"]:checked + .attendance-pill {
+            background-color: #dc2626 !important;
+            border: 1.5px solid #b91c1c !important;
+            color: #ffffff !important;
+            box-shadow: 0 2px 6px rgba(220, 38, 38, 0.45) !important;
+        }
+
+        /* 2. KETIKA UNCHECKED / BELUM DIPILIH DI MODE TERANG (LIGHT MODE) */
+        html.theme-light input[type="radio"]:not(:checked) + .attendance-pill.attendance-pill-h,
+        html.theme-light input[type="radio"][value="Hadir"]:not(:checked) + .attendance-pill {
+            background-color: #ecfdf5 !important;
+            border: 1.5px solid #10b981 !important;
+            color: #047857 !important;
+        }
+        html.theme-light input[type="radio"]:not(:checked) + .attendance-pill.attendance-pill-s,
+        html.theme-light input[type="radio"][value="Sakit"]:not(:checked) + .attendance-pill {
+            background-color: #fffbeb !important;
+            border: 1.5px solid #f59e0b !important;
+            color: #b45309 !important;
+        }
+        html.theme-light input[type="radio"]:not(:checked) + .attendance-pill.attendance-pill-i,
+        html.theme-light input[type="radio"][value="Izin"]:not(:checked) + .attendance-pill {
+            background-color: #eff6ff !important;
+            border: 1.5px solid #3b82f6 !important;
+            color: #1d4ed8 !important;
+        }
+        html.theme-light input[type="radio"]:not(:checked) + .attendance-pill.attendance-pill-a,
+        html.theme-light input[type="radio"][value="Alpa"]:not(:checked) + .attendance-pill {
+            background-color: #fef2f2 !important;
+            border: 1.5px solid #ef4444 !important;
+            color: #b91c1c !important;
+        }
+
+        /* 3. KETIKA UNCHECKED / BELUM DIPILIH DI MODE GELAP (DARK MODE) */
+        html.dark input[type="radio"]:not(:checked) + .attendance-pill,
+        input[type="radio"]:not(:checked) + .attendance-pill {
+            background-color: #0f172a !important;
+            border: 1.5px solid #334155 !important;
+            color: #94a3b8 !important;
+        }
+    </style>
 </x-app-layout>

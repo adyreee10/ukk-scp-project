@@ -5,9 +5,20 @@
             importModalOpen: false,
             deleteSelectedModalOpen: false,
             deleteAllModalOpen: false,
+            lockedModalOpen: false,
+            lockedModalTitle: 'Jadwal Sedang Terkunci',
+            lockedModalMessage: '',
+            lockedModalCycle: '',
             selectedSchedules: [],
             selectAll: false,
             editSchedule: { id: '', subject: '', teacher_id: '', class_id: '', room_id: '', day_of_week: '', start_time: '', end_time: '', cycle_type: '' },
+
+            showLockedAlert(cycle, action = 'memodifikasi') {
+                this.lockedModalCycle = cycle || 'Putaran Ini';
+                this.lockedModalTitle = 'Jadwal ' + this.lockedModalCycle + ' Sedang Terkunci';
+                this.lockedModalMessage = 'PERINGATAN: Jadwal pelajaran untuk ' + this.lockedModalCycle + ' saat ini sedang TERKUNCI. Anda tidak dapat ' + action + ' jadwal pada putaran ini sampai status kuncian dibuka di menu Siklus Blok.';
+                this.lockedModalOpen = true;
+            },
 
             toggleSelectAll(allIds) {
                 if (this.selectAll) {
@@ -28,15 +39,19 @@
                 <h1 class="text-xl sm:text-2xl font-black text-white tracking-tight">Jadwal Mengajar</h1>
                 <p class="text-xs font-semibold text-slate-400 mt-0.5">Input dan kelola jadwal pelajaran mandiri untuk seluruh guru dan kelas</p>
             </div>
+            @php
+                $activeFilterCycle = request('cycle_type', $config->active_cycle);
+                $isCurrentViewCycleLocked = $config->isCycleLocked($activeFilterCycle);
+            @endphp
             <div class="flex items-center gap-2 shrink-0 flex-wrap">
-                @if($config->is_schedule_locked)
+                @if($isCurrentViewCycleLocked)
                     <button type="button" 
-                            onclick="alert('Jadwal saat ini sedang TERKUNCI. Buka kunci siklus blok terlebih dahulu untuk menambah, mengimpor, atau menghapus jadwal!')" 
-                            class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl btn-schedule-locked text-xs sm:text-sm font-black whitespace-nowrap cursor-pointer transition inline-flex items-center gap-2 tracking-wide uppercase">
+                            @click="showLockedAlert('{{ $activeFilterCycle }}', 'menambah, mengimpor, atau menghapus')" 
+                            class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl btn-schedule-locked text-xs sm:text-sm font-black whitespace-nowrap cursor-pointer transition inline-flex items-center gap-2 tracking-wide uppercase shadow-md shadow-red-950/40">
                         <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                         </svg>
-                        <span>Jadwal Terkunci</span>
+                        <span>Jadwal {{ $activeFilterCycle }} Terkunci</span>
                     </button>
                 @else
                     <!-- Tombol Hapus Semua Jadwal (Merah Solid & Kontras di Mode Terang Maupun Gelap) -->
@@ -157,11 +172,7 @@
                     Batal Pilih
                 </button>
                 <button type="button" 
-                        @if($config->is_schedule_locked)
-                            onclick="alert('Jadwal saat ini sedang TERKUNCI.')"
-                        @else
-                            @click="deleteSelectedModalOpen = true" 
-                        @endif
+                        @click="deleteSelectedModalOpen = true" 
                         class="px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white shadow-md shadow-rose-950/60 transition flex items-center gap-1.5 cursor-pointer">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                     <span>Hapus (<span x-text="selectedSchedules.length"></span>) Jadwal Terpilih</span>
@@ -219,15 +230,31 @@
                                     </span>
                                 </td>
                                 <td class="p-4 text-center whitespace-nowrap">
+                                    @php
+                                        $isItemLocked = $config->isCycleLocked($item->cycle_type);
+                                    @endphp
                                     <div class="inline-flex items-center gap-1.5">
+                                        @if($isItemLocked)
+                                            <!-- Tombol Edit Terkunci (Memicu Modal Pop-up Custom) -->
+                                            <button type="button" 
+                                                    @click="showLockedAlert('{{ $item->cycle_type }}', 'mengedit')" 
+                                                    class="px-2.5 py-1 text-xs font-bold text-slate-400 bg-slate-800/80 hover:bg-slate-700/80 rounded-lg cursor-pointer transition flex items-center gap-1 border border-slate-700/50 shadow-sm"
+                                                    title="Jadwal {{ $item->cycle_type }} Terkunci">
+                                                <svg class="w-3 h-3 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                                </svg>
+                                                <span>Edit</span>
+                                            </button>
 
-                                        <!-- Tombol Edit -->
-
-                                        @if($config->is_schedule_locked)
-                                            <button type="button" onclick="alert('Jadwal sedang TERKUNCI. Buka kunci siklus blok untuk mengedit!')" class="px-2.5 py-1 text-xs font-bold text-slate-500 bg-slate-800/60 rounded-lg cursor-not-allowed">
-                                                Edit
+                                            <!-- Tombol Hapus Terkunci (Memicu Modal Pop-up Custom) -->
+                                            <button type="button" 
+                                                    @click="showLockedAlert('{{ $item->cycle_type }}', 'menghapus')" 
+                                                    class="px-2.5 py-1 text-xs font-bold text-slate-500 bg-slate-800/40 hover:bg-slate-700/50 rounded-lg cursor-pointer transition flex items-center gap-1"
+                                                    title="Jadwal {{ $item->cycle_type }} Terkunci">
+                                                <span>Hapus</span>
                                             </button>
                                         @else
+                                            <!-- Tombol Edit Aktif -->
                                             <button type="button" 
                                                     @click="editSchedule = { 
                                                         id: '{{ $item->id }}', 
@@ -244,10 +271,8 @@
                                                     title="Edit Jadwal">
                                                 Edit
                                             </button>
-                                        @endif
 
-                                        <!-- Tombol Hapus -->
-                                        @if(!$config->is_schedule_locked)
+                                            <!-- Tombol Hapus Aktif -->
                                             <form method="POST" action="{{ route('waka.schedules.destroy', $item) }}" onsubmit="return confirm('Apakah Anda yakin ingin menghapus jadwal ini?')">
                                                 @csrf
                                                 @method('DELETE')
@@ -287,9 +312,19 @@
 
                 <form method="POST" action="{{ route('waka.schedules.store') }}" class="space-y-3.5">
                     @csrf
+                    {{-- =========================================================================
+                         FITUR UKK: TC-SCH-01 - PILIH MATA PELAJARAN (DROPDOWN)
+                         Mengganti input teks manual dengan daftar pilihan mata pelajaran
+                         agar format seragam dan memudahkan Waka dalam penugasan jadwal.
+                         ========================================================================= --}}
                     <div>
                         <label class="block text-xs font-bold text-slate-300 mb-1">Mata Pelajaran</label>
-                        <input type="text" name="subject" required class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" placeholder="Contoh: Pemrograman Berorientasi Objek" />
+                        <select name="subject" required class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 text-sm text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                            <option value="">-- Pilih Mata Pelajaran --</option>
+                            @foreach($subjects as $subj)
+                                <option value="{{ $subj }}">{{ $subj }}</option>
+                            @endforeach
+                        </select>
                     </div>
 
                     <div>
@@ -401,9 +436,18 @@
                     @csrf
                     @method('PUT')
                     
+                    {{-- =========================================================================
+                         FITUR UKK: TC-SCH-02 - EDIT MATA PELAJARAN (DROPDOWN)
+                         Pilihan mata pelajaran terintegrasi secara reaktif dengan Alpine.js (x-model)
+                         ========================================================================= --}}
                     <div>
                         <label class="block text-xs font-bold text-slate-300 mb-1">Mata Pelajaran</label>
-                        <input type="text" name="subject" x-model="editSchedule.subject" required class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 text-sm text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" />
+                        <select name="subject" x-model="editSchedule.subject" required class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 text-sm text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                            <option value="">-- Pilih Mata Pelajaran --</option>
+                            @foreach($subjects as $subj)
+                                <option value="{{ $subj }}">{{ $subj }}</option>
+                            @endforeach
+                        </select>
                     </div>
 
                     <div> 
@@ -742,6 +786,49 @@
                         </button>
                     </div>
                 </form>
+            </div>
+        </div>
+
+        <!-- ================= MODAL PERINGATAN: JADWAL TERKUNCI (CUSTOM POPUP SESUAI FOTO 2) ================= -->
+        <div x-show="lockedModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
+            <div @click="lockedModalOpen = false" class="fixed inset-0 bg-black/70 backdrop-blur-sm transition-opacity"></div>
+            
+            <div class="relative w-full max-w-md bg-[#0f172a] p-6 shadow-2xl border border-amber-500/40 space-y-4 my-auto max-h-[90vh] overflow-y-auto" style="border-radius: 20px;">
+                <!-- Header Modal dengan Ikon Gembok / Warning Amber -->
+                <div class="flex items-center gap-3 border-b border-slate-800 pb-3">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-extrabold text-white" x-text="lockedModalTitle"></h3>
+                        <p class="text-xs text-amber-400 font-semibold">Aksi modifikasi jadwal dinonaktifkan</p>
+                    </div>
+                </div>
+
+                <!-- Callout Banner Peringatan Sesuai Format Foto 2 -->
+                <div class="p-3.5 rounded-xl bg-amber-950/40 border border-amber-800/50 text-xs text-amber-200 leading-relaxed" x-text="lockedModalMessage">
+                </div>
+
+                <!-- Info Tambahan / Panduan -->
+                <div class="rounded-xl bg-slate-900/80 p-3.5 border border-slate-800 text-xs text-slate-300 space-y-1">
+                    <p class="font-bold text-white">Panduan Waka Kurikulum:</p>
+                    <p class="text-[11.5px] leading-relaxed text-slate-400">
+                        Jika Anda perlu menambah, mengubah, mengimpor, atau menghapus jadwal pada putaran tersebut, silakan buka kunci jadwal terlebih dahulu pada menu <strong>Siklus Blok</strong>.
+                    </p>
+                </div>
+
+                <!-- Footer Tombol Aksi -->
+                <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
+                    <button @click="lockedModalOpen = false" type="button" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:bg-slate-800 hover:text-white transition cursor-pointer">
+                        Tutup
+                    </button>
+                    <a href="{{ route('waka.cycle.index') }}" class="px-4 py-2 rounded-xl scp-btn-gradient text-xs font-bold text-white shadow-md transition cursor-pointer flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                        <span>Buka Siklus Blok</span>
+                    </a>
+                </div>
             </div>
         </div>
 

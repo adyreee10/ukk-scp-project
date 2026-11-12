@@ -1,8 +1,11 @@
 <x-app-layout>
+        {{-- =========================================================================
+             FITUR UKK: MASTER TINGKAT KELAS & KELULUSAN
+             Fokus pada manajemen evaluasi kenaikan jenjang (Naik / Tinggal Kelas)
+             dan penetapan kelulusan siswa menjadi alumni.
+             Aksi CRUD data siswa (Detail/Edit/Hapus) dipusatkan di Data Siswa.
+             ========================================================================= --}}
         <div x-data="{ 
-            viewModalOpen: false, 
-            editModalOpen: false,
-            activeStudent: { id: '', name: '', nis: '', username: '', email: '', phone: '', address: '', class_id: '', class_name: '', student_status: 'Aktif' },
             selectedIds: [{{ $students->pluck('id')->implode(',') }}],
             toggleAll(e) {
                 if (e.target.checked) {
@@ -183,7 +186,7 @@
                                 <th class="p-4">Nama Siswa</th>
                                 <th class="p-4">Kelas</th>
                                 <th class="p-4">Status Rencana</th>
-                                <th class="p-4 text-center print:hidden">Aksi</th>
+                                {{-- Kolom Aksi (Detail, Edit, Hapus) dihapus karena pengelolaan CRUD siswa dipusatkan di menu Data Siswa --}}
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-800/60">
@@ -236,52 +239,10 @@
                                             </template>
                                         @endif
                                     </td>
-                                    <td class="p-4 text-center print:hidden">
-                                        <div class="flex items-center justify-center gap-1.5">
-                                            <!-- Tombol Detail -->
-                                            <button @click="activeStudent = {
-                                                        id: '{{ $s->id }}',
-                                                        name: '{{ $s->name }}',
-                                                        nis: '{{ $s->nis }}',
-                                                        username: '{{ $s->username }}',
-                                                        email: '{{ $s->email }}',
-                                                        phone: '{{ $s->phone }}',
-                                                        address: '{{ $s->address }}',
-                                                        class_name: '{{ $s->schoolClass?->class_name ?? '-' }}',
-                                                        student_status: '{{ $s->student_status }}'
-                                                    }; viewModalOpen = true" 
-                                                    type="button" 
-                                                    class="px-2.5 py-1 text-xs font-bold rounded-lg transition cursor-pointer btn-action-view shadow-sm"
-                                                    title="Lihat Detail Siswa">
-                                                Detail
-                                            </button>
-
-                                            <!-- Tombol Edit Cepat -->
-                                            <button @click="activeStudent = {
-                                                        id: '{{ $s->id }}',
-                                                        name: '{{ $s->name }}',
-                                                        nis: '{{ $s->nis }}',
-                                                        class_id: '{{ $s->class_id }}',
-                                                        student_status: '{{ $s->student_status }}'
-                                                    }; editModalOpen = true" 
-                                                    type="button" 
-                                                    class="px-2.5 py-1 text-xs font-bold rounded-lg transition cursor-pointer btn-action-edit shadow-sm"
-                                                    title="Edit Status Siswa">
-                                                Edit
-                                            </button>
-
-                                            <!-- Tombol Hapus -->
-                                            <button type="submit" form="deleteForm_{{ $s->id }}" 
-                                                    class="px-2.5 py-1 text-xs font-bold rounded-lg transition cursor-pointer btn-action-delete shadow-sm"
-                                                    title="Hapus Siswa">
-                                                Hapus
-                                            </button>
-                                        </div>
-                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="{{ $activeTab !== 'lulus' ? '6' : '5' }}" class="p-8 text-center text-slate-500 text-sm">
+                                    <td colspan="{{ $activeTab !== 'lulus' ? '5' : '4' }}" class="p-8 text-center text-slate-500 text-sm">
                                         Tidak ada data siswa pada filter ini.
                                     </td>
                                 </tr>
@@ -311,113 +272,6 @@
                 <div class="h-20"></div>
                 <p class="font-bold underline">{{ auth()->user()->name }}</p>
                 <p>NIP. {{ auth()->user()->nip ?? '-' }}</p>
-            </div>
-        </div>
-
-        <!-- Hidden Delete Forms untuk setiap siswa (agar tidak merusak form tabel checklist) -->
-        @foreach ($students as $s)
-            <form id="deleteForm_{{ $s->id }}" method="POST" action="{{ route('waka.students.destroy', $s->id) }}" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data siswa ini?')" style="display: none;">
-                @csrf
-                @method('DELETE')
-            </form>
-        @endforeach
-
-        <!-- ================= MODAL DETAIL SISWA ================= -->
-        <div x-show="viewModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 print:hidden">
-            <div @click="viewModalOpen = false" class="fixed inset-0 bg-black/70 backdrop-blur-sm"></div>
-            <div class="relative w-full max-w-md bg-[#0f172a] p-6 shadow-2xl border border-slate-800 space-y-4 rounded-2xl">
-                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                    <h3 class="text-base font-bold text-white">Detail Siswa</h3>
-                    <button @click="viewModalOpen = false" class="text-xs font-bold text-slate-400 hover:text-white px-2 py-1">[Tutup]</button>
-                </div>
-
-                <div class="space-y-3 text-xs">
-                    <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800">
-                        <span class="text-slate-400 block mb-0.5">Nama Siswa:</span>
-                        <span class="text-sm font-extrabold text-white" x-text="activeStudent.name"></span>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800">
-                            <span class="text-slate-400 block mb-0.5">NIS:</span>
-                            <span class="font-mono font-bold text-indigo-300" x-text="activeStudent.nis || '-'"></span>
-                        </div>
-                        <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800">
-                            <span class="text-slate-400 block mb-0.5">Kelas:</span>
-                            <span class="font-bold text-slate-200" x-text="activeStudent.class_name"></span>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800">
-                            <span class="text-slate-400 block mb-0.5">Status:</span>
-                            <span class="font-bold text-emerald-400" x-text="activeStudent.student_status"></span>
-                        </div>
-                        <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800">
-                            <span class="text-slate-400 block mb-0.5">Telepon:</span>
-                            <span class="font-bold text-slate-200" x-text="activeStudent.phone || '-'"></span>
-                        </div>
-                    </div>
-
-                    <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800">
-                        <span class="text-slate-400 block mb-0.5">Alamat:</span>
-                        <span class="text-slate-200" x-text="activeStudent.address || 'Belum diisi'"></span>
-                    </div>
-                </div>
-
-                <div class="flex justify-end pt-2">
-                    <button @click="viewModalOpen = false" type="button" class="px-4 py-2 rounded-xl bg-slate-800 text-xs font-bold text-white hover:bg-slate-700 transition">
-                        Tutup
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- ================= MODAL EDIT SISWA & STATUS ================= -->
-        <div x-show="editModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 print:hidden">
-            <div @click="editModalOpen = false" class="fixed inset-0 bg-black/70 backdrop-blur-sm"></div>
-            <div class="relative w-full max-w-md bg-[#0f172a] p-6 shadow-2xl border border-slate-800 space-y-4 rounded-2xl">
-                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                    <h3 class="text-base font-bold text-white">Edit Siswa & Kelulusan</h3>
-                    <button @click="editModalOpen = false" class="text-xs font-bold text-slate-400 hover:text-white px-2 py-1">[Tutup]</button>
-                </div>
-
-                <form :action="'{{ url('/waka/grades') }}/' + activeStudent.id" method="POST" class="space-y-3.5 text-xs">
-                    @csrf
-                    @method('PUT')
-                    <div>
-                        <label class="block font-bold text-slate-300 mb-1">Nama Siswa</label>
-                        <input type="text" name="name" x-model="activeStudent.name" required class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-white focus:border-indigo-500 font-bold" />
-                    </div>
-
-                    <div>
-                        <label class="block font-bold text-slate-300 mb-1">NIS Siswa</label>
-                        <input type="text" name="nis" x-model="activeStudent.nis" class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-white focus:border-indigo-500" />
-                    </div>
-
-                    <div>
-                        <label class="block font-bold text-slate-300 mb-1">Pilihan Kelas</label>
-                        <select name="class_id" x-model="activeStudent.class_id" class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-white focus:border-indigo-500">
-                            <option value="">-- Tanpa Kelas (Alumni) --</option>
-                            @foreach($allClasses as $ac)
-                                <option value="{{ $ac->id }}">{{ $ac->class_name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block font-bold text-slate-300 mb-1">Status Keaktifan</label>
-                        <select name="student_status" x-model="activeStudent.student_status" class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-white focus:border-indigo-500">
-                            <option value="Aktif">Aktif Belajar</option>
-                            <option value="Lulus">Lulus (Alumni)</option>
-                        </select>
-                    </div>
-
-                    <div class="flex justify-end gap-2 pt-2">
-                        <button @click="editModalOpen = false" type="button" class="px-4 py-2 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition cursor-pointer">Batal</button>
-                        <button type="submit" class="px-5 py-2.5 rounded-xl scp-btn-gradient font-bold text-white shadow-md cursor-pointer transition">Simpan</button>
-                    </div>
-                </form>
             </div>
         </div>
 

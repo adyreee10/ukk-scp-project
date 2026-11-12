@@ -220,7 +220,7 @@
             html.theme-light main h1,
             html.theme-light main h2,
             html.theme-light main h3,
-            html.theme-light main .text-white:not(.scp-btn-gradient):not(.scp-btn-gradient *):not(button):not(button *):not(.table-page-active):not(.table-page-active *):not(.room-count-badge):not(.room-count-badge *):not(input[type="radio"]:checked + span):not(.btn-fill-now):not(.btn-fill-now *) {
+            html.theme-light main .text-white:not(.scp-btn-gradient):not(.scp-btn-gradient *):not(button):not(button *):not(.table-page-active):not(.table-page-active *):not(.room-count-badge):not(.room-count-badge *):not(input[type="radio"]:checked + span):not(.btn-fill-now):not(.btn-fill-now *):not(.attendance-pill):not(.attendance-pill *):not(.period-pill-active):not(.period-pill-active *):not(a.bg-indigo-600):not(a.bg-indigo-600 *):not(button.bg-indigo-600):not(button.bg-indigo-600 *):not(.bg-indigo-600):not(.bg-indigo-600 *):not(.bg-emerald-600):not(.bg-emerald-600 *):not(.bg-red-600):not(.bg-red-600 *):not(.bg-amber-600):not(.bg-amber-600 *):not(.bg-blue-600):not(.bg-blue-600 *):not(.bg-teal-600):not(.bg-teal-600 *) {
                 color: #0f172a !important;
             }
             html.theme-light main .text-slate-100,
@@ -244,12 +244,23 @@
             html.theme-light main button.scp-btn-gradient *,
             html.theme-light main a.scp-btn-gradient,
             html.theme-light main a.scp-btn-gradient *,
+            .period-pill-active,
+            .period-pill-active *,
+            html.theme-light .period-pill-active,
+            html.theme-light .period-pill-active *,
+            html.dark .period-pill-active,
+            html.dark .period-pill-active *,
+            a.period-pill-active,
+            html.theme-light a.period-pill-active,
+            html.theme-light a.period-pill-active *,
             html.theme-light button.bg-emerald-600,
             html.theme-light button.bg-emerald-600 *,
             html.theme-light button.bg-red-600,
             html.theme-light button.bg-red-600 *,
             html.theme-light a.bg-indigo-600,
             html.theme-light a.bg-indigo-600 *,
+            html.theme-light button.bg-indigo-600,
+            html.theme-light button.bg-indigo-600 *,
             .btn-fill-now,
             .btn-fill-now *,
             html.theme-light .btn-fill-now,
@@ -398,9 +409,15 @@
                 color: #6ee7b7 !important;
                 box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
             }
+            .badge-filled-status * {
+                color: #6ee7b7 !important;
+            }
             html.theme-light .badge-filled-status {
                 background-color: #ecfdf5 !important;
                 border: 1px solid #a7f3d0 !important;
+                color: #047857 !important;
+            }
+            html.theme-light .badge-filled-status * {
                 color: #047857 !important;
             }
 
@@ -520,8 +537,14 @@
                 border: 1px solid #6366f1 !important;
                 color: #c7d2fe !important;
             }
+            .btn-action-edit * {
+                color: inherit !important;
+            }
             .btn-action-edit:hover {
                 background-color: #4f46e5 !important;
+                color: #ffffff !important;
+            }
+            .btn-action-edit:hover * {
                 color: #ffffff !important;
             }
             html.theme-light .btn-action-edit {
@@ -529,8 +552,14 @@
                 border: 1px solid #a78bfa !important;
                 color: #5b21b6 !important;
             }
+            html.theme-light .btn-action-edit * {
+                color: #5b21b6 !important;
+            }
             html.theme-light .btn-action-edit:hover {
                 background-color: #7c3aed !important;
+                color: #ffffff !important;
+            }
+            html.theme-light .btn-action-edit:hover * {
                 color: #ffffff !important;
             }
 
@@ -769,82 +798,113 @@
             /* ===================================================
                INDIKATOR PIL PRESENSI H, S, I, A (MODE TERANG & GELAP)
                =================================================== */
-            /* Status Terpilih (Checked) - Wajib Teks Putih Bersih & Kontras */
+            span.attendance-pill {
+                min-width: 28px !important;
+                height: 28px !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                font-weight: 900 !important;
+                font-size: 11px !important;
+                text-align: center !important;
+                border-radius: 8px !important;
+                user-select: none !important;
+                transition: all 0.15s ease-in-out !important;
+            }
+
+            /* Status Terpilih (Checked) - Wajib Teks Putih Bersih & Kontras Penuh */
             input[type="radio"]:checked + span.attendance-pill-h,
+            input[type="radio"][value="Hadir"]:checked + span.attendance-pill,
             html.theme-light input[type="radio"]:checked + span.attendance-pill-h,
-            html.dark input[type="radio"]:checked + span.attendance-pill-h {
+            html.theme-light input[type="radio"][value="Hadir"]:checked + span.attendance-pill,
+            html.dark input[type="radio"]:checked + span.attendance-pill-h,
+            html.dark input[type="radio"][value="Hadir"]:checked + span.attendance-pill {
                 background-color: #059669 !important;
-                border-color: #059669 !important;
+                border: 1.5px solid #047857 !important;
                 color: #ffffff !important;
-                box-shadow: 0 2px 6px rgba(5, 150, 105, 0.4) !important;
-                font-weight: 800 !important;
+                box-shadow: 0 2px 6px rgba(5, 150, 105, 0.45) !important;
+                font-weight: 900 !important;
             }
 
             input[type="radio"]:checked + span.attendance-pill-s,
+            input[type="radio"][value="Sakit"]:checked + span.attendance-pill,
             html.theme-light input[type="radio"]:checked + span.attendance-pill-s,
-            html.dark input[type="radio"]:checked + span.attendance-pill-s {
+            html.theme-light input[type="radio"][value="Sakit"]:checked + span.attendance-pill,
+            html.dark input[type="radio"]:checked + span.attendance-pill-s,
+            html.dark input[type="radio"][value="Sakit"]:checked + span.attendance-pill {
                 background-color: #d97706 !important;
-                border-color: #d97706 !important;
+                border: 1.5px solid #b45309 !important;
                 color: #ffffff !important;
-                box-shadow: 0 2px 6px rgba(217, 119, 6, 0.4) !important;
-                font-weight: 800 !important;
+                box-shadow: 0 2px 6px rgba(217, 119, 6, 0.45) !important;
+                font-weight: 900 !important;
             }
 
             input[type="radio"]:checked + span.attendance-pill-i,
+            input[type="radio"][value="Izin"]:checked + span.attendance-pill,
             html.theme-light input[type="radio"]:checked + span.attendance-pill-i,
-            html.dark input[type="radio"]:checked + span.attendance-pill-i {
+            html.theme-light input[type="radio"][value="Izin"]:checked + span.attendance-pill,
+            html.dark input[type="radio"]:checked + span.attendance-pill-i,
+            html.dark input[type="radio"][value="Izin"]:checked + span.attendance-pill {
                 background-color: #2563eb !important;
-                border-color: #2563eb !important;
+                border: 1.5px solid #1d4ed8 !important;
                 color: #ffffff !important;
-                box-shadow: 0 2px 6px rgba(37, 99, 235, 0.4) !important;
-                font-weight: 800 !important;
+                box-shadow: 0 2px 6px rgba(37, 99, 235, 0.45) !important;
+                font-weight: 900 !important;
             }
 
             input[type="radio"]:checked + span.attendance-pill-a,
+            input[type="radio"][value="Alpa"]:checked + span.attendance-pill,
             html.theme-light input[type="radio"]:checked + span.attendance-pill-a,
-            html.dark input[type="radio"]:checked + span.attendance-pill-a {
+            html.theme-light input[type="radio"][value="Alpa"]:checked + span.attendance-pill,
+            html.dark input[type="radio"]:checked + span.attendance-pill-a,
+            html.dark input[type="radio"][value="Alpa"]:checked + span.attendance-pill {
                 background-color: #dc2626 !important;
-                border-color: #dc2626 !important;
+                border: 1.5px solid #b91c1c !important;
                 color: #ffffff !important;
-                box-shadow: 0 2px 6px rgba(220, 38, 38, 0.4) !important;
-                font-weight: 800 !important;
+                box-shadow: 0 2px 6px rgba(220, 38, 38, 0.45) !important;
+                font-weight: 900 !important;
             }
 
             /* Status Belum Dipilih (Unchecked) di Mode Terang (Light Mode) */
-            html.theme-light input[type="radio"]:not(:checked) + span.attendance-pill-h {
-                background-color: #ffffff !important;
-                border: 1.5px solid #a7f3d0 !important;
+            html.theme-light input[type="radio"]:not(:checked) + span.attendance-pill-h,
+            html.theme-light input[type="radio"][value="Hadir"]:not(:checked) + span.attendance-pill {
+                background-color: #ecfdf5 !important;
+                border: 1.5px solid #10b981 !important;
                 color: #047857 !important; /* Hijau pekat */
-                font-weight: 800 !important;
+                font-weight: 900 !important;
             }
-            html.theme-light input[type="radio"]:not(:checked) + span.attendance-pill-s {
-                background-color: #ffffff !important;
-                border: 1.5px solid #fde68a !important;
+            html.theme-light input[type="radio"]:not(:checked) + span.attendance-pill-s,
+            html.theme-light input[type="radio"][value="Sakit"]:not(:checked) + span.attendance-pill {
+                background-color: #fffbeb !important;
+                border: 1.5px solid #f59e0b !important;
                 color: #b45309 !important; /* Amber pekat */
-                font-weight: 800 !important;
+                font-weight: 900 !important;
             }
-            html.theme-light input[type="radio"]:not(:checked) + span.attendance-pill-i {
-                background-color: #ffffff !important;
-                border: 1.5px solid #bfdbfe !important;
+            html.theme-light input[type="radio"]:not(:checked) + span.attendance-pill-i,
+            html.theme-light input[type="radio"][value="Izin"]:not(:checked) + span.attendance-pill {
+                background-color: #eff6ff !important;
+                border: 1.5px solid #3b82f6 !important;
                 color: #1d4ed8 !important; /* Biru pekat */
-                font-weight: 800 !important;
+                font-weight: 900 !important;
             }
-            html.theme-light input[type="radio"]:not(:checked) + span.attendance-pill-a {
-                background-color: #ffffff !important;
-                border: 1.5px solid #fecaca !important;
+            html.theme-light input[type="radio"]:not(:checked) + span.attendance-pill-a,
+            html.theme-light input[type="radio"][value="Alpa"]:not(:checked) + span.attendance-pill {
+                background-color: #fef2f2 !important;
+                border: 1.5px solid #ef4444 !important;
                 color: #b91c1c !important; /* Merah pekat */
-                font-weight: 800 !important;
+                font-weight: 900 !important;
             }
 
             /* Status Belum Dipilih (Unchecked) di Mode Gelap (Dark Mode) */
             html.dark input[type="radio"]:not(:checked) + span.attendance-pill-h,
             html.dark input[type="radio"]:not(:checked) + span.attendance-pill-s,
             html.dark input[type="radio"]:not(:checked) + span.attendance-pill-i,
-            html.dark input[type="radio"]:not(:checked) + span.attendance-pill-a {
+            html.dark input[type="radio"]:not(:checked) + span.attendance-pill-a,
+            html.dark input[type="radio"]:not(:checked) + span.attendance-pill {
                 background-color: #0f172a !important;
                 border: 1.5px solid #334155 !important;
                 color: #94a3b8 !important;
-                font-weight: 800 !important;
+                font-weight: 900 !important;
             }
 
             /* Kotak Info Internal / Kotak Alasan / Sub-kartu di Light Mode */
@@ -859,8 +919,8 @@
                 border-color: #e2e8f0 !important;
                 color: #1e293b !important;
             }
-            html.theme-light [class*="bg-slate-950"] span:not(button span):not(button *):not(a.btn *):not(.btn-fill-now *):not(.scp-btn-gradient *):not(.btn-camera-snap *):not(.badge-day-today):not(.badge-today-tab-active):not(.badge-today-tab-inactive),
-            html.theme-light [class*="bg-slate-900"] span:not(button span):not(button *):not(a.btn *):not(.btn-fill-now *):not(.scp-btn-gradient *):not(.btn-camera-snap *):not(.badge-day-today):not(.badge-today-tab-active):not(.badge-today-tab-inactive) {
+            html.theme-light [class*="bg-slate-950"] span:not(button span):not(button *):not(a.btn *):not(.btn-fill-now *):not(.scp-btn-gradient *):not(.btn-camera-snap *):not(.badge-day-today):not(.badge-today-tab-active):not(.badge-today-tab-inactive):not(.attendance-pill):not(.attendance-pill *):not(.badge-filled-status):not(.badge-filled-status *):not(.btn-action-edit):not(.btn-action-edit *),
+            html.theme-light [class*="bg-slate-900"] span:not(button span):not(button *):not(a.btn *):not(.btn-fill-now *):not(.scp-btn-gradient *):not(.btn-camera-snap *):not(.badge-day-today):not(.badge-today-tab-active):not(.badge-today-tab-inactive):not(.attendance-pill):not(.attendance-pill *):not(.badge-filled-status):not(.badge-filled-status *):not(.btn-action-edit):not(.btn-action-edit *) {
                 color: #64748b !important;
             }
             html.theme-light [class*="bg-slate-950"] p.font-bold,

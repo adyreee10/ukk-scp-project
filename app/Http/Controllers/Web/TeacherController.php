@@ -96,7 +96,11 @@ class TeacherController extends Controller
     }
 
     /**
-     * Halaman Formulir Isi Jurnal & Absensi Siswa
+     * -------------------------------------------------------------------------
+     * Fitur: Formulir Pengisian Jurnal KBM & Presensi Siswa Baru
+     * -------------------------------------------------------------------------
+     * Halaman ini MURNI menangani pengisian jurnal pembelajaran baru hari ini.
+     * Pengeditan presensi yang telah terisi dialihkan ke menu 'Riwayat Jurnal KBM'.
      */
     public function createJournal(Request $request)
     {
@@ -107,6 +111,11 @@ class TeacherController extends Controller
         // Deteksi hari saat ini (dapat disimulasikan via ?day= jika dibutuhkan untuk pengetesan)
         $todayName = $request->query('day', IndonesianDay::from(now()));
 
+        // Jika terdapat request dengan 'journal_id', alihkan langsung ke formulir edit khusus
+        if ($request->filled('journal_id')) {
+            return redirect()->route('teacher.journals.edit-attendance', $request->journal_id);
+        }
+
         // Ambil semua jadwal guru di putaran aktif
         $allSchedules = Schedule::with(['schoolClass', 'room'])
             ->where('teacher_id', $user->id)
@@ -115,12 +124,11 @@ class TeacherController extends Controller
             ->orderBy('start_time')
             ->get();
 
-        // 1. Sistem otomatis menyesuaikan hari: ambil jadwal yang HANYA cocok dengan hari hari ini ($todayName)
+        // 1. Ambil jadwal guru yang berlangsung pada hari ini ($todayName)
         $todaySchedules = $allSchedules->filter(fn($s) => $s->day_of_week === $todayName)->values();
         $isEffectiveDayToday = $todaySchedules->isNotEmpty();
 
-        // Jadwal yang diproses: jika hari ini ada jadwal mengajar, sistem gunakan jadwal hari ini.
-        // Jika hari ini libur KBM (misal Minggu saat pengetesan), sistem otomatis mengambil jadwal mengajar pertama guru tersebut.
+        // Jadwal yang diproses
         $schedules = $isEffectiveDayToday 
             ? $todaySchedules 
             : ($allSchedules->isNotEmpty() ? collect([$allSchedules->first()]) : collect());
@@ -131,50 +139,75 @@ class TeacherController extends Controller
             ->pluck('schedule_id')
             ->toArray();
 
-        // 2. Pemilihan jadwal dilakukan 100% otomatis oleh sistem (atau berdasarkan request schedule_id jika valid):
+        $selectedSchedule = null;
+        $allFilledToday = false;
+        $filledJournalsToday = collect();
+        $waitingNextSession = false;
+        $waitingSchedule = null;
+
+        // 2. Pemilihan jadwal KBM yang akan diisi:
         if ($request->filled('schedule_id')) {
-            $selectedSchedule = $schedules->firstWhere('id', (int) $request->schedule_id)
+            $candidateSchedule = $schedules->firstWhere('id', (int) $request->schedule_id)
                 ?? $allSchedules->firstWhere('id', (int) $request->schedule_id);
-        } else {
-            // Cek apakah ada sesi KBM yang sedang berlangsung saat ini (sesuai jam pelajaran real-time)
-            $currentTime = now()->format('H:i:s');
-            $ongoingSchedule = $schedules->first(function ($s) use ($currentTime) {
-                return $currentTime >= $s->real_start_time && $currentTime <= $s->real_end_time;
-            });
 
-            if ($ongoingSchedule && !in_array($ongoingSchedule->id, $filledScheduleIdsToday)) {
-                $selectedSchedule = $ongoingSchedule;
-            } else {
-                $selectedSchedule = $schedules->first(fn($s) => !in_array($s->id, $filledScheduleIdsToday)) 
-                    ?? $schedules->last();
-            }
-        }
-
-        // Cek apakah jadwal ini sudah memiliki rekaman jurnal pada hari ini
-        $existingJournalToday = null;
-        $isEditableWithin24Hours = false;
-        if ($selectedSchedule) {
-            $existingJournalToday = Journal::with(['attendances.student'])
-                ->where('schedule_id', $selectedSchedule->id)
-                ->whereDate('date', $today)
-                ->latest('id')
-                ->first();
-
-            if ($existingJournalToday) {
-                // Periksa apakah masih dalam toleransi hari KBM (bisa edit presensi hingga pukul 23:59 malam ini)
-                $isEditableWithin24Hours = Carbon::parse($existingJournalToday->date)->isToday();
-            } else {
-                // VALIDASI WAKTU MENGAJAR: Guru hanya bisa isi jurnal jika sudah memasuki jam mengajar
-                // Jika waktu saat ini belum mencapai jam mulai mengajar, sistem langsung menolak!
-                if ($selectedSchedule->day_of_week !== $todayName) {
-                    return redirect()->route('teacher.dashboard')
-                        ->with('error', "Belum jadwal mengajar! Sesi pembelajaran {$selectedSchedule->subject} berada di hari {$selectedSchedule->day_of_week}.");
+            if ($candidateSchedule) {
+                // Jika jadwal ini sudah diisi hari ini, arahkan guru ke halaman edit presensi
+                if (in_array($candidateSchedule->id, $filledScheduleIdsToday)) {
+                    $existingJournal = Journal::where('schedule_id', $candidateSchedule->id)
+                        ->whereDate('date', $today)
+                        ->latest('id')
+                        ->first();
+                    if ($existingJournal) {
+                        return redirect()->route('teacher.journals.edit-attendance', $existingJournal->id)
+                            ->with('info', 'Jurnal untuk jadwal ini sudah diisi. Anda dialihkan ke halaman edit presensi.');
+                    }
                 }
 
-                if (!$selectedSchedule->isTeachingTimeStarted()) {
-                    $startTimeFormatted = substr($selectedSchedule->real_start_time, 0, 5);
+                // Validasi hari mengajar
+                if ($candidateSchedule->day_of_week !== $todayName) {
                     return redirect()->route('teacher.dashboard')
-                        ->with('error', "Belum waktunya mengisi jurnal! Sesi pembelajaran {$selectedSchedule->subject} baru dimulai pada pukul {$startTimeFormatted} WIB. Pengisian jurnal dan presensi hanya dapat dilakukan saat jam mengajar Anda telah dimulai.");
+                        ->with('error', "Belum jadwal mengajar! Sesi pembelajaran {$candidateSchedule->subject} berada di hari {$candidateSchedule->day_of_week}.");
+                }
+
+                // Validasi jam mengajar
+                if (!$candidateSchedule->isTeachingTimeStarted()) {
+                    $startTimeFormatted = substr($candidateSchedule->real_start_time, 0, 5);
+                    return redirect()->route('teacher.dashboard')
+                        ->with('error', "Belum waktunya mengisi jurnal! Sesi pembelajaran {$candidateSchedule->subject} baru dimulai pada pukul {$startTimeFormatted} WIB. Pengisian jurnal dan presensi hanya dapat dilakukan saat jam mengajar Anda telah dimulai.");
+                }
+
+                $selectedSchedule = $candidateSchedule;
+            }
+        } else {
+            // Otomatisasi pemilihan jadwal hari ini:
+            if ($isEffectiveDayToday) {
+                // Ambil daftar jadwal hari ini yang BELUM diisi
+                $unfilledSchedules = $todaySchedules->reject(fn($s) => in_array($s->id, $filledScheduleIdsToday))->values();
+
+                if ($unfilledSchedules->isEmpty()) {
+                    // KONDISI: Seluruh jadwal hari ini sudah terisi semua
+                    $allFilledToday = true;
+                    $filledJournalsToday = Journal::with(['schedule.schoolClass', 'schedule.room', 'attendances'])
+                        ->whereIn('schedule_id', $todaySchedules->pluck('id'))
+                        ->whereDate('date', $today)
+                        ->get();
+                } else {
+                    // Cari apakah ada sesi yang sedang berlangsung saat ini
+                    $currentTime = now()->format('H:i:s');
+                    $ongoingSchedule = $unfilledSchedules->first(function ($s) use ($currentTime) {
+                        return $currentTime >= $s->real_start_time && $currentTime <= $s->real_end_time;
+                    });
+
+                    $candidate = $ongoingSchedule ?? $unfilledSchedules->first();
+
+                    // Cek apakah jam mengajar sesi ini sudah dimulai
+                    if ($candidate->isTeachingTimeStarted()) {
+                        $selectedSchedule = $candidate;
+                    } else {
+                        // KONDISI: Belum masuk jam mengajar untuk sesi berikutnya
+                        $waitingNextSession = true;
+                        $waitingSchedule = $candidate;
+                    }
                 }
             }
         }
@@ -202,13 +235,15 @@ class TeacherController extends Controller
             'schedules', 
             'selectedSchedule', 
             'students', 
-            'configuration',
-            'filledScheduleIdsToday',
-            'existingJournalToday',
-            'isEditableWithin24Hours',
-            'approvedLeavesToday',
-            'isEffectiveDayToday',
-            'todayName'
+            'configuration', 
+            'filledScheduleIdsToday', 
+            'approvedLeavesToday', 
+            'isEffectiveDayToday', 
+            'todayName', 
+            'allFilledToday', 
+            'filledJournalsToday', 
+            'waitingNextSession', 
+            'waitingSchedule'
         ));
     }
 
@@ -320,7 +355,56 @@ class TeacherController extends Controller
     }
 
     /**
-     * Perbarui Presensi Siswa pada Jurnal KBM (Hanya Bisa dalam Batas Waktu 24 Jam)
+     * -------------------------------------------------------------------------
+     * Fitur: Formulir Dedikasi Edit Presensi Siswa pada Jurnal KBM
+     * -------------------------------------------------------------------------
+     * Membuka form pengeditan kehadiran siswa dari menu 'Riwayat Jurnal KBM'
+     * dengan proteksi batas waktu toleransi 24 jam (hari KBM).
+     */
+    public function editJournalAttendance(Journal $journal)
+    {
+        $user = auth()->user();
+
+        // Pastikan hanya guru pemilik jadwal yang dapat mengakses
+        if ($journal->schedule->teacher_id !== $user->id) {
+            abort(403, 'Anda tidak memiliki hak akses untuk mengedit jurnal ini.');
+        }
+
+        // Cek batasan waktu: hanya bisa edit di hari KBM hingga pukul 23:59
+        if (!Carbon::parse($journal->date)->isToday()) {
+            return redirect()->route('teacher.journals.history')
+                ->with('error', 'Batas waktu pengeditan presensi siswa pada jurnal ini telah berakhir (toleransi 24 jam di hari KBM). Data presensi telah terkunci permanen.');
+        }
+
+        $schedule = $journal->schedule()->with(['schoolClass', 'room'])->first();
+        
+        $students = User::where('class_id', $schedule->class_id)
+            ->whereHas('role', fn($q) => $q->where('role_name', 'Siswa'))
+            ->where('student_status', 'Aktif')
+            ->orderBy('name')
+            ->get();
+
+        $approvedLeavesToday = LeaveRequest::approvedOn(Carbon::parse($journal->date)->toDateString())
+            ->whereIn('student_id', $students->pluck('id'))
+            ->latest('updated_at')
+            ->get()
+            ->unique('student_id')
+            ->keyBy('student_id');
+
+        return view('teacher.journals.edit', compact(
+            'journal',
+            'schedule',
+            'students',
+            'approvedLeavesToday'
+        ));
+    }
+
+    /**
+     * -------------------------------------------------------------------------
+     * Fitur: Perbarui Presensi Siswa pada Jurnal KBM (Toleransi Hari KBM 24 Jam)
+     * -------------------------------------------------------------------------
+     * Guru, Wali Kelas, dan Guru BK dapat mengubah kehadiran siswa melalui Riwayat Jurnal
+     * selama sesi KBM masih berlangsung di hari yang sama (hingga pukul 23:59 WIB).
      */
     public function updateJournalAttendance(Request $request, Journal $journal, AttendanceService $attendanceService)
     {
@@ -352,7 +436,8 @@ class TeacherController extends Controller
 
         $attendanceService->saveBatch($journal, $rows);
 
-        return redirect()->back()->with('success', 'Presensi siswa berhasil diperbarui! (Masih dalam batas waktu 24 jam)');
+        return redirect()->route('teacher.journals.history')
+            ->with('success', 'Presensi siswa berhasil diperbarui! Perubahan data kehadiran telah tersimpan di riwayat jurnal.');
     }
         /**
      * Halaman Riwayat Lengkap Jurnal KBM Guru & Deteksi Jurnal yang Belum Diisi

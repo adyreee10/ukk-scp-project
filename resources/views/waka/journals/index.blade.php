@@ -27,9 +27,38 @@
                     <h2 class="text-base font-extrabold text-white">Arsip & Riwayat Jurnal KBM</h2>
                     <p class="text-xs text-slate-400">Monitoring seluruh jadwal pelajaran dan status pengisian jurnal harian guru</p>
                 </div>
-                <div class="text-xs font-bold px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 inline-flex items-center gap-2 self-start sm:self-auto">
-                    <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
-                    <span>Hari Terpilih: <strong class="text-white">{{ $dayOfWeek }}</strong>, {{ \Carbon\Carbon::parse($date)->translatedFormat('d F Y') }}</span>
+                <div class="flex flex-wrap items-center gap-2.5 self-start sm:self-auto">
+                    <div class="text-xs font-bold px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 inline-flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
+                        <span>Hari Terpilih: <strong class="text-white">{{ $dayOfWeek }}</strong>, {{ \Carbon\Carbon::parse($date)->translatedFormat('d F Y') }}</span>
+                    </div>
+
+                    {{-- =========================================================================
+                         FITUR UKK: TOMBOL CETAK SEMUA JURNAL KBM TERISI (ROLE WAKA)
+                         Mencetak seluruh lembar jurnal yang sudah diisi sesuai filter/tanggal aktif
+                         ========================================================================= --}}
+                    @if($totalFilled > 0)
+                        <a href="{{ route('waka.journals.print-all', request()->query()) }}" 
+                           target="_blank" 
+                           class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-extrabold shadow-md transition cursor-pointer hover:opacity-90 active:scale-95"
+                           style="background-color: #2563eb !important; color: #ffffff !important;"
+                           title="Cetak Seluruh Dokumen Jurnal yang Sudah Diisi Pada Tanggal & Filter Ini">
+                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                            </svg>
+                            <span style="color: #ffffff !important;">Cetak Semua Jurnal ({{ $totalFilled }})</span>
+                        </a>
+                    @else
+                        <button type="button" 
+                                disabled 
+                                class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-800/80 text-slate-500 cursor-not-allowed border border-slate-700/60"
+                                title="Belum ada jurnal yang berstatus 'Sudah Diisi' pada filter ini">
+                            <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                            </svg>
+                            <span>Cetak Semua Jurnal (0)</span>
+                        </button>
+                    @endif
                 </div>
             </div>
 
@@ -189,6 +218,7 @@
                                 <th class="p-3.5 text-left">Materi KBM</th>
                                 <th class="p-3.5 text-center whitespace-nowrap" style="white-space: nowrap !important;">Kehadiran Siswa</th>
                                 <th class="p-3.5 text-center whitespace-nowrap" style="white-space: nowrap !important;">Foto Bukti</th>
+                                <th class="p-3.5 text-center whitespace-nowrap" style="white-space: nowrap !important;">Cetak Jurnal</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-800/60">
@@ -260,6 +290,27 @@
                                             </button>
                                         @else
                                             <span class="text-slate-500 text-xs">-</span>
+                                        @endif
+                                    </td>
+
+                                    {{-- =========================================================================
+                                         FITUR UKK: TOMBOL CETAK DOKUMEN JURNAL KBM PER SESI (ROLE WAKA)
+                                         Mencetak dokumen lembar kerja A4 untuk sesi jurnal yang dipilih
+                                         ========================================================================= --}}
+                                    <td class="p-3.5 text-center whitespace-nowrap">
+                                        @if($j->is_filled && $j->id)
+                                            <a href="{{ route('waka.journals.print', $j->id) }}" 
+                                               target="_blank" 
+                                               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm transition cursor-pointer"
+                                               style="background-color: #2563eb !important; color: #ffffff !important;"
+                                               title="Cetak Dokumen Lembar Jurnal & Presensi KBM Ini (Format A4)">
+                                                <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                                                </svg>
+                                                <span style="color: #ffffff !important;">Cetak</span>
+                                            </a>
+                                        @else
+                                            <span class="text-slate-500 text-xs italic">-</span>
                                         @endif
                                     </td>
                                 </tr>

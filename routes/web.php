@@ -338,6 +338,8 @@ Route::middleware(['auth', 'role:Waka Kurikulum'])->group(function () {
 
     // Monitoring & Riwayat Jurnal Guru
     Route::get('/waka/journals', [WakaController::class, 'journalsIndex'])->name('waka.journals.index');
+    Route::get('/waka/journals/print-all', [WakaController::class, 'journalsPrintAll'])->name('waka.journals.print-all');
+    Route::get('/waka/journals/{id}/print', [WakaController::class, 'journalPrint'])->name('waka.journals.print');
 
 });
 
@@ -349,6 +351,15 @@ Route::middleware(['auth', 'role:Guru,Wali Kelas,Guru BK'])->group(function () {
     Route::get('/teacher/schedules', [TeacherController::class, 'schedulesIndex'])->name('teacher.schedules.index');
     Route::get('/teacher/journals/create', [TeacherController::class, 'createJournal'])->name('teacher.journals.create');
     Route::post('/teacher/journals', [TeacherController::class, 'storeJournal'])->name('teacher.journals.store');
+    
+    /**
+     * -------------------------------------------------------------------------
+     * Fitur: Formulir Dedikasi Edit Presensi Siswa (Toleransi Hari KBM 24 Jam)
+     * -------------------------------------------------------------------------
+     * Membuka halaman khusus pengeditan kehadiran siswa dari menu 'Riwayat Jurnal KBM'
+     */
+    Route::get('/teacher/journals/{journal}/edit-attendance', [TeacherController::class, 'editJournalAttendance'])->name('teacher.journals.edit-attendance');
+
     Route::put('/teacher/journals/{journal}/attendance', [TeacherController::class, 'updateJournalAttendance'])->name('teacher.journals.update-attendance');
     Route::get('/teacher/journals/history', [TeacherController::class, 'journalsHistory'])->name('teacher.journals.history');
 });
@@ -551,6 +562,44 @@ Route::middleware(['auth', 'role:Wali Kelas,Guru BK,Waka Kurikulum'])->group(fun
             });
         }
 
+        // [FITUR UKK: FILTER PERIODE REKAP IZIN (HARIAN, MINGGUAN, BULANAN, PER SEMESTER)]
+        $selectedPeriod = $request->query('period', 'semester'); // 'daily', 'weekly', 'monthly', 'semester'
+        $today = now()->toDateString();
+        $config = \App\Models\SystemConfiguration::current();
+
+        if ($selectedPeriod === 'daily') {
+            $processedQuery->where(function ($q) use ($today) {
+                $q->whereDate('start_date', '<=', $today)
+                  ->whereDate('end_date', '>=', $today);
+            });
+            $periodLabel = "Harian (" . now()->translatedFormat('d F Y') . ")";
+        } elseif ($selectedPeriod === 'weekly') {
+            $startWeek = now()->subDays(6)->toDateString();
+            $processedQuery->where(function ($q) use ($startWeek, $today) {
+                $q->whereDate('end_date', '>=', $startWeek)
+                  ->whereDate('start_date', '<=', $today);
+            });
+            $periodLabel = "Mingguan (" . now()->subDays(6)->translatedFormat('d M') . " - " . now()->translatedFormat('d M Y') . ")";
+        } elseif ($selectedPeriod === 'monthly') {
+            $startMonth = now()->startOfMonth()->toDateString();
+            $endMonth   = now()->endOfMonth()->toDateString();
+            $processedQuery->where(function ($q) use ($startMonth, $endMonth) {
+                $q->whereDate('end_date', '>=', $startMonth)
+                  ->whereDate('start_date', '<=', $endMonth);
+            });
+            $periodLabel = "Bulanan (" . now()->translatedFormat('F Y') . ")";
+        } else {
+            $selectedPeriod = 'semester';
+            $periodLabel = "Semester " . ($config->semester ?? '1 (Ganjil)') . " (TA " . ($config->academic_year ?? '2026/2027') . ")";
+        }
+
+        $activeClass = null;
+        if ($user->role?->role_name === 'Wali Kelas') {
+            $activeClass = $user->homeroomClass;
+        } elseif ($selectedClassId && $selectedClassId !== 'all') {
+            $activeClass = $classes->firstWhere('id', (int)$selectedClassId);
+        }
+
         $processedLeaves = $processedQuery->take(100)->get()->map(function ($leave) {
             return (object)[
                 'id'            => $leave->id,
@@ -570,7 +619,7 @@ Route::middleware(['auth', 'role:Wali Kelas,Guru BK,Waka Kurikulum'])->group(fun
             ];
         });
 
-        return view('student-affairs.history', compact('processedLeaves', 'classes', 'majors', 'selectedGrade', 'selectedMajor', 'selectedRombel', 'selectedClassId'));
+        return view('student-affairs.history', compact('processedLeaves', 'classes', 'majors', 'selectedGrade', 'selectedMajor', 'selectedRombel', 'selectedClassId', 'selectedPeriod', 'periodLabel', 'activeClass'));
     })->name('student-affairs.leaves.history');
 
     // Laman Rekapitulasi Presensi Siswa (Beserta status disiplin & filter 3 kriteria)
@@ -642,6 +691,23 @@ Route::middleware(['auth', 'role:Wali Kelas,Guru BK,Waka Kurikulum'])->group(fun
             }
         }
 
+        // [FITUR UKK: FILTER PERIODE REKAP PRESENSI (HARIAN, MINGGUAN, BULANAN, PER SEMESTER)]
+        $selectedPeriod = $request->query('period', 'semester'); // 'daily', 'weekly', 'monthly', 'semester'
+        $today = now()->toDateString();
+        $config = \App\Models\SystemConfiguration::current();
+
+        if ($selectedPeriod === 'daily') {
+            $periodLabel = "Harian (" . now()->translatedFormat('d F Y') . ")";
+        } elseif ($selectedPeriod === 'weekly') {
+            $startWeek = now()->subDays(6)->toDateString();
+            $periodLabel = "Mingguan (" . now()->subDays(6)->translatedFormat('d M') . " - " . now()->translatedFormat('d M Y') . ")";
+        } elseif ($selectedPeriod === 'monthly') {
+            $periodLabel = "Bulanan (" . now()->translatedFormat('F Y') . ")";
+        } else {
+            $selectedPeriod = 'semester';
+            $periodLabel = "Semester " . ($config->semester ?? '1 (Ganjil)') . " (TA " . ($config->academic_year ?? '2026/2027') . ")";
+        }
+
         $studentsAttendance = collect();
         if (!empty($targetClassIds)) {
             $students = \App\Models\User::whereIn('class_id', $targetClassIds)
@@ -653,7 +719,35 @@ Route::middleware(['auth', 'role:Wali Kelas,Guru BK,Waka Kurikulum'])->group(fun
             $studentIds = $students->pluck('id');
 
             // 1 Query cepat untuk seluruh kehadiran siswa yang difilter (Tanpa N+1 loop)
-            $attendanceStats = \App\Models\Attendance::whereIn('student_id', $studentIds)
+            $attendanceStatsQuery = \App\Models\Attendance::whereIn('student_id', $studentIds);
+
+            if ($selectedPeriod === 'daily') {
+                $attendanceStatsQuery->where(function ($q) use ($today) {
+                    $q->whereDate('date', $today)
+                      ->orWhere(function ($sub) use ($today) {
+                          $sub->whereNull('date')->whereDate('created_at', $today);
+                      });
+                });
+            } elseif ($selectedPeriod === 'weekly') {
+                $startWeek = now()->subDays(6)->toDateString();
+                $attendanceStatsQuery->where(function ($q) use ($startWeek, $today) {
+                    $q->whereBetween('date', [$startWeek, $today])
+                      ->orWhere(function ($sub) use ($startWeek, $today) {
+                          $sub->whereNull('date')->whereBetween('created_at', [$startWeek . ' 00:00:00', $today . ' 23:59:59']);
+                      });
+                });
+            } elseif ($selectedPeriod === 'monthly') {
+                $startMonth = now()->startOfMonth()->toDateString();
+                $endMonth   = now()->endOfMonth()->toDateString();
+                $attendanceStatsQuery->where(function ($q) use ($startMonth, $endMonth) {
+                    $q->whereBetween('date', [$startMonth, $endMonth])
+                      ->orWhere(function ($sub) use ($startMonth, $endMonth) {
+                          $sub->whereNull('date')->whereBetween('created_at', [$startMonth . ' 00:00:00', $endMonth . ' 23:59:59']);
+                      });
+                });
+            }
+
+            $attendanceStats = $attendanceStatsQuery
                 ->selectRaw('student_id, status, count(*) as total')
                 ->groupBy('student_id', 'status')
                 ->get()
@@ -693,7 +787,7 @@ Route::middleware(['auth', 'role:Wali Kelas,Guru BK,Waka Kurikulum'])->group(fun
             });
         }
 
-        return view('student-affairs.attendance', compact('classes', 'majors', 'activeClass', 'studentsAttendance', 'selectedGrade', 'selectedMajor', 'selectedRombel', 'selectedClassId'));
+        return view('student-affairs.attendance', compact('classes', 'majors', 'activeClass', 'studentsAttendance', 'selectedGrade', 'selectedMajor', 'selectedRombel', 'selectedClassId', 'selectedPeriod', 'periodLabel'));
     })->name('student-affairs.attendance'); 
 });
 

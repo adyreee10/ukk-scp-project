@@ -41,9 +41,9 @@
                     <div class="academic-stat-box p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-center">                        <span class="text-[10px] font-bold text-slate-400 uppercase block">Status Putaran</span>
                         <span class="text-sm font-extrabold text-white mt-0.5 block">{{ $config->active_cycle }}</span>
                     </div>
-                    <div class="academic-stat-box p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-center">                        <span class="text-[10px] font-bold text-slate-400 uppercase block">Jadwal</span>
-                        <span class="text-sm font-extrabold {{ $config->is_schedule_locked ? 'text-red-400' : 'text-emerald-400' }} mt-0.5 block">
-                            {{ $config->is_schedule_locked ? 'Terkunci' : 'Terbuka' }}
+                    <div class="academic-stat-box p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-center">                        <span class="text-[10px] font-bold text-slate-400 uppercase block">Jadwal ({{ $config->active_cycle }})</span>
+                        <span class="text-sm font-extrabold {{ $config->isCycleLocked() ? 'text-red-400' : 'text-emerald-400' }} mt-0.5 block">
+                            {{ $config->isCycleLocked() ? 'Terkunci' : 'Terbuka' }}
                         </span>
                     </div>
                 </div>

@@ -413,14 +413,31 @@
                         <input type="text" name="name" x-model="selectedStudent.name" required class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" />
                     </div>
 
+                    {{-- =========================================================================
+                         FITUR UKK: INPUT NIS & USERNAME SISWA (EDIT DATA)
+                         - NIS: Khusus angka, dibatasi maksimal 10 digit karakter
+                         - Username: Tipe Varchar bebas tanpa batas karakter angka (NISN ditiadakan)
+                         ========================================================================= --}}
                     <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs font-bold text-slate-300 mb-1">NIS (Opsional)</label>
-                            <input type="text" name="nis" x-model="selectedStudent.nis" class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" placeholder="12345" />
+                            <label class="block text-xs font-bold text-slate-300 mb-1">NIS (Opsional - Maks. 10 Angka)</label>
+                            <input type="text" 
+                                   name="nis" 
+                                   inputmode="numeric" 
+                                   maxlength="10" 
+                                   x-model="selectedStudent.nis" 
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)" 
+                                   @input="selectedStudent.nis = $event.target.value.replace(/[^0-9]/g, '').slice(0, 10)" 
+                                   class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" 
+                                   placeholder="12345" />
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-300 mb-1">Username</label>
-                            <input type="text" name="username" x-model="selectedStudent.username" required class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" />                       
+                            <input type="text" 
+                                   name="username" 
+                                   x-model="selectedStudent.username" 
+                                   required 
+                                   class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" />                       
                         </div>
                     </div>
 
@@ -462,14 +479,26 @@
                         <input type="hidden" name="class_id" :value="edit_class_id" required>
                     </div>
 
+                    {{-- =========================================================================
+                         FITUR UKK: INPUT TANGGAL LAHIR & NOMOR HP SISWA (EDIT DATA)
+                         - Nomor HP Siswa: Khusus angka, dibatasi maksimal 13 digit karakter
+                         ========================================================================= --}}
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="block text-xs font-bold text-slate-300 mb-1">Tanggal Lahir (Opsional)</label>
                             <input type="date" name="birth_date" x-model="selectedStudent.birth_date" class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 text-sm text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" />
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-300 mb-1">Nomor HP Siswa (Opsional)</label>
-                            <input type="text" name="phone" x-model="selectedStudent.phone" class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" placeholder="0812..." />
+                            <label class="block text-xs font-bold text-slate-300 mb-1">Nomor HP Siswa (Opsional - Maks. 13 Angka)</label>
+                            <input type="text" 
+                                   name="phone" 
+                                   inputmode="numeric" 
+                                   maxlength="13" 
+                                   x-model="selectedStudent.phone" 
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 13)" 
+                                   @input="selectedStudent.phone = $event.target.value.replace(/[^0-9]/g, '').slice(0, 13)" 
+                                   class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" 
+                                   placeholder="08123456789" />
                         </div>
                     </div>
 
@@ -516,14 +545,28 @@
                         <input type="text" name="name" required class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" placeholder="Contoh: Muhammad Rizky" />
                     </div>
 
+                    {{-- =========================================================================
+                         FITUR UKK: INPUT NIS & USERNAME SISWA (TAMBAH DATA BARU)
+                         - NIS: Khusus angka, dibatasi maksimal 10 digit karakter
+                         - Username: Tipe Varchar bebas tanpa batas karakter angka (NISN ditiadakan)
+                         ========================================================================= --}}
                     <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs font-bold text-slate-300 mb-1">NIS (Opsional)</label>
-                            <input type="text" name="nis" class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" placeholder="Contoh: 12345" />
+                            <label class="block text-xs font-bold text-slate-300 mb-1">NIS (Opsional - Maks. 10 Angka)</label>
+                            <input type="text" 
+                                   name="nis" 
+                                   inputmode="numeric" 
+                                   maxlength="10" 
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)" 
+                                   class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" 
+                                   placeholder="Contoh: 12345" />
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-300 mb-1">NISN / Username (Opsional)</label>
-                            <input type="text" name="username" class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" placeholder="Otomatis jika dikosongkan" />
+                            <label class="block text-xs font-bold text-slate-300 mb-1">Username (Opsional)</label>
+                            <input type="text" 
+                                   name="username" 
+                                   class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" 
+                                   placeholder="Otomatis jika kosong" />
                         </div>
                     </div>
 
@@ -567,14 +610,24 @@
                         </div>
                     </div>
 
+                    {{-- =========================================================================
+                         FITUR UKK: INPUT EMAIL & NOMOR HP SISWA (TAMBAH DATA BARU)
+                         - Nomor HP Siswa: Khusus angka, dibatasi maksimal 13 digit karakter
+                         ========================================================================= --}}
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="block text-xs font-bold text-slate-300 mb-1">Email Siswa (Opsional)</label>
                             <input type="email" name="email" class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" placeholder="siswa@sekolah.sch.id" />
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-300 mb-1">Nomor HP Siswa (Opsional)</label>
-                            <input type="text" name="phone" class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" placeholder="08123456789" />
+                            <label class="block text-xs font-bold text-slate-300 mb-1">Nomor HP Siswa (Opsional - Maks. 13 Angka)</label>
+                            <input type="text" 
+                                   name="phone" 
+                                   inputmode="numeric" 
+                                   maxlength="13" 
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 13)" 
+                                   class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" 
+                                   placeholder="08123456789" />
                         </div>
                     </div>
 

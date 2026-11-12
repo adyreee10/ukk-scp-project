@@ -161,9 +161,9 @@
                 Atur Siklus Blok →
             </a>
             <div class="flex items-center gap-2">
-                <span class="text-xs font-semibold text-slate-400">Status Jadwal:</span>
-                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold {{ $configuration->is_schedule_locked ? 'badge-locked' : 'badge-open' }} shadow-sm">
-                    {{ $configuration->is_schedule_locked ? 'Terkunci' : 'Terbuka' }}
+                <span class="text-xs font-semibold text-slate-400">Status Jadwal ({{ $configuration->active_cycle }}):</span>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold {{ $configuration->isCycleLocked() ? 'badge-locked' : 'badge-open' }} shadow-sm">
+                    {{ $configuration->isCycleLocked() ? 'Terkunci' : 'Terbuka' }}
                 </span>
             </div>
         </div>
