@@ -70,23 +70,34 @@ class LoginRequest extends FormRequest
         $login = trim($this->input('login'));
         $inputPassword = (string) $this->input('password');
 
+        // Pemetaan alias ramah demo (memudahkan penguji demo dengan username yang mudah diingat)
+        $demoAliases = [
+            'guru_rosyida'          => '199203252014022002', // Bu Rosyida (Wali Kelas)
+            'guru_dinda'            => '3403036308970002',   // Bu Dinda (Guru Pengajar)
+            'guru_mulati'           => '196709222007012012', // Bu Mulati (Guru Pengajar)
+            'guru_ryawidyaningtyas' => '199503272022212001', // Bu Ryawidyaningtyas (Guru BK)
+        ];
+        $targetLogin = $demoAliases[strtolower($login)] ?? $login;
+
         // Cari user yang cocok dengan salah satu kolom: email, username, nis, atau nip
-        $user = User::where(function ($query) use ($login) {
+        $user = User::where(function ($query) use ($login, $targetLogin) {
             $query->where('email', $login)
                   ->orWhere('username', $login)
+                  ->orWhere('username', $targetLogin)
                   ->orWhere('nis', $login)
-                  ->orWhere('nip', $login);
+                  ->orWhere('nip', $login)
+                  ->orWhere('nip', $targetLogin);
         })->first();
 
         // Cek kecocokan kata sandi
         $passwordValid = false;
         if ($user) {
-            $passwordValid = Hash::check($inputPassword, $user->password);
-
-            // Penyelarasan Cerdas Otomatis (Auto-Heal) untuk Akun Orang Tua:
-            // Mengatasi kendala password bawaan impor (password123) vs password default resmi (p[NIS])
-            // sehingga orang tua langsung berhasil login baik menggunakan p[NIS] maupun password123.
-            if (! $passwordValid && $user->role?->role_name === 'Orang Tua') {
+            // =========================================================================
+            // FITUR UKK: KEBIJAKAN AUTENTIKASI KHUSUS AKUN ORANG TUA
+            // 1. Password resmi Orang Tua WAJIB berformat 'p[NIS]' (misal: p17821)
+            // 2. Akses menggunakan 'password123' DITOLAK KERAS demi keamanan data siswa
+            // =========================================================================
+            if ($user->role?->role_name === 'Orang Tua') {
                 $child = User::where('parent_id', $user->id)->first();
                 $childNis = preg_replace('/[^0-9A-Za-z]/', '', (string) ($child?->nis ?? ''));
                 if (! $childNis && preg_match('/ortu_([0-9A-Za-z]+)/', $user->username, $matches)) {
@@ -95,15 +106,26 @@ class LoginRequest extends FormRequest
 
                 $expectedParentPassword = $childNis ? "p{$childNis}" : "portu123";
 
-                if ($inputPassword === $expectedParentPassword || $inputPassword === 'password123') {
+                if ($inputPassword === 'password123') {
+                    // Tolak akses jika orang tua memasukkan password123
+                    $passwordValid = false;
+                } elseif ($inputPassword === $expectedParentPassword) {
                     $passwordValid = true;
-                    // Selaraskan kata sandi di database ke format resmi p[NIS] untuk login selanjutnya
-                    try {
-                        \Illuminate\Support\Facades\DB::table('users')->where('id', $user->id)->update([
-                            'password' => Hash::make($expectedParentPassword),
-                        ]);
-                    } catch (\Throwable $e) {}
+                    // Selaraskan kata sandi di database ke format resmi p[NIS] jika belum sesuai
+                    if (! Hash::check($expectedParentPassword, $user->password)) {
+                        try {
+                            \Illuminate\Support\Facades\DB::table('users')->where('id', $user->id)->update([
+                                'password' => Hash::make($expectedParentPassword),
+                            ]);
+                        } catch (\Throwable $e) {}
+                    }
+                } else {
+                    // Hanya izinkan jika orang tua mengganti password mandiri (dan bukan password123)
+                    $passwordValid = Hash::check($inputPassword, $user->password) && ! Hash::check('password123', $user->password);
                 }
+            } else {
+                // Role selain Orang Tua (Waka, Guru, Wali Kelas, Guru BK, Siswa)
+                $passwordValid = Hash::check($inputPassword, $user->password);
             }
         }
 

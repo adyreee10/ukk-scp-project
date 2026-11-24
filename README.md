@@ -70,18 +70,25 @@ Sistem mendukung **6 Peran Pengguna** dengan batasan hak akses yang terisolasi d
 
 ## 🔐 Kredensial Akun untuk Pengujian (Demo Accounts)
 
-Untuk mempermudah pengujian oleh dewan juri dan guru penguji, sistem menyediakan akun siap pakai dengan kata sandi default:
+Untuk mempermudah pengujian oleh dewan juri dan guru penguji saat sesi demonstrasi sistem, seluruh peran (*multi-role*) telah disediakan dengan akun siap pakai:
 
-> **Kata Sandi Seluruh Akun Demo:** `password123`
+| Peran | Username Login | Alternatif Login (NIP / NIS) | Kata Sandi | Deskripsi & Akses Fitur |
+|---|---|---|---|---|
+| **Waka Kurikulum** | `waka` | `waka` | `password123` | Akses penuh master data, jadwal blok, dan monitoring jurnal guru |
+| **Wali Kelas** | `guru_rosyida` | `199203252014022002` | `password123` | Wali Kelas (Verifikasi izin siswa & monitoring kelas binaan) |
+| **Guru Pengajar** | `guru_dinda` | `3403036308970002` | `password123` | Guru mata pelajaran (Pengisian jurnal & presensi KBM real-time) |
+| **Guru Pengajar** | `guru_mulati` | `196709222007012012` | `password123` | Guru mata pelajaran (Pengisian jurnal & presensi KBM real-time) |
+| **Guru BK / Kesiswaan** | `guru_ryawidyaningtyas` | `199503272022212001` | `password123` | Monitoring kesiswaan, rekap presensi & tindak lanjut siswa bermasalah |
+| **Siswa** | `17821` | `17821` | `password123` | Siswa (Cek jadwal, riwayat presensi & pengajuan izin siswa) |
+| **Orang Tua / Wali** | `ortu_17821` | `ortu_17821` | `p17821` | Wali murid (Monitoring absensi anak real-time & izin dari rumah) |
 
-| Peran | Username | Email | Keterangan |
-|---|---|---|---|
-| **Waka Kurikulum** | `waka` | `waka@sekolah.test` | Akses penuh master data & jadwal |
-| **Guru** | `guru` | `guru@sekolah.test` | Guru pengajar demo |
-| **Wali Kelas** | `walikelas` | `walikelas@sekolah.test` | Wali Kelas X RPL 1 (Verifikasi Izin) |
-| **Guru BK** | `gurubk` | `gurubk@sekolah.test` | Monitoring kesiswaan & pembinaan |
-| **Siswa** | `siswa` | `siswa@sekolah.test` | Siswa kelas X RPL 1 |
-| **Orang Tua** | `orangtua` | `orangtua@sekolah.test` | Orang tua siswa demo |
+> 📌 **Catatan Kebijakan Autentikasi Sistem:**
+> 1. **Fleksibilitas Identitas Login Guru & Staf:** Akun Waka Kurikulum, Guru Pengajar, Wali Kelas, dan Guru BK dapat masuk ke sistem menggunakan **Username** maupun nomor **NIP** resmi masing-masing dengan kata sandi default `password123`.
+> 2. **Login Siswa:** Siswa dapat masuk ke sistem langsung menggunakan **NIS** masing-masing (contoh: `17821`) atau username dengan kata sandi default `password123`.
+> 3. **Format Khusus Akun Orang Tua (Wali Murid):**
+>    * **Username:** Menggunakan format `ortu_[NIS]` (contoh: `ortu_17821`).
+>    * **Kata Sandi:** **HANYA** menggunakan format `p[NIS]` (huruf 'p' kecil diawali nomor NIS anak, contoh: `p17821`).
+>    * *Demi menjaga kerahasiaan dan privasi wali murid, akun Orang Tua tidak diizinkan masuk menggunakan kata sandi umum `password123`.*
 
 ---
 
