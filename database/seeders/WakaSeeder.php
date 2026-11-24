@@ -2,24 +2,26 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
-use App\Models\User;
 use App\Models\Role;
+use App\Models\User;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class WakaSeeder extends Seeder
 {
-    
     public function run(): void
     {
-        $wakaRole = Role::where('role_name', 'Waka Kurikulum')->first();
+        $wakaRole = Role::firstOrCreate(['role_name' => 'Waka Kurikulum']);
 
-        User::create([
-            'role_id' => $wakaRole->id,
-            'name' => 'Waka Kurikulum',
-            'username' => 'waka',
-            'email' => 'waka@sekolah.test',
-            'password' => 'waka123',
-        ]);
+        User::updateOrCreate(
+            ['username' => 'waka'],
+            [
+                'role_id'  => $wakaRole->id,
+                'name'     => 'Waka Kurikulum',
+                'nip'      => 'waka',
+                'email'    => 'waka@sekolah.test',
+                'password' => Hash::make('password123'),
+            ]
+        );
     }
 }
