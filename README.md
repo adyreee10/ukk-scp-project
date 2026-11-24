@@ -72,19 +72,20 @@ Sistem mendukung **6 Peran Pengguna** dengan batasan hak akses yang terisolasi d
 
 Untuk mempermudah pengujian oleh dewan juri dan guru penguji saat sesi demonstrasi sistem, seluruh peran (*multi-role*) telah disediakan dengan akun siap pakai:
 
-| Peran | Username Login | Alternatif Login (NIP / NIS) | Kata Sandi | Deskripsi & Akses Fitur |
+| Peran | Username Login | Alternatif Login (NIP / NIK / NIS) | Kata Sandi | Deskripsi & Akses Fitur |
 |---|---|---|---|---|
 | **Waka Kurikulum** | `waka` | `waka` | `password123` | Akses penuh master data, jadwal blok, dan monitoring jurnal guru |
-| **Wali Kelas** | `guru_rosyida` | `199203252014022002` | `password123` | Wali Kelas (Verifikasi izin siswa & monitoring kelas binaan) |
-| **Guru Pengajar** | `guru_dinda` | `3403036308970002` | `password123` | Guru mata pelajaran (Pengisian jurnal & presensi KBM real-time) |
-| **Guru Pengajar** | `guru_mulati` | `196709222007012012` | `password123` | Guru mata pelajaran (Pengisian jurnal & presensi KBM real-time) |
-| **Guru BK / Kesiswaan** | `guru_ryawidyaningtyas` | `199503272022212001` | `password123` | Monitoring kesiswaan, rekap presensi & tindak lanjut siswa bermasalah |
-| **Siswa** | `17821` | `17821` | `password123` | Siswa (Cek jadwal, riwayat presensi & pengajuan izin siswa) |
-| **Orang Tua / Wali** | `ortu_17821` | `ortu_17821` | `p17821` | Wali murid (Monitoring absensi anak real-time & izin dari rumah) |
+| **Wali Kelas** | `guru_rosyida` | `199203252014022002` (NIP) | `password123` | Wali Kelas XII RPL 2 (Verifikasi izin siswa & monitoring kelas binaan) |
+| **Guru Pengajar** | `guru_dinda` | `3403036308970002` (NIK) | `password123` | Guru mata pelajaran (Pengisian jurnal & presensi KBM real-time) |
+| **Guru Pengajar** | `guru_mulati` | `196709222007012012` (NIP) | `password123` | Guru mata pelajaran (Pengisian jurnal & presensi KBM real-time) |
+| **Guru BK / Kesiswaan** | `guru_ryawidyaningtyas` | `199503272022212001` (NIP) | `password123` | Monitoring kesiswaan, rekap presensi & tindak lanjut siswa bermasalah |
+| **Siswa** | `17821` | `17821` (NIS) | `password123` | Siswa XII RPL 2 (Cek jadwal, riwayat presensi & pengajuan izin) |
+| **Orang Tua / Wali** | `ortu_17821` | `ortu_17821` | `p17821` | Wali murid Rezky Aditya (Monitoring presensi & pengajuan izin) |
 
 > 📌 **Catatan Kebijakan Autentikasi Sistem:**
-> 1. **Fleksibilitas Identitas Login Guru & Staf:** Akun Waka Kurikulum, Guru Pengajar, Wali Kelas, dan Guru BK dapat masuk ke sistem menggunakan **Username** maupun nomor **NIP** resmi masing-masing dengan kata sandi default `password123`.
-> 2. **Login Siswa:** Siswa dapat masuk ke sistem langsung menggunakan **NIS** masing-masing (contoh: `17821`) atau username dengan kata sandi default `password123`.
+> 1. **Fleksibilitas Identitas Login Guru & Staf:** Akun Waka Kurikulum, Guru Pengajar, Wali Kelas, dan Guru BK dapat masuk ke sistem menggunakan **Username** maupun nomor **NIP / NIK** resmi masing-masing dengan kata sandi default `password123`.
+>    * *Bagi guru/tenaga pendidik yang nomor identitas pada data master sekolah masih berupa nomor NIK (16 digit) seperti pada akun Bu Dinda, sistem telah secara cerdas mendukung autentikasi langsung menggunakan NIK tersebut.*
+> 2. **Login Siswa:** Siswa dapat masuk ke sistem langsung menggunakan nomor **NIS** masing-masing (contoh: `17821`) atau username dengan kata sandi default `password123`.
 > 3. **Format Khusus Akun Orang Tua (Wali Murid):**
 >    * **Username:** Menggunakan format `ortu_[NIS]` (contoh: `ortu_17821`).
 >    * **Kata Sandi:** **HANYA** menggunakan format `p[NIS]` (huruf 'p' kecil diawali nomor NIS anak, contoh: `p17821`).
