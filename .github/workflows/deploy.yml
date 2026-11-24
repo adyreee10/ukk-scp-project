@@ -41,7 +41,6 @@ jobs:
             **/.git*
             **/.git*/**
             **/node_modules/**
-            mobile/**
             PANDUAN_PENGEMBANGAN/**
             scratch/**
             *.md
