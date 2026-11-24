@@ -98,59 +98,60 @@
                          FITUR UKK: FILTER PERIODE REKAP IZIN (HARIAN, MINGGUAN, BULANAN, SEMESTER)
                          Memungkinkan Waka, Guru BK, dan Wali Kelas memfilter arsip izin
                          sesuai rentang waktu yang dibutuhkan sebelum mencetak dokumen.
+                         Responsif mobile: tidak terpotong di layar HP, mendukung scroll halus
                          ========================================================================= --}}
-                    <div class="flex items-center gap-1.5 bg-slate-950/60 dark:bg-slate-950/60 p-1 rounded-xl border border-slate-800">
-                        <span class="text-slate-400 font-bold text-[10px] uppercase px-2">Periode:</span>
+                    <div class="max-w-full overflow-x-auto scrollbar-none flex items-center gap-1 sm:gap-1.5 bg-slate-950/60 dark:bg-slate-950/60 p-1 rounded-xl border border-slate-800 self-start sm:self-auto shrink-0" style="-webkit-overflow-scrolling: touch;">
+                        <span class="text-slate-400 font-bold text-[9px] sm:text-[10px] uppercase px-1.5 sm:px-2 shrink-0 whitespace-nowrap">Periode:</span>
                         <a href="{{ request()->fullUrlWithQuery(['period' => 'daily']) }}" 
-                           class="px-2.5 py-1 rounded-lg transition text-xs font-semibold {{ ($selectedPeriod ?? 'semester') === 'daily' ? 'period-pill-active bg-indigo-600 text-white font-bold shadow' : 'text-slate-400 hover:text-white' }}"
+                           class="px-2 sm:px-2.5 py-1 rounded-lg transition text-[11px] sm:text-xs font-semibold shrink-0 whitespace-nowrap {{ ($selectedPeriod ?? 'semester') === 'daily' ? 'period-pill-active bg-indigo-600 text-white font-bold shadow' : 'text-slate-400 hover:text-white' }}"
                            @if(($selectedPeriod ?? 'semester') === 'daily') style="color: #ffffff !important; background-color: #2563eb !important;" @endif>Harian</a>
                         <a href="{{ request()->fullUrlWithQuery(['period' => 'weekly']) }}" 
-                           class="px-2.5 py-1 rounded-lg transition text-xs font-semibold {{ ($selectedPeriod ?? 'semester') === 'weekly' ? 'period-pill-active bg-indigo-600 text-white font-bold shadow' : 'text-slate-400 hover:text-white' }}"
+                           class="px-2 sm:px-2.5 py-1 rounded-lg transition text-[11px] sm:text-xs font-semibold shrink-0 whitespace-nowrap {{ ($selectedPeriod ?? 'semester') === 'weekly' ? 'period-pill-active bg-indigo-600 text-white font-bold shadow' : 'text-slate-400 hover:text-white' }}"
                            @if(($selectedPeriod ?? 'semester') === 'weekly') style="color: #ffffff !important; background-color: #2563eb !important;" @endif>Mingguan</a>
                         <a href="{{ request()->fullUrlWithQuery(['period' => 'monthly']) }}" 
-                           class="px-2.5 py-1 rounded-lg transition text-xs font-semibold {{ ($selectedPeriod ?? 'semester') === 'monthly' ? 'period-pill-active bg-indigo-600 text-white font-bold shadow' : 'text-slate-400 hover:text-white' }}"
+                           class="px-2 sm:px-2.5 py-1 rounded-lg transition text-[11px] sm:text-xs font-semibold shrink-0 whitespace-nowrap {{ ($selectedPeriod ?? 'semester') === 'monthly' ? 'period-pill-active bg-indigo-600 text-white font-bold shadow' : 'text-slate-400 hover:text-white' }}"
                            @if(($selectedPeriod ?? 'semester') === 'monthly') style="color: #ffffff !important; background-color: #2563eb !important;" @endif>Bulanan</a>
                         <a href="{{ request()->fullUrlWithQuery(['period' => 'semester']) }}" 
-                           class="px-2.5 py-1 rounded-lg transition text-xs font-semibold {{ ($selectedPeriod ?? 'semester') === 'semester' ? 'period-pill-active bg-indigo-600 text-white font-bold shadow' : 'text-slate-400 hover:text-white' }}"
+                           class="px-2 sm:px-2.5 py-1 rounded-lg transition text-[11px] sm:text-xs font-semibold shrink-0 whitespace-nowrap {{ ($selectedPeriod ?? 'semester') === 'semester' ? 'period-pill-active bg-indigo-600 text-white font-bold shadow' : 'text-slate-400 hover:text-white' }}"
                            @if(($selectedPeriod ?? 'semester') === 'semester') style="color: #ffffff !important; background-color: #2563eb !important;" @endif>Semester</a>
                     </div>
 
                     <!-- Filter Status -->
-                    <div class="flex items-center gap-1.5 bg-slate-950/60 p-1 rounded-xl border border-slate-800">
-                        <span class="text-slate-400 font-bold text-[10px] uppercase px-2">Status:</span>
+                    <div class="max-w-full overflow-x-auto scrollbar-none flex items-center gap-1 sm:gap-1.5 bg-slate-950/60 p-1 rounded-xl border border-slate-800 self-start sm:self-auto shrink-0" style="-webkit-overflow-scrolling: touch;">
+                        <span class="text-slate-400 font-bold text-[9px] sm:text-[10px] uppercase px-1.5 sm:px-2 shrink-0 whitespace-nowrap">Status:</span>
                         <button type="button" @click="filterStatus = 'all'" 
                                 :class="filterStatus === 'all' ? 'bg-indigo-600 text-white font-bold shadow' : 'text-slate-400 hover:text-white'"
                                 :style="filterStatus === 'all' ? 'color: #ffffff !important; background-color: #2563eb !important;' : ''"
-                                class="px-2.5 py-1 rounded-lg transition cursor-pointer text-xs">Semua</button>
+                                class="px-2 sm:px-2.5 py-1 rounded-lg transition cursor-pointer text-[11px] sm:text-xs shrink-0 whitespace-nowrap">Semua</button>
                         <button type="button" @click="filterStatus = 'Approved'" 
                                 :class="filterStatus === 'Approved' ? 'bg-emerald-600 text-white font-bold shadow' : 'text-slate-400 hover:text-white'"
                                 :style="filterStatus === 'Approved' ? 'color: #ffffff !important; background-color: #059669 !important;' : ''"
-                                class="px-2.5 py-1 rounded-lg transition cursor-pointer text-xs">Disetujui</button>
+                                class="px-2 sm:px-2.5 py-1 rounded-lg transition cursor-pointer text-[11px] sm:text-xs shrink-0 whitespace-nowrap">Disetujui</button>
                         <button type="button" @click="filterStatus = 'Rejected'" 
                                 :class="filterStatus === 'Rejected' ? 'bg-red-600 text-white font-bold shadow' : 'text-slate-400 hover:text-white'"
                                 :style="filterStatus === 'Rejected' ? 'color: #ffffff !important; background-color: #dc2626 !important;' : ''"
-                                class="px-2.5 py-1 rounded-lg transition cursor-pointer text-xs">Ditolak</button>
+                                class="px-2 sm:px-2.5 py-1 rounded-lg transition cursor-pointer text-[11px] sm:text-xs shrink-0 whitespace-nowrap">Ditolak</button>
                     </div>
 
                     <!-- Filter Jenis -->
-                    <div class="flex items-center gap-1.5 bg-slate-950/60 p-1 rounded-xl border border-slate-800">
-                        <span class="text-slate-400 font-bold text-[10px] uppercase px-2">Jenis:</span>
+                    <div class="max-w-full overflow-x-auto scrollbar-none flex items-center gap-1 sm:gap-1.5 bg-slate-950/60 p-1 rounded-xl border border-slate-800 self-start sm:self-auto shrink-0" style="-webkit-overflow-scrolling: touch;">
+                        <span class="text-slate-400 font-bold text-[9px] sm:text-[10px] uppercase px-1.5 sm:px-2 shrink-0 whitespace-nowrap">Jenis:</span>
                         <button type="button" @click="filterType = 'all'" 
                                 :class="filterType === 'all' ? 'bg-indigo-600 text-white font-bold shadow' : 'text-slate-400 hover:text-white'"
                                 :style="filterType === 'all' ? 'color: #ffffff !important; background-color: #2563eb !important;' : ''"
-                                class="px-2.5 py-1 rounded-lg transition cursor-pointer text-xs">Semua</button>
+                                class="px-2 sm:px-2.5 py-1 rounded-lg transition cursor-pointer text-[11px] sm:text-xs shrink-0 whitespace-nowrap">Semua</button>
                         <button type="button" @click="filterType = 'Sakit'" 
                                 :class="filterType === 'Sakit' ? 'bg-amber-600 text-white font-bold shadow' : 'text-slate-400 hover:text-white'"
                                 :style="filterType === 'Sakit' ? 'color: #ffffff !important; background-color: #d97706 !important;' : ''"
-                                class="px-2.5 py-1 rounded-lg transition cursor-pointer text-xs">Sakit</button>
+                                class="px-2 sm:px-2.5 py-1 rounded-lg transition cursor-pointer text-[11px] sm:text-xs shrink-0 whitespace-nowrap">Sakit</button>
                         <button type="button" @click="filterType = 'Izin'" 
                                 :class="filterType === 'Izin' ? 'bg-blue-600 text-white font-bold shadow' : 'text-slate-400 hover:text-white'"
                                 :style="filterType === 'Izin' ? 'color: #ffffff !important; background-color: #2563eb !important;' : ''"
-                                class="px-2.5 py-1 rounded-lg transition cursor-pointer text-xs">Izin</button>
+                                class="px-2 sm:px-2.5 py-1 rounded-lg transition cursor-pointer text-[11px] sm:text-xs shrink-0 whitespace-nowrap">Izin</button>
                         <button type="button" @click="filterType = 'Potong Jam Pelajaran'" 
                                 :class="filterType === 'Potong Jam Pelajaran' ? 'bg-teal-600 text-white font-bold shadow' : 'text-slate-400 hover:text-white'"
                                 :style="filterType === 'Potong Jam Pelajaran' ? 'color: #ffffff !important; background-color: #0d9488 !important;' : ''"
-                                class="px-2.5 py-1 rounded-lg transition cursor-pointer text-xs">Potong Jam</button>
+                                class="px-2 sm:px-2.5 py-1 rounded-lg transition cursor-pointer text-[11px] sm:text-xs shrink-0 whitespace-nowrap">Potong Jam</button>
                     </div>
 
                     <!-- Filter 3 Kriteria: Tingkat, Jurusan, Rombel (Waka & Guru BK) -->

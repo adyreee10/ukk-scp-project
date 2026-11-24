@@ -138,20 +138,21 @@
                 {{-- =========================================================================
                      FITUR UKK: FILTER PERIODE REKAP PRESENSI (HARIAN, MINGGUAN, BULANAN, SEMESTER)
                      - Teks aktif putih solid dan kontras di Mode Terang & Gelap
+                     - Responsif mobile: tidak terpotong di layar HP, mendukung scroll halus
                      ========================================================================= --}}
-                <div class="flex items-center gap-1.5 bg-slate-900/80 p-1 rounded-xl border border-slate-700 shrink-0">
-                    <span class="text-slate-400 font-bold text-[10px] uppercase px-2">Periode:</span>
+                <div class="max-w-full overflow-x-auto scrollbar-none flex items-center gap-1 sm:gap-1.5 bg-slate-900/80 p-1 rounded-xl border border-slate-700 self-start sm:self-auto shrink-0" style="-webkit-overflow-scrolling: touch;">
+                    <span class="text-slate-400 font-bold text-[9px] sm:text-[10px] uppercase px-1.5 sm:px-2 shrink-0 whitespace-nowrap">Periode:</span>
                     <a href="{{ request()->fullUrlWithQuery(['period' => 'daily']) }}" 
-                       class="px-2.5 py-1.5 rounded-lg transition text-xs font-semibold {{ ($selectedPeriod ?? 'semester') === 'daily' ? 'period-pill-active bg-indigo-600 text-white font-bold shadow' : 'text-slate-400 hover:text-white' }}"
+                       class="px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg transition text-[11px] sm:text-xs font-semibold shrink-0 whitespace-nowrap {{ ($selectedPeriod ?? 'semester') === 'daily' ? 'period-pill-active bg-indigo-600 text-white font-bold shadow' : 'text-slate-400 hover:text-white' }}"
                        @if(($selectedPeriod ?? 'semester') === 'daily') style="color: #ffffff !important; background-color: #2563eb !important;" @endif>Harian</a>
                     <a href="{{ request()->fullUrlWithQuery(['period' => 'weekly']) }}" 
-                       class="px-2.5 py-1.5 rounded-lg transition text-xs font-semibold {{ ($selectedPeriod ?? 'semester') === 'weekly' ? 'period-pill-active bg-indigo-600 text-white font-bold shadow' : 'text-slate-400 hover:text-white' }}"
+                       class="px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg transition text-[11px] sm:text-xs font-semibold shrink-0 whitespace-nowrap {{ ($selectedPeriod ?? 'semester') === 'weekly' ? 'period-pill-active bg-indigo-600 text-white font-bold shadow' : 'text-slate-400 hover:text-white' }}"
                        @if(($selectedPeriod ?? 'semester') === 'weekly') style="color: #ffffff !important; background-color: #2563eb !important;" @endif>Mingguan</a>
                     <a href="{{ request()->fullUrlWithQuery(['period' => 'monthly']) }}" 
-                       class="px-2.5 py-1.5 rounded-lg transition text-xs font-semibold {{ ($selectedPeriod ?? 'semester') === 'monthly' ? 'period-pill-active bg-indigo-600 text-white font-bold shadow' : 'text-slate-400 hover:text-white' }}"
+                       class="px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg transition text-[11px] sm:text-xs font-semibold shrink-0 whitespace-nowrap {{ ($selectedPeriod ?? 'semester') === 'monthly' ? 'period-pill-active bg-indigo-600 text-white font-bold shadow' : 'text-slate-400 hover:text-white' }}"
                        @if(($selectedPeriod ?? 'semester') === 'monthly') style="color: #ffffff !important; background-color: #2563eb !important;" @endif>Bulanan</a>
                     <a href="{{ request()->fullUrlWithQuery(['period' => 'semester']) }}" 
-                       class="px-2.5 py-1.5 rounded-lg transition text-xs font-semibold {{ ($selectedPeriod ?? 'semester') === 'semester' ? 'period-pill-active bg-indigo-600 text-white font-bold shadow' : 'text-slate-400 hover:text-white' }}"
+                       class="px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg transition text-[11px] sm:text-xs font-semibold shrink-0 whitespace-nowrap {{ ($selectedPeriod ?? 'semester') === 'semester' ? 'period-pill-active bg-indigo-600 text-white font-bold shadow' : 'text-slate-400 hover:text-white' }}"
                        @if(($selectedPeriod ?? 'semester') === 'semester') style="color: #ffffff !important; background-color: #2563eb !important;" @endif>Semester</a>
                 </div>
             </div>
